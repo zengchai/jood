@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "284356052717",
+    "project_id": "jood-f8d4f",
+    "storage_bucket": "jood-f8d4f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:284356052717:android:7285ba731e2bad1e3faee4",
+        "android_client_info": {
+          "package_name": "jojoeTech.com.jood"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKgXFRvr6YasIKvLssy3_wfy5zI6X_ZOo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
