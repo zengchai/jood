@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../services/auth.dart';
+import '../../shared/loading.dart';
 
 class Register extends StatefulWidget {
 
@@ -16,13 +17,14 @@ class _RegisterState extends State<Register> {
   final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
 
+  bool loading = false;
   String email = '';
   String password = '';
   String error = '';
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return loading ? Loading() : Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: Color(0xFF7b5916).withOpacity(0.75),
@@ -92,13 +94,18 @@ class _RegisterState extends State<Register> {
                       ElevatedButton(
                         onPressed: () async{
                           if(_formKey.currentState!.validate()){
+                            setState(() {
+                              loading = true;
+                            });
                             dynamic result = await _auth.registerWithEmailAndPassword(email, password);
                             if(result == null){
                               setState(() {
+                                loading = false;
                                 error = 'Please supply a valid email';
                               });
                             }
                             else {
+                              print('Navigating to register screen.');
                               Navigator.pop(context);
                             }
                           }
