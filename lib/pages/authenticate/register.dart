@@ -19,6 +19,7 @@ class _RegisterState extends State<Register> {
 
   bool loading = false;
   String email = '';
+  String name = '';
   String password = '';
   String error = '';
 
@@ -48,6 +49,28 @@ class _RegisterState extends State<Register> {
                       SizedBox(height: 50.0),
                       TextFormField(
                         decoration: InputDecoration(
+                            hintText: 'Name', // Add your placeholder text
+                            fillColor: Colors.white,
+                            filled: true,
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(4.0), // Set the border radius here
+                                borderSide: BorderSide(color: Color(0xFFF6B22D).withOpacity(0.25), width: 2.0)
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.0), // Set the border radius here
+                                borderSide: BorderSide(color: Color(0xFFF6B22D).withOpacity(0.75), width: 2.0)
+                            )
+                        ),
+                        validator: (val) => val!.isEmpty ? 'Enter an name': null,
+                        onChanged: (value){
+                          setState(() {
+                            name = value;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 30.0),
+                      TextFormField(
+                        decoration: InputDecoration(
                           hintText: 'Email', // Add your placeholder text
                           fillColor: Colors.white,
                           filled: true,
@@ -70,18 +93,18 @@ class _RegisterState extends State<Register> {
                       SizedBox(height: 30.0),
                       TextFormField(
                           decoration: InputDecoration(
-                        hintText: 'Password',
-                            fillColor: Colors.white,
-                            filled: true,// Add your placeholder text
-                            enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(4.0), // Set the border radius here
-                                borderSide: BorderSide(color: Color(0xFFF6B22D).withOpacity(0.25), width: 2.0)
-                            ),
+                              hintText: 'Password',
+                              fillColor: Colors.white,
+                              filled: true,// Add your placeholder text
+                              enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(4.0), // Set the border radius here
+                                  borderSide: BorderSide(color: Color(0xFFF6B22D).withOpacity(0.25), width: 2.0)
+                              ),
                               focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12.0), // Set the border radius here
                                   borderSide: BorderSide(color: Color(0xFFF6B22D).withOpacity(0.75), width: 2.0)
-                      )
-                      ),
+                              )
+                          ),
                           validator: (val) => val!.length<6 ? 'Enter a password 6+ chars long': null,
                           obscureText: true,
                           onChanged: (val){
@@ -97,7 +120,7 @@ class _RegisterState extends State<Register> {
                             setState(() {
                               loading = true;
                             });
-                            dynamic result = await _auth.registerWithEmailAndPassword(email, password);
+                            dynamic result = await _auth.registerWithEmailAndPassword(email, password, name);
                             if(result == null){
                               setState(() {
                                 loading = false;
