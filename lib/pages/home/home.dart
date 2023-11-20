@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jood/models/userprofile.dart';
-import 'package:jood/pages/home/profiledetail.dart';
+import 'package:jood/pages/home/addressForm.dart';
 import 'package:jood/pages/payment/payment.dart';
 import 'package:jood/services/auth.dart';
 import 'package:jood/services/database.dart';
@@ -18,7 +18,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final AuthService _auth = AuthService();
 
   int _selectedIndex = 0;
 
@@ -30,6 +29,16 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    void _showPanel(){
+      showModalBottomSheet(
+          context: context,
+          builder: (context){
+            return Container(
+              padding: EdgeInsets.symmetric(vertical: 20,horizontal: 20),
+              child: addressForm(),
+            );
+          });
+    }
     final currentUser = Provider.of<AppUsers?>(context);
     return StreamProvider<UserProfile>.value(
       value: DatabaseService(uid: currentUser!.uid).useraccount,
@@ -49,12 +58,29 @@ class _HomeState extends State<Home> {
           backgroundColor: Colors.white,
           elevation: 0.0,
           actions: <Widget>[
+            TextButton(
+                onPressed: () => _showPanel(),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.location_on,
+                      color: Color(0xFF3C312B).withOpacity(0.75),
+                    ),
+                    SizedBox(width: 10,),
+                    Text('Edit Location',
+                      style: TextStyle(
+                        color: Color(0xFF3C312B).withOpacity(0.75),
+                      ),),
+                  ],
+                )),
             TextButton.icon(
                 onPressed: () async {
-                  await _auth.signOut();
+                  await Navigator.pushNamed(context, '/cart');
                 },
-                icon: Icon(Icons.people),
-                label: Text('Logout'))
+                icon: Icon(Icons.shopping_bag_outlined,
+                  color: Color(0xFF3C312B).withOpacity(0.75),
+                ),
+                label: Text(''))
           ],
         ),
         body: IndexedStack(

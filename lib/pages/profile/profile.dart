@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/userprofile.dart';
+import '../../services/auth.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -11,6 +12,8 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _PaymentState extends State<ProfilePage> {
+
+  final AuthService _auth = AuthService();
   @override
   Widget build(BuildContext context) {
     final profile = Provider.of<UserProfile>(context);
@@ -53,6 +56,21 @@ class _PaymentState extends State<ProfilePage> {
                     ),
                     child: Text(
                       'Sign In',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  SizedBox(height: 20,),
+                  ElevatedButton(
+                    onPressed: () async{
+                      await _auth.signOut();
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B).withOpacity(0.75),),
+                      foregroundColor: MaterialStateProperty.all<Color>(Color(0xFFFFFFCC)),
+                      minimumSize: MaterialStateProperty.all<Size>(Size(300, 40)),
+                    ),
+                    child: Text(
+                      'Sign Out',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
