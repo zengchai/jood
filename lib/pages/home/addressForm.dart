@@ -17,16 +17,6 @@ class _addressFormState extends State<addressForm> {
       key: _formKey,
       child: Column(
         children: <Widget>[
-          Text(
-            'Address',
-            style: TextStyle(fontSize: 18.0),
-          ),
-          SizedBox(height: 10,),
-          Divider(
-            height: 20, // Adjust the height of the line
-            thickness: 1.4, // Adjust the thickness of the line
-            color: Colors.black.withOpacity(0.3),
-          ),
           SizedBox(height: 35,),
           TextFormField(
             decoration: InputDecoration(

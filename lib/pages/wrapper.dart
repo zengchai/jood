@@ -15,11 +15,7 @@ class Wrapper extends StatelessWidget {
       return Authenticate();
     }
     else{
-    if(currentUser!.uid =='Pbzg09v1v5Q1ZrNLr92PyqxQ1QG2'){
-    return AdminHome();
-    }
-    else{
       print('User detected. Navigating to Home screen.');
       return Home();
-    }}
+    }
 }}
