@@ -5,6 +5,7 @@ class DatabaseService{
   final String uid;
   DatabaseService({ required this.uid});
   final CollectionReference Jood =  FirebaseFirestore.instance.collection('User');
+  final CollectionReference paymentCollection = FirebaseFirestore.instance.collection('payments');
 
   Future updateUserData(String name,String email) async {
     return await Jood.doc(uid).set({
@@ -12,5 +13,13 @@ class DatabaseService{
       'email': email,
     });
   }
+  Future updatePaymentData(String Pmethod,String amount) async {
+    return await paymentCollection.doc(uid).set({
+      'Pmethod': Pmethod,
+      'amount': amount,
+    });
+  }
+
+
 
 }
