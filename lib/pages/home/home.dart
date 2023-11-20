@@ -89,7 +89,7 @@ class _HomeState extends State<Home> {
             // Page 1 content
             MenuPage(),
             // Page 2 content
-            PaymentPage(),
+            Payment(),
             ProfilePage(),
           ],
         ),

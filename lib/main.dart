@@ -34,7 +34,9 @@ class MyApp extends StatelessWidget {
           '/home': (context) => Home(),
           '/signin': (context) => SignIn(),
           '/signup': (context) => Register(),
-          '/cart': (context) => Cart(),
+          '/cart': (context) => Payment(),
+
+
         },
         home: Wrapper(),
       ),

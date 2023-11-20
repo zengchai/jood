@@ -7,6 +7,7 @@ class DatabaseService{
   DatabaseService({ required this.uid});
   DatabaseService.noParams();
   final CollectionReference Jood =  FirebaseFirestore.instance.collection('User');
+  final CollectionReference paymentCollection = FirebaseFirestore.instance.collection('payments');
 
   Future updateUserData(String name,String email,String matricnum,String phonenum,String address) async {
     return await Jood.doc(uid).set({
@@ -17,6 +18,14 @@ class DatabaseService{
       'address': address,
     });
   }
+  Future updatePaymentData(String Pmethod,String amount) async {
+    return await paymentCollection.doc(uid).set({
+      'Pmethod': Pmethod,
+      'amount': amount,
+    });
+  }
+
+
 
 // Convert a single document snapshot to a UserProfile
   UserProfile _userProfileFromSnapshot(DocumentSnapshot snapshot) {
