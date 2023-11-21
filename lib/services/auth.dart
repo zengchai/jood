@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:jood/models/users.dart';
+import 'package:jood/services/database.dart';
 
 class AuthService{
 
@@ -21,6 +22,7 @@ Future signInAnon() async {
   try{
     UserCredential result  = await _auth.signInAnonymously();
     User? users = result.user;
+
     return _userFromFirebaseUser(users!);
   }
   catch(e){
@@ -40,11 +42,14 @@ Future signInAnon() async {
     }
   }
   // register with email & password
-  Future registerWithEmailAndPassword (String email, String password) async {
+  Future registerWithEmailAndPassword (String email, String password, String name) async {
     try{
       UserCredential result  = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       User? users = result.user;
-      return _userFromFirebaseUser(users!);
+      //create a new document for the new user with the uid
+      await DatabaseService(uid: users!.uid).updateUserData(name, email,'','','');
+      await DatabaseService(uid: users!.uid).updatePaymentData('TnG', '0.00');
+      return _userFromFirebaseUser(users);
     } catch(e){
       print(e.toString());
       return null;
