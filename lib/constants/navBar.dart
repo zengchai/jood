@@ -28,6 +28,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
             label: 'HOME',
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Menu',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.list_alt),
             label: 'ORDER',
           ),
