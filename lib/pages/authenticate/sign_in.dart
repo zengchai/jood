@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jood/services/auth.dart';
 
+import '../../shared/loading.dart';
+
 class SignIn extends StatefulWidget {
 
   // final Function toggleView;
@@ -14,7 +16,7 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
 
   final AuthService _auth = AuthService();
-
+  bool loading = false;
   final _formKey = GlobalKey<FormState>();
 
   String email = '';
@@ -23,7 +25,7 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return loading ? Loading() : Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.brown[400],
@@ -95,9 +97,13 @@ class _SignInState extends State<SignIn> {
         ElevatedButton(
             onPressed: () async{
               if(_formKey.currentState!.validate()){
+                setState(() {
+                  loading = true;
+                });
                 dynamic result = await _auth.signInWithEmailAndPassword(email, password);
                 if(result == null){
                   setState(() {
+                    loading = false;
                     error = 'Your email or password is wrong';
                   });
                 }
