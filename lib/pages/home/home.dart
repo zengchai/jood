@@ -72,7 +72,7 @@ class _HomeState extends State<Home> {
     bool showCustomer = true;
     final currentUser = Provider.of<AppUsers?>(context);
 
-    if(currentUser!.uid =='Pbzg09v1v5Q1ZrNLr92PyqxQ1QG2'){
+    if(currentUser!.uid =='TnDmXCiJINXWdNBhfZvuAFCuaSL2'){
       showCustomer = false;
     }else{
       showCustomer = true;
@@ -106,18 +106,23 @@ class _HomeState extends State<Home> {
           actions: <Widget>[
             TextButton(
                 onPressed: () => _showPanel(),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.location_on,
-                      color: Color(0xFF3C312B).withOpacity(0.75),
-                    ),
-                    SizedBox(width: 10,),
-                    Text(addressController.text,
-                      style: TextStyle(
+                child: Container(
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
                         color: Color(0xFF3C312B).withOpacity(0.75),
-                      ),),
-                  ],
+                      ),
+                      SizedBox(width: 14,),
+                      Text(
+                        addressController.text.length > 14
+                          ? '${addressController.text.substring(0, 14)}...' // Display first 20 characters
+                          : addressController.text,
+                        style: TextStyle(
+                          color: Color(0xFF3C312B).withOpacity(0.75),
+                        ),),
+                    ],
+                  ),
                 )),
             TextButton.icon(
                 onPressed: () async {

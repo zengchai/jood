@@ -60,7 +60,23 @@ class _EditProfileState extends State<EditProfile> {
     };
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        iconTheme: IconThemeData(
+          color: Colors.black, // Set the color you want for the back button
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0.0,
+        title: Text('Profile',
+          style: TextStyle(color: Colors.black),
+        ),
+        centerTitle: true, // Center the title
+      ),
       body: FutureBuilder<UserProfile?>(
         // Use FutureBuilder to wait for the Future<UserProfile> to complete
         future: DatabaseService(uid: Provider.of<AppUsers?>(context)!.uid)
@@ -82,98 +98,121 @@ class _EditProfileState extends State<EditProfile> {
             addressController.text = '${user.address}';
             return ListView(
               children: [Container(
+                padding: EdgeInsets.symmetric(vertical: 20.0,horizontal: 50.0),
                 child: Column(
                   children: [
-                    TextFormField(
-                      controller: nameController,
-                      decoration: InputDecoration(
-                          fillColor: Colors.white,
-                          filled: true,
-                          hintText: 'Name', // Add your placeholder text
-                          enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(4.0), // Set the border radius here
-                              borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0), // Set the border radius here
-                              borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
-                          )
+                    Container(
+                      child: Column(
+                          children: [Text('Name'),
+                                    TextFormField(
+                        controller: nameController,
+                        decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 15.0),
+                            fillColor: Colors.white,
+                            filled: true,
+                            hintText: 'Name', // Add your placeholder text
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(4.0), // Set the border radius here
+                                borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.0), // Set the border radius here
+                                borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
+                            )
+                        ),
+                        validator: (val) => val!.isEmpty ? 'Enter a name': null,
                       ),
-                      validator: (val) => val!.isEmpty ? 'Enter a name': null,
-                    ),
-                    SizedBox(height: 30.0),
-                    TextFormField(
-                      controller: emailController,
-                      enabled: false,
-                      decoration: InputDecoration(
-                          fillColor: Colors.white,
-                          filled: true,
-                          hintText: 'Email', // Add your placeholder text
-                          enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(4.0), // Set the border radius here
-                              borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
+                                    SizedBox(height: 30.0),]
+                              )
                           ),
-                          focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0), // Set the border radius here
-                              borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
-                          )
-                      ),
-                      validator: (val) => val!.isEmpty ? 'Enter a email': null,
-                    ),
-                    SizedBox(height: 30.0),
-                    TextFormField(
-                      controller: matricController,
-                      decoration: InputDecoration(
-                          fillColor: Colors.white,
-                          filled: true,
-                          hintText: 'Matric Number', // Add your placeholder text
-                          enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(4.0), // Set the border radius here
-                              borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0), // Set the border radius here
-                              borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
-                          )
-                      ),
-                      validator: (val) => val!.isEmpty ? 'Enter a matric number': null,
-                    ),
-                    SizedBox(height: 30.0),
-                    TextFormField(
-                      controller: phonenumController,
-                      decoration: InputDecoration(
-                          fillColor: Colors.white,
-                          filled: true,
-                          hintText: 'Phone Number', // Add your placeholder text
-                          enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(4.0), // Set the border radius here
-                              borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0), // Set the border radius here
-                              borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
-                          )
-                      ),
-                      validator: (val) => val!.isEmpty ? 'Enter a phone number': null,
-                    ),
-                    SizedBox(height: 30.0),
-                    TextFormField(
-                      controller: addressController,
-                      decoration: InputDecoration(
-                          fillColor: Colors.white,
-                          filled: true,
-                          hintText: 'Address', // Add your placeholder text
-                          enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(4.0), // Set the border radius here
-                              borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0), // Set the border radius here
-                              borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
-                          )
-                      ),
-                      validator: (val) => val!.isEmpty ? 'Enter an address': null,
-                    ),
+                    Container(
+                      child: Column(
+                          children: [Text('Email'),
+                                    TextFormField(
+                                    controller: emailController,
+                                    enabled: false,
+                                    decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 15.0),
+                                        fillColor: Colors.white,
+                                        filled: true,
+                                        hintText: 'Email', // Add your placeholder text
+                                        enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(4.0), // Set the border radius here
+                                            borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(12.0), // Set the border radius here
+                                            borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
+                                        )
+                                    ),
+                                    validator: (val) => val!.isEmpty ? 'Enter a email': null,
+                                  ),
+                                  SizedBox(height: 30.0),])),
+                    Container(
+                        child: Column(
+                            children: [Text('Matric Number'),
+                              TextFormField(
+                                controller: matricController,
+                                decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 15.0),
+                                    fillColor: Colors.white,
+                                    filled: true,
+                                    hintText: 'Email', // Add your placeholder text
+                                    enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(4.0), // Set the border radius here
+                                        borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12.0), // Set the border radius here
+                                        borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
+                                    )
+                                ),
+                                validator: (val) => val!.isEmpty ? 'Enter a matric number': null,
+                              ),
+                              SizedBox(height: 30.0),])),
+                    Container(
+                        child: Column(
+                            children: [Text('Phone Number'),
+                              TextFormField(
+                                controller: phonenumController,
+                                decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 15.0),
+                                    fillColor: Colors.white,
+                                    filled: true,
+                                    hintText: 'Email', // Add your placeholder text
+                                    enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(4.0), // Set the border radius here
+                                        borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12.0), // Set the border radius here
+                                        borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
+                                    )
+                                ),
+                                validator: (val) => val!.isEmpty ? 'Enter a phone number': null,
+                              ),
+                              SizedBox(height: 30.0),])),
+                    Container(
+                        child: Column(
+                            children: [Text('Address'),
+                              TextFormField(
+                                controller: addressController,
+                                decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 15.0),
+                                    fillColor: Colors.white,
+                                    filled: true,
+                                    hintText: 'Address', // Add your placeholder text
+                                    enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(4.0), // Set the border radius here
+                                        borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12.0), // Set the border radius here
+                                        borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
+                                    )
+                                ),
+                                validator: (val) => val!.isEmpty ? 'Enter a address': null,
+                              )])),
                     SizedBox(height:50.0),
                     ElevatedButton(
                       onPressed: () async{
