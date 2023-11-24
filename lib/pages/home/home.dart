@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jood/models/userprofile.dart';
+import 'package:jood/pages/Order/orderPage.dart';
 import 'package:jood/pages/home/addressForm.dart';
 import 'package:jood/pages/payment/payment.dart';
 import 'package:jood/services/auth.dart';
@@ -111,7 +112,7 @@ class _HomeState extends State<Home> {
             // Page 1 content
             MenuPage(),
             // Page 2 content
-            Payment(),
+            OrderPage(),
             ProfilePage(),
           ],
         ),

@@ -10,11 +10,11 @@ class Wrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentUser = Provider.of<AppUsers?>(context);
-    if (currentUser == null){
+    if (currentUser == null) {
       return Authenticate();
-    }
-    else{
+    } else {
       print('User detected. Navigating to Home screen.');
       return Home();
     }
-}}
+  }
+}
