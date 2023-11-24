@@ -1,13 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jood/models/userprofile.dart';
 
-class DatabaseService{
-
+class DatabaseService {
   late final String uid;
-  DatabaseService({ required this.uid});
+  DatabaseService({required this.uid});
   DatabaseService.noParams();
-  final CollectionReference Jood =  FirebaseFirestore.instance.collection('User');
-  final CollectionReference paymentCollection = FirebaseFirestore.instance.collection('payments');
+  final CollectionReference Jood =
+      FirebaseFirestore.instance.collection('User');
+  final CollectionReference paymentCollection =
+      FirebaseFirestore.instance.collection('payments');
+  final CollectionReference orderCollection =
+      FirebaseFirestore.instance.collection('orders');
 
   Future setUserData(String uid,String name,String email,String matricnum,String phonenum,String address) async {
     return await Jood.doc(uid).set({
@@ -37,14 +40,20 @@ class DatabaseService{
     });
   }
 
-  Future updatePaymentData(String Pmethod,String amount) async {
+  Future updatePaymentData(String Pmethod, String amount) async {
     return await paymentCollection.doc(uid).set({
       'Pmethod': Pmethod,
       'amount': amount,
     });
   }
 
-
+  Future updateOrderData(String fName, String price, String status) async {
+    return await orderCollection.doc(uid).set({
+      'fName': fName,
+      'price': price,
+      'status': status,
+    });
+  }
 
 // Convert a single document snapshot to a UserProfile
   UserProfile _userProfileFromSnapshot(DocumentSnapshot snapshot) {

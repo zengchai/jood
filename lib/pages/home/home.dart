@@ -47,34 +47,38 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    void _showPanel(){
+    void _showPanel() {
       showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-                title: Text('Address'),
-                contentPadding: EdgeInsets.all(0),
-                content: Container(
-                  width: MediaQuery.of(context).size.width,
-                  child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [ Container(
-                      padding: EdgeInsets.symmetric(vertical: 30,horizontal: 20),
-                      child: addressForm(),
-                    )],
-                  ),
-                ),
-            );
-          },
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Address'),
+            contentPadding: EdgeInsets.all(0),
+            content: Container(
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                    child: addressForm(),
+                  )
+                ],
+              ),
+            ),
+          );
+        },
       );
-    };
+    }
+
+    ;
 
     bool showCustomer = true;
     final currentUser = Provider.of<AppUsers?>(context);
 
     if(currentUser!.uid =='TnDmXCiJINXWdNBhfZvuAFCuaSL2'){
       showCustomer = false;
-    }else{
+    } else {
       showCustomer = true;
     }
 
