@@ -83,7 +83,7 @@ class _HomeState extends State<Home> {
     }
 
     return StreamProvider<UserProfile>.value(
-      value: DatabaseService(uid: currentUser!.uid).useraccount,
+    value: DatabaseService(uid: currentUser!.uid).useraccount,
       initialData: UserProfile.defaultInstance(),
       child: Consumer<UserProfile>(
         builder: (context, userProfile, _) {
