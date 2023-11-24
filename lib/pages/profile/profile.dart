@@ -48,6 +48,7 @@ class _PaymentState extends State<ProfilePage> {
                   SizedBox(height: 30,),
                   ElevatedButton(
                     onPressed: () async{
+                      await Navigator.pushNamed(context, '/editprofile');
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B).withOpacity(0.75),),
@@ -55,7 +56,22 @@ class _PaymentState extends State<ProfilePage> {
                       minimumSize: MaterialStateProperty.all<Size>(Size(300, 40)),
                     ),
                     child: Text(
-                      'Sign In',
+                      'Edit profile',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  SizedBox(height: 20,),
+                  ElevatedButton(
+                    onPressed: () async{
+                      await _auth.deleteUserAccount();
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B).withOpacity(0.75),),
+                      foregroundColor: MaterialStateProperty.all<Color>(Color(0xFFFFFFCC)),
+                      minimumSize: MaterialStateProperty.all<Size>(Size(300, 40)),
+                    ),
+                    child: Text(
+                      'Delete account',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
