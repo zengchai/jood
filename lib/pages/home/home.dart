@@ -21,11 +21,28 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
   int _selectedIndex = 0;
+  TextEditingController addressController = TextEditingController();
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeAddressController();
+  }
+
+  Future<void> _initializeAddressController() async {
+    final currentUser = Provider.of<AppUsers?>(context, listen: false);
+    final userProfile = await DatabaseService(uid: currentUser!.uid).getUserProfile(currentUser.uid);
+    if (addressController != null) {
+      setState(() {
+        addressController.text = userProfile?.address ?? '';
+      });
+    }
   }
 
   @override
@@ -60,10 +77,16 @@ class _HomeState extends State<Home> {
     }else{
       showCustomer = true;
     }
+
     return StreamProvider<UserProfile>.value(
       value: DatabaseService(uid: currentUser!.uid).useraccount,
       initialData: UserProfile.defaultInstance(),
-      child: showCustomer ?
+      child: Consumer<UserProfile>(
+        builder: (context, userProfile, _) {
+      // Update addressController when userProfile changes
+      addressController.text = userProfile.address ?? '';
+
+      return showCustomer ?
 
       // If he/she is a customer
       Scaffold(
@@ -90,7 +113,7 @@ class _HomeState extends State<Home> {
                       color: Color(0xFF3C312B).withOpacity(0.75),
                     ),
                     SizedBox(width: 10,),
-                    Text('Edit Location',
+                    Text(addressController.text,
                       style: TextStyle(
                         color: Color(0xFF3C312B).withOpacity(0.75),
                       ),),
@@ -162,6 +185,6 @@ class _HomeState extends State<Home> {
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
       ),
-    ));
+    );}));
   }
 }
