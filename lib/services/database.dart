@@ -30,7 +30,7 @@ class DatabaseService {
     });
   }
 
-  Future updateOrderData(String fName, double price, String status) async {
+  Future updateOrderData(String fName, String price, String status) async {
     return await orderCollection.doc(uid).set({
       'fName': fName,
       'price': price,
