@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_string_interpolations
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:jood/pages/payment/payment.dart';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({Key? key}) : super(key: key);
@@ -29,7 +29,10 @@ class OrderItem {
 }
 
 class _OrderPageState extends State<OrderPage> {
-  List<OrderItem> orderItems = [
+  late PageController _pageController;
+  int _currentPageIndex = 0;
+
+  List<OrderItem> ongoingItems = [
     OrderItem(
         orderID: '#1234',
         name: 'Fried Mee',
@@ -38,92 +41,147 @@ class _OrderPageState extends State<OrderPage> {
         price: 7.0,
         status: 'Order Preparing'),
     OrderItem(
-        orderID: '#5678',
+        orderID: '#2345',
         name: 'Fried Rice',
         image: 'assets/friedrice.jpeg',
         quantity: 1,
         price: 6.0,
         status: 'Order Preparing'),
+    // Add more ongoing items as needed
   ];
 
-//Date
+  List<OrderItem> historyItems = [
+    OrderItem(
+        orderID: '#5678',
+        name: 'Fried Rice',
+        image: 'assets/friedrice.jpeg',
+        quantity: 1,
+        price: 6.0,
+        status: 'Order Delivered'),
+    // Add more history items as needed
+  ];
+
+  // Date
   late DateTime currentDate = DateTime.now();
   late String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _currentPageIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _navigateToPage(int pageIndex) {
+    setState(() {
+      _currentPageIndex = pageIndex;
+    });
+    _pageController.animateToPage(
+      pageIndex,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "MY ORDER",
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 0, 0, 0),
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "MY ORDER",
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 0, 0, 0),
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Icon(
+                      Icons.calendar_today,
+                      color: Colors.black,
                     ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Icon(
-                        Icons.calendar_today,
+                    SizedBox(width: 4.0),
+                    Text(
+                      formattedDate,
+                      style: TextStyle(
                         color: Colors.black,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.bold,
                       ),
-                      SizedBox(width: 4.0),
-                      Text(
-                        formattedDate,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 15.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  TextButton(
-                    onPressed: () {},
-                    child: Text('Ongoing'),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton(
+                  onPressed: () => _navigateToPage(0),
+                  style: TextButton.styleFrom(
+                    backgroundColor: _currentPageIndex == 0
+                        ? Color.fromARGB(
+                            255, 250, 169, 63) // Highlight the selected button
+                        : null,
                   ),
-                  TextButton(
-                    onPressed: () {},
-                    child: Text('History'),
+                  child: Text('Ongoing'),
+                ),
+                TextButton(
+                  onPressed: () => _navigateToPage(1),
+                  style: TextButton.styleFrom(
+                    backgroundColor: _currentPageIndex == 1
+                        ? Color.fromARGB(
+                            255, 250, 169, 63) // Highlight the selected button
+                        : null,
                   ),
-                ],
-              ),
+                  child: Text('History'),
+                ),
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-              child: Column(
-                children: [
-                  // ListView.builder to dynamically create order item cards
-                  ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: orderItems.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return _buildOrderItemCard(orderItems[index]);
-                    },
-                  ),
-                ],
-              ),
+          ),
+          Expanded(
+            child: PageView(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentPageIndex = index;
+                });
+              },
+              children: [
+                _buildOrderList(ongoingItems),
+                _buildOrderList(historyItems),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildOrderList(List<OrderItem> items) {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: items.length,
+      itemBuilder: (BuildContext context, int index) {
+        return _buildOrderItemCard(items[index]);
+      },
     );
   }
 
@@ -156,7 +214,7 @@ class _OrderPageState extends State<OrderPage> {
                   bottomRight: Radius.circular(30)),
             ),
             child: ListTile(
-              contentPadding: EdgeInsets.all(8), // Adjusted content padding
+              contentPadding: EdgeInsets.all(8),
               leading: Image.asset(
                 orderItem.image,
                 width: 60,
