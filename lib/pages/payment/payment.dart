@@ -80,7 +80,7 @@ class _PaymentState extends State<Payment> {
   final AuthService _auth = AuthService();
   int _selectedIndex = 2;
 
-  //replace with real data
+  // replace with real data
   List<FoodItem> foodItems = [
     FoodItem(name: 'FriedMee', image: 'assets/friedmee.jpeg', quantity: 2, price: 7.0),
     FoodItem(name: 'FriedRice', image: 'assets/friedrice.jpeg', quantity: 1, price: 6.0),
@@ -90,21 +90,16 @@ class _PaymentState extends State<Payment> {
     return foodItems.fold(0, (sum, item) => sum + item.price * item.quantity);
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.brown[50],
-      appBar: AppBar(
-        backgroundColor: Color(0xFF7b5916).withOpacity(0.75),
-        elevation: 0.0,
-        actions: <Widget>[],
-      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(15.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            CustomStepIndicator(currentStep: currentStep), // Add the step indicator
             Text(
               'Food Items',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -122,12 +117,9 @@ class _PaymentState extends State<Payment> {
             _buildTotalPrice(),
             SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async{
                 // Navigate to another page for payment
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => PaymentConfirmationPage()),
-                );
+                await Navigator.pushNamed(context, '/method');
               },
               child: Text('Pay'),
             ),
@@ -217,18 +209,24 @@ class _PaymentState extends State<Payment> {
       }
     });
   }
-}
 
-class PaymentConfirmationPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Payment Confirmation'),
-      ),
-      body: Center(
-        child: Text('Payment successful!'),
-      ),
-    );
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    switch (index) {
+      case 0:
+        Navigator.pushReplacementNamed(context, '/home');
+        break;
+      case 1:
+        Navigator.pushReplacementNamed(context, '/menu');
+        break;
+      case 2:
+        Navigator.pushReplacementNamed(context, '/payment');
+        break;
+      case 3:
+        Navigator.pushReplacementNamed(context, '/profile');
+        break;
+    }
   }
 }
