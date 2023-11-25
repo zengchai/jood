@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:jood/pages/Order/reviewForm.dart';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({Key? key}) : super(key: key);
@@ -10,9 +11,62 @@ class OrderPage extends StatefulWidget {
   State<OrderPage> createState() => _OrderPageState();
 }
 
+
 class _OrderPageState extends State<OrderPage> {
+
+  final _formKey = GlobalKey<FormState>();
+  late final String review;
   @override
   Widget build(BuildContext context) {
+    void _popupReview(){
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Review'),
+            contentPadding: EdgeInsets.all(0),
+            content: Container(
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          leading: Image.asset(
+                            'assets/friedmee.jpeg',
+                            width: 120,
+                            height: 120,
+                          ),
+                          title: Text("Fried Mee"),
+                          subtitle: Text('RM7.0'),
+                        ),
+                        SizedBox(height: 20), // Add some spacing between ListTile and TextField
+                        // TextField(
+                        //   decoration: InputDecoration(
+                        //     labelText: 'Enter text',
+                        //     border: OutlineInputBorder(),
+                        //   ),
+                        // ),
+                        // ElevatedButton(
+                        //   onPressed: (){
+                        //
+                        //   },
+                        //   child: Text('Submit'),
+                        // ),
+                        reviewForm(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    };
     //Date
     DateTime currentDate = DateTime.now();
     String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
@@ -101,12 +155,28 @@ class _OrderPageState extends State<OrderPage> {
                       borderRadius: BorderRadius.circular(30.0),
                     ),
                     child: Container(
+                      padding: const EdgeInsets.fromLTRB(0, 60, 20, 0),
                       width: 400,
                       decoration: BoxDecoration(
                         color: Color.fromRGBO(248, 232, 209, 1),
                         borderRadius: BorderRadius.only(
                             bottomLeft: Radius.circular(30),
                             bottomRight: Radius.circular(30)),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Align(
+                              alignment: Alignment.bottomRight,
+                              child: ElevatedButton(
+                                onPressed: (){
+                                  _popupReview();
+                                },
+                                child: Text('Rate'),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ),

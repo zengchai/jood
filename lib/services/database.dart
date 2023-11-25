@@ -8,6 +8,7 @@ class DatabaseService{
   DatabaseService.noParams();
   final CollectionReference Jood =  FirebaseFirestore.instance.collection('User');
   final CollectionReference paymentCollection = FirebaseFirestore.instance.collection('payments');
+  final CollectionReference reviewCollection = FirebaseFirestore.instance.collection('reviews');
 
   Future updateUserData(String name,String email,String matricnum,String phonenum,String address) async {
     return await Jood.doc(uid).set({
@@ -22,6 +23,14 @@ class DatabaseService{
     return await paymentCollection.doc(uid).set({
       'Pmethod': Pmethod,
       'amount': amount,
+    });
+  }
+
+  Future updateReviewData(String RfoodName,String RfoodPrice, String RfoodReview) async {
+    return await reviewCollection.doc(uid).set({
+      'RfoodName': RfoodName,
+      'RfoodPrice': RfoodPrice,
+      'RfoodReview' : RfoodReview
     });
   }
 
