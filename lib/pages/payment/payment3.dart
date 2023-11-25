@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jood/services/auth.dart';
 
 class CustomStepIndicator extends StatelessWidget {
   final int currentStep;
@@ -13,11 +12,11 @@ class CustomStepIndicator extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildStep(1, isFirst: true),
+          _buildStep(1),
           _buildBridge(),
           _buildStep(2),
           _buildBridge(),
-          _buildStep(3),
+          _buildStep(3, isFirst: true),
         ],
       ),
     );
@@ -56,103 +55,140 @@ class CustomStepIndicator extends StatelessWidget {
   }
 }
 
-
-class Payment extends StatefulWidget {
+class Receipt extends StatefulWidget {
   @override
-  _PaymentState createState() => _PaymentState();
+  _ReceiptState createState() => _ReceiptState();
 }
 
-class _PaymentState extends State<Payment> {
-  int currentStep=1;
-  final AuthService _auth = AuthService();
-  int _selectedIndex = 2;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    switch (index) {
-      case 0:
-        Navigator.pushReplacementNamed(context, '/home');
-        break;
-      case 1:
-        Navigator.pushReplacementNamed(context, '/menu');
-        break;
-      case 2:
-        Navigator.pushReplacementNamed(context, '/payment');
-        break;
-      case 3:
-        Navigator.pushReplacementNamed(context, '/profile');
-        break;
-    }
-  }
+class _ReceiptState extends State<Receipt> {
+  int currentStep = 3;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.brown[50],
-      appBar: AppBar(
-        leadingWidth: 120,
-        leading: Container(
-          padding: EdgeInsets.symmetric(vertical: 19, horizontal: 19),
-          child: Image.asset(
-            'assets/icon.png',
-            width: 50, // adjust the width as needed
-            height: 50, // adjust the height as needed
-          ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0.0,
-        actions: <Widget>[
-          TextButton.icon(
-              onPressed: () async {
-                await _auth.signOut();
+      body: Padding(
+        padding: const EdgeInsets.all(50.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CustomStepIndicator(currentStep: currentStep),
+            SizedBox(height: 30),
+            _buildConfirmationSection(),
+            Divider(height: 30, thickness: 2),
+            _buildPaymentDetails(),
+            SizedBox(height: 30),
+            ElevatedButton.icon(
+              onPressed: () {
+                // Handle download PDF action
+                //_downloadReceipt();
               },
-              icon: Icon(Icons.shopping_cart),
-              label: Text('Cart'))
-        ],
-      ),
-
-      body: Column(
-        children: [
-          CustomStepIndicator(currentStep: currentStep),
-          // Add other widgets or components here
-        ],
-      ),
-
-      //bottomNavigationBar=============================
-      bottomNavigationBar: Container(
-        height: 70.0, //height of bar
-        decoration: BoxDecoration(
-          border: Border.all(
-              color: const Color.fromARGB(255, 114, 114, 114).withOpacity(0.5), width: 0.5),
-        ),
-        child: BottomNavigationBar(
-          backgroundColor: Colors.white,
-          unselectedItemColor: Colors.grey,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'HOME',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.menu),
-              label: 'MENU',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.payments),
-              label: 'ORDER',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'ME',
+              icon: Icon(Icons.download),
+              label: Text('Download Receipt'),
             ),
           ],
-          currentIndex: _selectedIndex,
-          selectedItemColor: Colors.black,
-          onTap: _onItemTapped,
         ),
       ),
     );
   }
+
+  Widget _buildConfirmationSection() {
+    return Center(
+      child: Column(
+        children: [
+          Icon(
+            Icons.check_circle,
+            color: Colors.green,
+            size: 60.0,
+          ),
+          SizedBox(height: 10),
+          Text(
+            'Payment Confirmed',
+            style: TextStyle(
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentDetails() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top:10.0),
+          child: Text(
+            'Payment Details',
+            style: TextStyle(
+              fontSize: 24.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        SizedBox(height: 10),
+        _buildDetailItem('Order No', 'null'),
+        _buildDetailItem('Date & Time', 'null'),
+        _buildDetailItem('Payment Method', 'null'),
+        _buildDetailItem('Name', 'null'),
+        _buildDetailItem('Email', 'null'),
+      ],
+    );
+  }
+
+  Widget _buildDetailItem(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 18.0,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
+/*
+  void _downloadReceipt() {
+    // Create a PDF document
+    final pdf = pw.Document();
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Center(
+            child: pw.Text('Receipt Content Goes Here'),
+          );
+        },
+      ),
+    );
+
+    // Save the PDF to a file
+    savePDF(pdf);
+  }
+
+  Future<void> savePDF(pw.Document pdf) async {
+    final bytes = await pdf.save();
+    final blob = html.Blob([bytes]);
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.AnchorElement(href: url)
+      ..target = 'blank'
+      ..download = 'receipt.pdf'
+      ..click();
+    html.Url.revokeObjectUrl(url);
+  }
+}
+ */
