@@ -6,8 +6,10 @@ import 'package:jood/pages/payment/payment.dart';
 import 'package:jood/services/auth.dart';
 import 'package:jood/services/database.dart';
 import 'package:provider/provider.dart';
+
 import '../../constants/navBar.dart';
 import '../../models/users.dart';
+import '../categories/category_menu.dart';
 import '../menu/menu.dart';
 import '../profile/profile.dart';
 
@@ -142,7 +144,7 @@ class _HomeState extends State<Home> {
           index: _selectedIndex,
           children: [
             // Page 1 content
-            MenuPage(),
+            CategoryMenuScreen(),
             // Page 2 content
             OrderPage(),
             ProfilePage(),
@@ -184,7 +186,7 @@ class _HomeState extends State<Home> {
         index: _selectedIndex,
         children: [
           // Page 1 content
-          Payment(),
+          CategoryMenuScreen(),
           // Page 2 content
           MenuPage(),
           ProfilePage(),
