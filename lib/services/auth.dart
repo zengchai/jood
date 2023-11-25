@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart'; //yam
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:jood/models/users.dart';
+import 'package:jood/pages/Order/orderPage.dart'; //yam
 import 'package:jood/services/database.dart';
 
 class AuthService {
@@ -51,9 +53,11 @@ class AuthService {
           email: email, password: password);
       User? users = result.user;
       //create a new document for the new user with the uid
-      await DatabaseService(uid: users!.uid).updateUserData(name, email, '', '', '');
+      await DatabaseService(uid: users!.uid)
+          .updateUserData(name, email, '', '', '');
       await DatabaseService(uid: users!.uid).updatePaymentData('TnG', '0.00');
-      await DatabaseService(uid: users!.uid).updateOrderData('Fried Rice', '0.00', 'Order Preparing');
+      await DatabaseService(uid: users!.uid)
+          .updateOrderData('#2345', 'Fried Rice', 1, 6.00, 'Order Preparing');
       return _userFromFirebaseUser(users);
     } catch (e) {
       print(e.toString());

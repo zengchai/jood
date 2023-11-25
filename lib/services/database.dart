@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:jood/models/userprofile.dart';
+import 'package:jood/pages/Order/orderPage.dart';
+import 'package:jood/services/auth.dart';
 
 class DatabaseService {
   late final String uid;
@@ -30,9 +33,13 @@ class DatabaseService {
     });
   }
 
-  Future updateOrderData(String fName, String price, String status) async {
+//Storing an order
+  Future updateOrderData(String orderID, String name, int quantity,
+      double price, String status) async {
     return await orderCollection.doc(uid).set({
-      'fName': fName,
+      'orderID': orderID,
+      'name': name,
+      'quantity': quantity,
       'price': price,
       'status': status,
     });
