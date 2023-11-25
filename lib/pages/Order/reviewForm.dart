@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../models/users.dart';
 import '../../services/database.dart';
 
 class reviewForm extends StatefulWidget {
@@ -9,12 +11,17 @@ class reviewForm extends StatefulWidget {
   State<reviewForm> createState() => _reviewFormState();
 }
 
+
+
 class _reviewFormState extends State<reviewForm> {
 
   final _formKey = GlobalKey<FormState>();
-  late final String review;
+  String review = '';
   @override
   Widget build(BuildContext context) {
+
+    final currentUser = Provider.of<AppUsers?>(context);
+
     return Form(
       key: _formKey,
       child: Column(
@@ -26,15 +33,14 @@ class _reviewFormState extends State<reviewForm> {
             ),
             validator: (val) => val!.isEmpty ? 'Enter review': null,
             onChanged: (value){
-              setState(() {
                 review = value;
-              });
             },
           ),
           SizedBox(height: 5),
           ElevatedButton(
             onPressed: () async{
               //await DatabaseService(uid: users!.uid).updateReviewData('','','review');
+              await DatabaseService(uid: currentUser!.uid).updateReviewData('','', review);
             },
             child: Text('Submit'),
           ),
