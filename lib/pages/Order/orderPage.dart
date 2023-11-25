@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_string_interpolations
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:jood/pages/Order/reviewForm.dart';
 import 'package:jood/pages/payment/payment.dart';
 
 class OrderPage extends StatefulWidget {
@@ -9,6 +10,7 @@ class OrderPage extends StatefulWidget {
   @override
   State<OrderPage> createState() => _OrderPageState();
 }
+
 
 class OrderItem {
   final String orderID;
@@ -29,8 +31,53 @@ class OrderItem {
 }
 
 class _OrderPageState extends State<OrderPage> {
+
+  final _formKey = GlobalKey<FormState>();
+  late final String review;
   late PageController _pageController;
   int _currentPageIndex = 0;
+
+  void _popupReview() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Review'),
+          contentPadding: EdgeInsets.all(0),
+          content: Container(
+            width: MediaQuery
+                .of(context)
+                .size
+                .width,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: Image.asset(
+                          'assets/friedmee.jpeg',
+                          width: 120,
+                          height: 120,
+                        ),
+                        title: Text("Fried Mee"),
+                        subtitle: Text('RM7.0'),
+                      ),
+                      SizedBox(height: 20),
+                      // Add some spacing between ListTile and TextField
+                      reviewForm(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   List<OrderItem> ongoingItems = [
     OrderItem(
@@ -90,6 +137,11 @@ class _OrderPageState extends State<OrderPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    //Date
+    DateTime currentDate = DateTime.now();
+    String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -165,8 +217,8 @@ class _OrderPageState extends State<OrderPage> {
                 });
               },
               children: [
-                _buildOrderList(ongoingItems),
-                _buildOrderList(historyItems),
+                _buildOrderList(ongoingItems, false),
+                _buildOrderList(historyItems, true),
               ],
             ),
           ),
@@ -175,17 +227,17 @@ class _OrderPageState extends State<OrderPage> {
     );
   }
 
-  Widget _buildOrderList(List<OrderItem> items) {
+  Widget _buildOrderList(List<OrderItem> items, bool isHistoryPage) {
     return ListView.builder(
       shrinkWrap: true,
       itemCount: items.length,
       itemBuilder: (BuildContext context, int index) {
-        return _buildOrderItemCard(items[index]);
+        return _buildOrderItemCard(items[index], isHistoryPage);
       },
     );
   }
 
-  Widget _buildOrderItemCard(OrderItem orderItem) {
+  Widget _buildOrderItemCard(OrderItem orderItem, bool isHistoryPage) {
     return Container(
       margin: const EdgeInsets.all(16.0),
       child: Column(
@@ -231,6 +283,13 @@ class _OrderPageState extends State<OrderPage> {
                       Text('Quantity: ${orderItem.quantity}'),
                       Text('Price: \$${orderItem.price.toStringAsFixed(2)}'),
                       Text('Status: ${orderItem.status}'),
+                      if (isHistoryPage) // Conditionally show the review button
+                        ElevatedButton(
+                          onPressed: () {
+                            _popupReview();
+                          },
+                          child: Text('Give Review'),
+                        ),
                     ],
                   ),
                 ],
