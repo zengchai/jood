@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 import '../../constants/navBar.dart';
 import '../../models/users.dart';
 import '../categories/category_menu.dart';
-import '../menu/menu.dart';
 import '../profile/profile.dart';
 
 class Home extends StatefulWidget {
@@ -188,7 +187,6 @@ class _HomeState extends State<Home> {
           // Page 1 content
           CategoryMenuScreen(),
           // Page 2 content
-          MenuPage(),
           ProfilePage(),
         ],
       ),

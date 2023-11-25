@@ -51,6 +51,7 @@ Future signInAnon() async {
       //create a new document for the new user with the uid
       await DatabaseService(uid: users!.uid).setUserData(users.uid, name, email,'','','');
       await DatabaseService(uid: users!.uid).updatePaymentData('TnG', '0.00');
+      await DatabaseService(uid: users!.uid).updateReviewData('','','');
       await DatabaseService(uid: users!.uid).updateOrderData('Fried Rice', '0.00', 'Order Preparing');
       return _userFromFirebaseUser(users);
     } catch(e){

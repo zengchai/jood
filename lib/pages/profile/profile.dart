@@ -18,7 +18,7 @@ class _PaymentState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final profile = Provider.of<UserProfile>(context);
     return Scaffold(
-        backgroundColor: Colors.brown[50],
+        backgroundColor: Colors.white,
         body: ListView(
           children: [
             Center(
@@ -28,12 +28,12 @@ class _PaymentState extends State<ProfilePage> {
                   Column(
                       children: [
                         CircleAvatar(
-                          radius: 50,
+                          radius: 40,
                           backgroundColor: Color(0xFF3C312B).withOpacity(0.25),
                           child: Icon(
                             Icons.person,
                             color: Color(0xFF3C312B).withOpacity(0.75),
-                            size: 60,
+                            size: 40,
                           ),
                         ),
                         SizedBox(height: 20,),

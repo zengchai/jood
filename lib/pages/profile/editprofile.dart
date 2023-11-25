@@ -20,6 +20,7 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController matricController = TextEditingController();
   TextEditingController phonenumController = TextEditingController();
   TextEditingController addressController = TextEditingController();
+  bool nameEnable = false;
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +104,17 @@ class _EditProfileState extends State<EditProfile> {
                   children: [
                     Container(
                       child: Column(
-                          children: [Text('Name'),
+                          children: [
+                            Column(
+                            children: [
+                              Text('Name',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 17,),
+                              ),
+                              SizedBox(height: 10,)
+                            ],
+                          ),
                                     TextFormField(
                         controller: nameController,
                         decoration: InputDecoration(
@@ -111,13 +122,14 @@ class _EditProfileState extends State<EditProfile> {
                             fillColor: Colors.white,
                             filled: true,
                             hintText: 'Name', // Add your placeholder text
+                            enabled: nameEnable,
                             enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(4.0), // Set the border radius here
-                                borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
+                                borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0), width: 2.0)
                             ),
                             focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12.0), // Set the border radius here
-                                borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
+                                borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0), width: 2.0)
                             )
                         ),
                         validator: (val) => val!.isEmpty ? 'Enter a name': null,
@@ -156,6 +168,7 @@ class _EditProfileState extends State<EditProfile> {
                                 decoration: InputDecoration(
                                     contentPadding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 15.0),
                                     fillColor: Colors.white,
+                                    enabled: nameEnable,
                                     filled: true,
                                     hintText: 'Email', // Add your placeholder text
                                     enabledBorder: OutlineInputBorder(
@@ -175,6 +188,7 @@ class _EditProfileState extends State<EditProfile> {
                             children: [Text('Phone Number'),
                               TextFormField(
                                 controller: phonenumController,
+                                enabled: nameEnable,
                                 decoration: InputDecoration(
                                     contentPadding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 15.0),
                                     fillColor: Colors.white,
@@ -197,6 +211,7 @@ class _EditProfileState extends State<EditProfile> {
                             children: [Text('Address'),
                               TextFormField(
                                 controller: addressController,
+                                enabled: nameEnable,
                                 decoration: InputDecoration(
                                     contentPadding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 15.0),
                                     fillColor: Colors.white,
@@ -214,20 +229,35 @@ class _EditProfileState extends State<EditProfile> {
                                 validator: (val) => val!.isEmpty ? 'Enter a address': null,
                               )])),
                     SizedBox(height:50.0),
-                    ElevatedButton(
-                      onPressed: () async{
-                        await DatabaseService(uid: user!.uid).updateUserData(nameController.text , emailController.text ,matricController.text ,phonenumController.text ,addressController.text);
-                        _showPanel(); // Close the dialog after updating
-                      },
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B).withOpacity(0.75),),
-                        foregroundColor: MaterialStateProperty.all<Color>(Color(0xFFFFFFCC)),
-                        minimumSize: MaterialStateProperty.all<Size>(Size(200, 50)),
-                      ),
-                      child: Text(
-                        'Save',
-                        style: TextStyle(color: Colors.white),
-                      ),
+                    Row(
+                      children: [
+                        TextButton.icon(
+                            onPressed: () async {
+                              setState(() {
+                                nameEnable = !nameEnable;
+                              });
+                            },
+                            icon: Icon(Icons.shopping_bag_outlined,
+                              size: 20,
+                              color: Color(0xFF3C312B).withOpacity(0.75),
+                            ),
+                            label: Text('')),
+                        ElevatedButton(
+                          onPressed: () async{
+                            await DatabaseService(uid: user!.uid).updateUserData(nameController.text , emailController.text ,matricController.text ,phonenumController.text ,addressController.text);
+                            _showPanel(); // Close the dialog after updating
+                          },
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B).withOpacity(0.75),),
+                            foregroundColor: MaterialStateProperty.all<Color>(Color(0xFFFFFFCC)),
+                            minimumSize: MaterialStateProperty.all<Size>(Size(200, 50)),
+                          ),
+                          child: Text(
+                            'Save',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
                     ),
                     // Add more widgets to display other user information
                   ],
