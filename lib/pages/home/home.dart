@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 
 import '../../constants/navBar.dart';
 import '../../models/users.dart';
-import '../categories/category_menu.dart';
 import '../menu/menu.dart';
 import '../profile/profile.dart';
 
@@ -122,7 +121,7 @@ class _HomeState extends State<Home> {
                     // Page 1 content
                     MenuPage(),
                     // Page 2 content
-                    CategoryMenuScreen(),
+
                     OrderPage(),
                     ProfilePage(),
                   ],
@@ -167,8 +166,13 @@ class _HomeState extends State<Home> {
                     // Page 1 content
                     Payment(),
                     // Page 2 content
-                    CategoryMenuScreen(),
+
                     MenuPage(),
+                    Container(
+                      child: Center(
+                        child: Text("data"),
+                      ),
+                    ),
                     ProfilePage(),
                   ],
                 ),
