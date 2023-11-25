@@ -56,8 +56,13 @@ class AuthService {
       await DatabaseService(uid: users!.uid)
           .updateUserData(name, email, '', '', '');
       await DatabaseService(uid: users!.uid).updatePaymentData('TnG', '0.00');
+<<<<<<< HEAD
       await DatabaseService(uid: users!.uid)
           .updateOrderData('#2345', 'Fried Rice', 1, 6.00, 'Order Preparing');
+=======
+      await DatabaseService(uid: users!.uid).updateReviewData('','','');
+      await DatabaseService(uid: users!.uid).updateOrderData('Fried Rice', '0.00', 'Order Preparing');
+>>>>>>> main
       return _userFromFirebaseUser(users);
     } catch (e) {
       print(e.toString());

@@ -14,6 +14,8 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('payments');
   final CollectionReference orderCollection =
       FirebaseFirestore.instance.collection('orders');
+  final CollectionReference reviewCollection =
+      FirebaseFirestore.instance.collection('reviews');
 
   Future updateUserData(String name, String email, String matricnum,
       String phonenum, String address) async {
@@ -33,9 +35,22 @@ class DatabaseService {
     });
   }
 
+<<<<<<< HEAD
 //Storing an order
   Future updateOrderData(String orderID, String name, int quantity,
       double price, String status) async {
+=======
+  Future updateReviewData(String RfoodName,String RfoodPrice, String RfoodReview) async {
+    return await reviewCollection.doc(uid).set({
+      'RfoodName': RfoodName,
+      'RfoodPrice': RfoodPrice,
+      'RfoodReview' : RfoodReview
+    });
+  }
+
+
+  Future updateOrderData(String fName, String price, String status) async {
+>>>>>>> main
     return await orderCollection.doc(uid).set({
       'orderID': orderID,
       'name': name,

@@ -7,6 +7,8 @@ import 'package:jood/pages/authenticate/register.dart';
 import 'package:jood/pages/authenticate/sign_in.dart';
 import 'package:jood/pages/home/home.dart';
 import 'package:jood/pages/payment/payment.dart';
+import 'package:jood/pages/payment/payment2.dart';
+import 'package:jood/pages/payment/payment3.dart';
 import 'package:jood/pages/profile/profile.dart';
 import 'package:jood/pages/shoppingcart/cart.dart';
 import 'package:jood/pages/wrapper.dart';
@@ -35,6 +37,8 @@ class MyApp extends StatelessWidget {
           '/signin': (context) => SignIn(),
           '/signup': (context) => Register(),
           '/cart': (context) => Payment(),
+          '/method': (context) => MethodPage(),
+          '/receipt': (context) => Receipt(),
 
 
         },
