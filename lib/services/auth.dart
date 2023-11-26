@@ -54,12 +54,8 @@ Future signInAnon() async {
       User? users = result.user;
 
       //create a new document for the new user with the uid
-<<<<<<< HEAD
-      await DatabaseService(uid: users!.uid).setUserData(users.uid, name, email,'','','');
-=======
       await DatabaseService(uid: users!.uid)
           .updateUserData(name, email, '', '', '');
->>>>>>> lazyyam
       await DatabaseService(uid: users!.uid).updatePaymentData('TnG', '0.00');
       await DatabaseService(uid: users!.uid).updateReviewData('', '', '');
       return _userFromFirebaseUser(users);
