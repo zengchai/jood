@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 import 'package:cloud_firestore/cloud_firestore.dart';
+=======
+import 'package:cloud_firestore/cloud_firestore.dart'; //yam
+>>>>>>> lazyyam
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:jood/models/users.dart';
+import 'package:jood/pages/Order/orderPage.dart'; //yam
 import 'package:jood/services/database.dart';
 
 class AuthService{
@@ -49,14 +54,42 @@ Future signInAnon() async {
       User? users = result.user;
 
       //create a new document for the new user with the uid
+<<<<<<< HEAD
       await DatabaseService(uid: users!.uid).setUserData(users.uid, name, email,'','','');
+=======
+      await DatabaseService(uid: users!.uid)
+          .updateUserData(name, email, '', '', '');
+>>>>>>> lazyyam
       await DatabaseService(uid: users!.uid).updatePaymentData('TnG', '0.00');
-      await DatabaseService(uid: users!.uid).updateReviewData('','','');
-      await DatabaseService(uid: users!.uid).updateOrderData('Fried Rice', '0.00', 'Order Preparing');
+      await DatabaseService(uid: users!.uid).updateReviewData('', '', '');
       return _userFromFirebaseUser(users);
     } catch(e){
       print(e.toString());
       return null;
+    }
+  }
+
+  Future ongoingOrder(List<OrderItem> orderItem) async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        // Update user data in the database
+        await DatabaseService(uid: user.uid).updateOngoingOrder(orderItem);
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future orderHistory(List<OrderItem> orderItem) async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        // Update user data in the database
+        await DatabaseService(uid: user.uid).updateOrderHistory(orderItem);
+      }
+    } catch (e) {
+      print(e.toString());
     }
   }
 
