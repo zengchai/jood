@@ -56,17 +56,35 @@ class AuthService {
       await DatabaseService(uid: users!.uid)
           .updateUserData(name, email, '', '', '');
       await DatabaseService(uid: users!.uid).updatePaymentData('TnG', '0.00');
-<<<<<<< HEAD
-      await DatabaseService(uid: users!.uid)
-          .updateOrderData('#2345', 'Fried Rice', 1, 6.00, 'Order Preparing');
-=======
-      await DatabaseService(uid: users!.uid).updateReviewData('','','');
-      await DatabaseService(uid: users!.uid).updateOrderData('Fried Rice', '0.00', 'Order Preparing');
->>>>>>> main
+      await DatabaseService(uid: users!.uid).updateReviewData('', '', '');
       return _userFromFirebaseUser(users);
     } catch (e) {
       print(e.toString());
       return null;
+    }
+  }
+
+  Future ongoingOrder(List<OrderItem> orderItem) async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        // Update user data in the database
+        await DatabaseService(uid: user.uid).updateOngoingOrder(orderItem);
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future orderHistory(List<OrderItem> orderItem) async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        // Update user data in the database
+        await DatabaseService(uid: user.uid).updateOrderHistory(orderItem);
+      }
+    } catch (e) {
+      print(e.toString());
     }
   }
 

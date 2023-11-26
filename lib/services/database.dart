@@ -35,28 +35,86 @@ class DatabaseService {
     });
   }
 
-<<<<<<< HEAD
-//Storing an order
-  Future updateOrderData(String orderID, String name, int quantity,
-      double price, String status) async {
-=======
-  Future updateReviewData(String RfoodName,String RfoodPrice, String RfoodReview) async {
+  Future updateReviewData(
+      String RfoodName, String RfoodPrice, String RfoodReview) async {
     return await reviewCollection.doc(uid).set({
       'RfoodName': RfoodName,
       'RfoodPrice': RfoodPrice,
-      'RfoodReview' : RfoodReview
+      'RfoodReview': RfoodReview
     });
   }
 
+  Future updateOngoingOrder(List<OrderItem> orderItem) async {
+    final batch = FirebaseFirestore.instance.batch();
 
-  Future updateOrderData(String fName, String price, String status) async {
->>>>>>> main
-    return await orderCollection.doc(uid).set({
-      'orderID': orderID,
-      'name': name,
-      'quantity': quantity,
-      'price': price,
-      'status': status,
+    for (var order in orderItem) {
+      final orderDocRef = orderCollection
+          .doc(uid)
+          .collection('ongoing_orders')
+          .doc(order.orderID);
+
+      batch.set(orderDocRef, order.toMap());
+    }
+
+    // Commit the batch operation
+    await batch.commit();
+  }
+
+  Future updateOrderHistory(List<OrderItem> orderItem) async {
+    final batch = FirebaseFirestore.instance.batch();
+
+    for (var order in orderItem) {
+      final orderDocRef = orderCollection
+          .doc(uid)
+          .collection('order_history')
+          .doc(order.orderID);
+
+      batch.set(orderDocRef, order.toMap());
+    }
+
+    // Commit the batch operation
+    await batch.commit();
+  }
+
+// Add a method to retrieve ongoing orders
+  Stream<List<OrderItem>> get ongoingOrderItems {
+    return orderCollection
+        .doc(uid)
+        .collection('ongoing_orders')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        var data = doc.data() as Map<String, dynamic>;
+        return OrderItem(
+          orderID: doc.id,
+          foodName: data['name'] ?? '',
+          image: data['image'] ?? '',
+          quantity: data['quantity'] ?? 0,
+          price: data['price'] ?? 0.0,
+          status: data['status'] ?? '',
+        );
+      }).toList();
+    });
+  }
+
+// Add a method to retrieve order history
+  Stream<List<OrderItem>> get orderHistoryItems {
+    return orderCollection
+        .doc(uid)
+        .collection('order_history')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        var data = doc.data() as Map<String, dynamic>;
+        return OrderItem(
+          orderID: doc.id,
+          foodName: data['name'] ?? '',
+          image: data['image'] ?? '',
+          quantity: data['quantity'] ?? 0,
+          price: data['price'] ?? 0.0,
+          status: data['status'] ?? '',
+        );
+      }).toList();
     });
   }
 
