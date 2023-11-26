@@ -1,8 +1,11 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_string_interpolations
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:jood/pages/Order/reviewForm.dart';
 import 'package:jood/pages/payment/payment.dart';
+import 'package:jood/services/auth.dart';
+import 'package:jood/services/database.dart';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({Key? key}) : super(key: key);
@@ -11,10 +14,9 @@ class OrderPage extends StatefulWidget {
   State<OrderPage> createState() => _OrderPageState();
 }
 
-
 class OrderItem {
   final String orderID;
-  final String name;
+  final String foodName;
   final String image;
   int quantity;
   final double price;
@@ -22,16 +24,26 @@ class OrderItem {
 
   OrderItem({
     required this.orderID,
-    required this.name,
+    required this.foodName,
     required this.image,
     required this.quantity,
     required this.price,
     required this.status,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'foodName': foodName,
+      'quantity': quantity,
+      'price': price,
+      'status': status,
+      'timestamp': FieldValue.serverTimestamp(),
+    };
+  }
 }
 
 class _OrderPageState extends State<OrderPage> {
-
+  DatabaseService databaseService = DatabaseService(uid: 'currentUserId');
   final _formKey = GlobalKey<FormState>();
   late final String review;
   late PageController _pageController;
@@ -45,10 +57,7 @@ class _OrderPageState extends State<OrderPage> {
           title: Text('Review'),
           contentPadding: EdgeInsets.all(0),
           content: Container(
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
+            width: MediaQuery.of(context).size.width,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -82,14 +91,14 @@ class _OrderPageState extends State<OrderPage> {
   List<OrderItem> ongoingItems = [
     OrderItem(
         orderID: '#1234',
-        name: 'Fried Mee',
+        foodName: 'Fried Mee',
         image: 'assets/friedmee.jpeg',
         quantity: 2,
         price: 7.0,
         status: 'Order Preparing'),
     OrderItem(
         orderID: '#2345',
-        name: 'Fried Rice',
+        foodName: 'Fried Rice',
         image: 'assets/friedrice.jpeg',
         quantity: 1,
         price: 6.0,
@@ -100,7 +109,7 @@ class _OrderPageState extends State<OrderPage> {
   List<OrderItem> historyItems = [
     OrderItem(
         orderID: '#5678',
-        name: 'Fried Rice',
+        foodName: 'Fried Rice',
         image: 'assets/friedrice.jpeg',
         quantity: 1,
         price: 6.0,
@@ -137,7 +146,6 @@ class _OrderPageState extends State<OrderPage> {
 
   @override
   Widget build(BuildContext context) {
-
     //Date
     DateTime currentDate = DateTime.now();
     String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
@@ -204,6 +212,18 @@ class _OrderPageState extends State<OrderPage> {
                         : null,
                   ),
                   child: Text('History'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    await AuthService().ongoingOrder(ongoingItems);
+                  },
+                  child: Text('1'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    await AuthService().orderHistory(historyItems);
+                  },
+                  child: Text('2'),
                 ),
               ],
             ),
@@ -273,7 +293,7 @@ class _OrderPageState extends State<OrderPage> {
                 height: 60,
                 fit: BoxFit.cover,
               ),
-              title: Text(orderItem.name),
+              title: Text(orderItem.foodName),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
