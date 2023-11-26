@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jood/constants/profileItem.dart';
 import 'package:jood/services/database.dart';
 import 'package:jood/shared/loading.dart';
 import 'package:provider/provider.dart';
@@ -20,16 +21,19 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController matricController = TextEditingController();
   TextEditingController phonenumController = TextEditingController();
   TextEditingController addressController = TextEditingController();
-  bool nameEnable = false;
+  bool editEnable = false;
 
   @override
   Widget build(BuildContext context) {
+    final FocusNode _focusNode = FocusNode();
+
     void _showPanel(){
       showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
             title: Text('Updated successfully'),
+            titlePadding: EdgeInsets.fromLTRB(68, 30, 68, 0),
             contentPadding: EdgeInsets.all(0),
             content: Container(
               width: MediaQuery.of(context).size.width,
@@ -40,7 +44,6 @@ class _EditProfileState extends State<EditProfile> {
                   child: ElevatedButton(
                     onPressed: () async{
                       Navigator.pop(context); // Close the dialog after updating
-                      Navigator.pop(context);
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B).withOpacity(0.75),),
@@ -77,6 +80,36 @@ class _EditProfileState extends State<EditProfile> {
           style: TextStyle(color: Colors.black),
         ),
         centerTitle: true, // Center the title
+        actions: [
+          editEnable? TextButton.icon(
+            onPressed: () async {
+              setState(() {
+                editEnable = !editEnable;
+              });
+            },
+            icon: Transform.rotate(
+              angle: editEnable ? 45 * (3.14159265358979323846264338327950288 / 180) : 0,
+              child: Icon(
+                Icons.add,
+                size: 30,
+                color: Color(0xFF3C312B).withOpacity(0.75),
+              ),
+            ),
+            label: Text(''),
+          ):
+
+          TextButton.icon(
+              onPressed: () async {
+                setState(() {
+                  editEnable = !editEnable;
+                });
+              },
+              icon: Icon(Icons.edit,
+                size: 25,
+                color: Color(0xFF3C312B).withOpacity(0.75),
+              ),
+              label: Text('')),
+        ],
       ),
       body: FutureBuilder<UserProfile?>(
         // Use FutureBuilder to wait for the Future<UserProfile> to complete
@@ -97,154 +130,30 @@ class _EditProfileState extends State<EditProfile> {
             matricController.text = '${user.matricnum}';
             phonenumController.text = '${user.phonenum}';
             addressController.text = '${user.address}';
+
             return ListView(
-              children: [Container(
-                padding: EdgeInsets.symmetric(vertical: 20.0,horizontal: 50.0),
+              children: [
+                Container(
+                padding: EdgeInsets.symmetric(vertical: 20.0,horizontal: 30.0),
                 child: Column(
                   children: [
-                    Container(
-                      child: Column(
-                          children: [
-                            Column(
-                            children: [
-                              Text('Name',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 17,),
-                              ),
-                              SizedBox(height: 10,)
-                            ],
-                          ),
-                                    TextFormField(
-                        controller: nameController,
-                        decoration: InputDecoration(
-                            contentPadding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 15.0),
-                            fillColor: Colors.white,
-                            filled: true,
-                            hintText: 'Name', // Add your placeholder text
-                            enabled: nameEnable,
-                            enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(4.0), // Set the border radius here
-                                borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0), width: 2.0)
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.0), // Set the border radius here
-                                borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0), width: 2.0)
-                            )
-                        ),
-                        validator: (val) => val!.isEmpty ? 'Enter a name': null,
-                      ),
-                                    SizedBox(height: 30.0),]
-                              )
-                          ),
-                    Container(
-                      child: Column(
-                          children: [Text('Email'),
-                                    TextFormField(
-                                    controller: emailController,
-                                    enabled: false,
-                                    decoration: InputDecoration(
-                                        contentPadding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 15.0),
-                                        fillColor: Colors.white,
-                                        filled: true,
-                                        hintText: 'Email', // Add your placeholder text
-                                        enabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(4.0), // Set the border radius here
-                                            borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(12.0), // Set the border radius here
-                                            borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
-                                        )
-                                    ),
-                                    validator: (val) => val!.isEmpty ? 'Enter a email': null,
-                                  ),
-                                  SizedBox(height: 30.0),])),
-                    Container(
-                        child: Column(
-                            children: [Text('Matric Number'),
-                              TextFormField(
-                                controller: matricController,
-                                decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 15.0),
-                                    fillColor: Colors.white,
-                                    enabled: nameEnable,
-                                    filled: true,
-                                    hintText: 'Email', // Add your placeholder text
-                                    enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(4.0), // Set the border radius here
-                                        borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12.0), // Set the border radius here
-                                        borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
-                                    )
-                                ),
-                                validator: (val) => val!.isEmpty ? 'Enter a matric number': null,
-                              ),
-                              SizedBox(height: 30.0),])),
-                    Container(
-                        child: Column(
-                            children: [Text('Phone Number'),
-                              TextFormField(
-                                controller: phonenumController,
-                                enabled: nameEnable,
-                                decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 15.0),
-                                    fillColor: Colors.white,
-                                    filled: true,
-                                    hintText: 'Email', // Add your placeholder text
-                                    enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(4.0), // Set the border radius here
-                                        borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12.0), // Set the border radius here
-                                        borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
-                                    )
-                                ),
-                                validator: (val) => val!.isEmpty ? 'Enter a phone number': null,
-                              ),
-                              SizedBox(height: 30.0),])),
-                    Container(
-                        child: Column(
-                            children: [Text('Address'),
-                              TextFormField(
-                                controller: addressController,
-                                enabled: nameEnable,
-                                decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 15.0),
-                                    fillColor: Colors.white,
-                                    filled: true,
-                                    hintText: 'Address', // Add your placeholder text
-                                    enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(4.0), // Set the border radius here
-                                        borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12.0), // Set the border radius here
-                                        borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
-                                    )
-                                ),
-                                validator: (val) => val!.isEmpty ? 'Enter a address': null,
-                              )])),
-                    SizedBox(height:50.0),
-                    Row(
-                      children: [
-                        TextButton.icon(
-                            onPressed: () async {
-                              setState(() {
-                                nameEnable = !nameEnable;
-                              });
-                            },
-                            icon: Icon(Icons.shopping_bag_outlined,
-                              size: 20,
-                              color: Color(0xFF3C312B).withOpacity(0.75),
-                            ),
-                            label: Text('')),
-                        ElevatedButton(
+                    SizedBox(height: 15,),
+                    ProfileItem(value: 'Name', controller: nameController, enable: editEnable),
+                    SizedBox(height: 30,),
+                    ProfileItem(value: 'Email', controller: emailController, enable: false),
+                    SizedBox(height: 30,),
+                    ProfileItem(value: 'Matric Number', controller: matricController, enable: editEnable),
+                    SizedBox(height: 30,),
+                    ProfileItem(value: 'Phone Number', controller: phonenumController, enable: editEnable),
+                    SizedBox(height: 30,),
+                    ProfileItem(value: 'Address', controller: addressController, enable: editEnable),
+                    SizedBox(height:40.0),
+                    editEnable ? ElevatedButton(
                           onPressed: () async{
                             await DatabaseService(uid: user!.uid).updateUserData(nameController.text , emailController.text ,matricController.text ,phonenumController.text ,addressController.text);
+                            setState(() {
+                              editEnable = false;
+                            });
                             _showPanel(); // Close the dialog after updating
                           },
                           style: ButtonStyle(
@@ -256,9 +165,7 @@ class _EditProfileState extends State<EditProfile> {
                             'Save',
                             style: TextStyle(color: Colors.white),
                           ),
-                        ),
-                      ],
-                    ),
+                        ): Container()
                     // Add more widgets to display other user information
                   ],
                 ),

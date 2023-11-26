@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../../constants/navBar.dart';
 import '../../models/users.dart';
-import '../categories/category_menu.dart';
+import '../menu/menu.dart';
 import '../profile/profile.dart';
 
 class Home extends StatefulWidget {
@@ -143,7 +143,7 @@ class _HomeState extends State<Home> {
           index: _selectedIndex,
           children: [
             // Page 1 content
-            CategoryMenuScreen(),
+            MenuPage(),
             // Page 2 content
             OrderPage(),
             ProfilePage(),
@@ -185,8 +185,9 @@ class _HomeState extends State<Home> {
         index: _selectedIndex,
         children: [
           // Page 1 content
-          CategoryMenuScreen(),
+          MenuPage(),
           // Page 2 content
+          OrderPage(),
           ProfilePage(),
         ],
       ),

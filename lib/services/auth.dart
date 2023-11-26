@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:jood/constants/warningalert.dart';
 import 'package:jood/models/users.dart';
 import 'package:jood/services/database.dart';
 
@@ -83,16 +85,29 @@ Future signInAnon() async {
   }
 
 
-  Future deleteUserAccount() async {
+  Future deleteUserAccount(BuildContext context) async {
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
       try {
         await deleteUserData(user.uid); // Delete Firestore data first
         await user.delete(); // Delete the Authentication account
+        showDialog(
+          context: context, // Make sure to have access to the current context
+          builder: (BuildContext context) {
+            return WarningAlert();
+          },
+        );
         return await FirebaseAuth.instance.signOut();
       } catch (e) {
+        showDialog(
+          context: context, // Make sure to have access to the current context
+          builder: (BuildContext context) {
+            return WarningAlert();
+          },
+        );
         print("Error deleting user account: $e");
+
       }
     }
   }
