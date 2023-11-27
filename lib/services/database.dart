@@ -32,14 +32,17 @@ class DatabaseService {
     });
   }
 
-  Future updateReviewData(String RfoodName,String RfoodPrice, String RfoodReview) async {
-    return await reviewCollection.doc(uid).set({
-      'RfoodName': RfoodName,
-      'RfoodPrice': RfoodPrice,
-      'RfoodReview' : RfoodReview
+  Future updateReviewData(String review) async { //UPDATE REVIEW DATA ON THE SAME ORDER
+    return await reviewCollection.doc(uid).update({
+      'RfoodReview' : FieldValue.arrayUnion([review]),
     });
   }
 
+  Future setReviewData(String review) async { //SET REVIEW DATA WHEN ADD MORE ORDER HISTORY
+    return await reviewCollection.doc(uid).set({
+      'RfoodReview' : FieldValue.arrayUnion([review]),
+    });
+  }
 
   Future updateOrderData(String fName, String price, String status) async {
     return await orderCollection.doc(uid).set({
