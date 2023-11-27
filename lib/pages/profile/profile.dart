@@ -18,7 +18,7 @@ class _PaymentState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final profile = Provider.of<UserProfile>(context);
     return Scaffold(
-        backgroundColor: Colors.brown[50],
+        backgroundColor: Colors.white,
         body: ListView(
           children: [
             Center(
@@ -28,12 +28,12 @@ class _PaymentState extends State<ProfilePage> {
                   Column(
                       children: [
                         CircleAvatar(
-                          radius: 50,
+                          radius: 40,
                           backgroundColor: Color(0xFF3C312B).withOpacity(0.25),
                           child: Icon(
                             Icons.person,
                             color: Color(0xFF3C312B).withOpacity(0.75),
-                            size: 60,
+                            size: 40,
                           ),
                         ),
                         SizedBox(height: 20,),
@@ -48,6 +48,7 @@ class _PaymentState extends State<ProfilePage> {
                   SizedBox(height: 30,),
                   ElevatedButton(
                     onPressed: () async{
+                      await Navigator.pushNamed(context, '/editprofile');
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B).withOpacity(0.75),),
@@ -55,7 +56,22 @@ class _PaymentState extends State<ProfilePage> {
                       minimumSize: MaterialStateProperty.all<Size>(Size(300, 40)),
                     ),
                     child: Text(
-                      'Sign In',
+                      'Edit profile',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  SizedBox(height: 20,),
+                  ElevatedButton(
+                    onPressed: () async{
+                      await _auth.deleteUserAccount(context);
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B).withOpacity(0.75),),
+                      foregroundColor: MaterialStateProperty.all<Color>(Color(0xFFFFFFCC)),
+                      minimumSize: MaterialStateProperty.all<Size>(Size(300, 40)),
+                    ),
+                    child: Text(
+                      'Delete account',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
