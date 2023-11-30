@@ -11,6 +11,8 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('payments');
   final CollectionReference orderCollection =
       FirebaseFirestore.instance.collection('orders');
+  final CollectionReference cartCollection =
+      FirebaseFirestore.instance.collection('cart');
 
   Future updateUserData(String name, String email, String matricnum,
       String phonenum, String address) async {
@@ -23,6 +25,15 @@ class DatabaseService {
     });
   }
 
+  Future updateOrderData(String fName, String price, String status) async {
+    return await orderCollection.doc(uid).set({
+      'fName': fName,
+      'price': price,
+      'status': status,
+    });
+  }
+
+
   Future updatePaymentData(String Pmethod, String amount) async {
     return await paymentCollection.doc(uid).set({
       'Pmethod': Pmethod,
@@ -30,11 +41,10 @@ class DatabaseService {
     });
   }
 
-  Future updateOrderData(String fName, String price, String status) async {
-    return await orderCollection.doc(uid).set({
-      'fName': fName,
-      'price': price,
-      'status': status,
+  Future updateCartData(List<Map<String, dynamic>>? foodItems, double amount) async {
+    return await cartCollection.doc(uid).set({
+      'foodItems': foodItems,
+      'amount': amount,
     });
   }
 
