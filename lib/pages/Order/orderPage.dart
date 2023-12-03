@@ -1,7 +1,11 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_string_interpolations
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:jood/pages/Order/reviewForm.dart';
 import 'package:jood/pages/payment/payment.dart';
+import 'package:jood/services/auth.dart';
+import 'package:jood/services/database.dart';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({Key? key}) : super(key: key);
@@ -12,7 +16,7 @@ class OrderPage extends StatefulWidget {
 
 class OrderItem {
   final String orderID;
-  final String name;
+  final String foodName;
   final String image;
   int quantity;
   final double price;
@@ -20,29 +24,81 @@ class OrderItem {
 
   OrderItem({
     required this.orderID,
-    required this.name,
+    required this.foodName,
     required this.image,
     required this.quantity,
     required this.price,
     required this.status,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'foodName': foodName,
+      'quantity': quantity,
+      'price': price,
+      'status': status,
+      'timestamp': FieldValue.serverTimestamp(),
+    };
+  }
 }
 
 class _OrderPageState extends State<OrderPage> {
+  DatabaseService databaseService = DatabaseService(uid: 'currentUserId');
+  final _formKey = GlobalKey<FormState>();
+  late final String review;
   late PageController _pageController;
   int _currentPageIndex = 0;
+
+  void _popupReview() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Review'),
+          contentPadding: EdgeInsets.all(0),
+          content: Container(
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: Image.asset(
+                          'assets/friedmee.jpeg',
+                          width: 120,
+                          height: 120,
+                        ),
+                        title: Text("Fried Mee"),
+                        subtitle: Text('RM7.0'),
+                      ),
+                      SizedBox(height: 20),
+                      // Add some spacing between ListTile and TextField
+                      reviewForm(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   List<OrderItem> ongoingItems = [
     OrderItem(
         orderID: '#1234',
-        name: 'Fried Mee',
+        foodName: 'Fried Mee',
         image: 'assets/friedmee.jpeg',
         quantity: 2,
         price: 7.0,
         status: 'Order Preparing'),
     OrderItem(
         orderID: '#2345',
-        name: 'Fried Rice',
+        foodName: 'Fried Rice',
         image: 'assets/friedrice.jpeg',
         quantity: 1,
         price: 6.0,
@@ -53,7 +109,7 @@ class _OrderPageState extends State<OrderPage> {
   List<OrderItem> historyItems = [
     OrderItem(
         orderID: '#5678',
-        name: 'Fried Rice',
+        foodName: 'Fried Rice',
         image: 'assets/friedrice.jpeg',
         quantity: 1,
         price: 6.0,
@@ -90,6 +146,10 @@ class _OrderPageState extends State<OrderPage> {
 
   @override
   Widget build(BuildContext context) {
+    //Date
+    DateTime currentDate = DateTime.now();
+    String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -153,6 +213,18 @@ class _OrderPageState extends State<OrderPage> {
                   ),
                   child: Text('History'),
                 ),
+                TextButton(
+                  onPressed: () async {
+                    await AuthService().ongoingOrder(ongoingItems);
+                  },
+                  child: Text('1'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    await AuthService().orderHistory(historyItems);
+                  },
+                  child: Text('2'),
+                ),
               ],
             ),
           ),
@@ -165,8 +237,8 @@ class _OrderPageState extends State<OrderPage> {
                 });
               },
               children: [
-                _buildOrderList(ongoingItems),
-                _buildOrderList(historyItems),
+                _buildOrderList(ongoingItems, false),
+                _buildOrderList(historyItems, true),
               ],
             ),
           ),
@@ -175,17 +247,17 @@ class _OrderPageState extends State<OrderPage> {
     );
   }
 
-  Widget _buildOrderList(List<OrderItem> items) {
+  Widget _buildOrderList(List<OrderItem> items, bool isHistoryPage) {
     return ListView.builder(
       shrinkWrap: true,
       itemCount: items.length,
       itemBuilder: (BuildContext context, int index) {
-        return _buildOrderItemCard(items[index]);
+        return _buildOrderItemCard(items[index], isHistoryPage);
       },
     );
   }
 
-  Widget _buildOrderItemCard(OrderItem orderItem) {
+  Widget _buildOrderItemCard(OrderItem orderItem, bool isHistoryPage) {
     return Container(
       margin: const EdgeInsets.all(16.0),
       child: Column(
@@ -221,7 +293,7 @@ class _OrderPageState extends State<OrderPage> {
                 height: 60,
                 fit: BoxFit.cover,
               ),
-              title: Text(orderItem.name),
+              title: Text(orderItem.foodName),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -231,6 +303,13 @@ class _OrderPageState extends State<OrderPage> {
                       Text('Quantity: ${orderItem.quantity}'),
                       Text('Price: \$${orderItem.price.toStringAsFixed(2)}'),
                       Text('Status: ${orderItem.status}'),
+                      if (isHistoryPage) // Conditionally show the review button
+                        ElevatedButton(
+                          onPressed: () {
+                            _popupReview();
+                          },
+                          child: Text('Give Review'),
+                        ),
                     ],
                   ),
                 ],
