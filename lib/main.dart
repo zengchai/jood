@@ -40,6 +40,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamProvider<AppUsers?>.value(
+      // ignore: body_might_complete_normally_nullable
       catchError: (User, user) {},
       value: AuthService().changeuser,
       initialData: null,
