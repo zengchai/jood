@@ -1,25 +1,17 @@
 import 'package:flutter/material.dart';
 
 import './utils/constants/colors_resources.dart';
-import './utils/constants/images.dart';
 import 'custom_button.dart';
+import 'provider/model/menu_model.dart';
 
-class AddAlertWidget extends StatefulWidget {
-  const AddAlertWidget({super.key});
-
-  @override
-  State<AddAlertWidget> createState() => _AddAlertWidgetState();
-}
-
-class _AddAlertWidgetState extends State<AddAlertWidget> {
-  TextEditingController foodNameCon = TextEditingController();
-  TextEditingController priceCon = TextEditingController();
+class EditAlertWidget extends StatelessWidget {
+  final MenuModel? cateMenu;
+  const EditAlertWidget({super.key, required this.cateMenu});
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.sizeOf(context);
     return AlertDialog(
-      scrollable: true,
       backgroundColor: ColorRes.cateBack,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       contentPadding: const EdgeInsets.all(0),
@@ -37,7 +29,7 @@ class _AddAlertWidgetState extends State<AddAlertWidget> {
                 const Center(
                   child: Padding(
                     padding: EdgeInsets.only(top: 15),
-                    child: Text("Add Item",
+                    child: Text("Edit Item",
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -74,7 +66,7 @@ class _AddAlertWidgetState extends State<AddAlertWidget> {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(20),
                         child: Image.asset(
-                          Images.vegetable,
+                          cateMenu?.img ?? '',
                           height: 100,
                           width: 120,
                           fit: BoxFit.cover,
@@ -114,25 +106,17 @@ class _AddAlertWidgetState extends State<AddAlertWidget> {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: ColorRes.grey.withOpacity(0.2)),
-                    child: TextFormField(
-                        controller: foodNameCon,
-                        decoration: const InputDecoration(
-                            contentPadding: EdgeInsets.only(bottom: 12),
-                            enabledBorder: InputBorder.none,
-                            disabledBorder: InputBorder.none,
-                            errorBorder: InputBorder.none,
-                            focusedErrorBorder: InputBorder.none,
-                            border: InputBorder.none,
-                            hintText: "Name",
-                            hintStyle: TextStyle(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(cateMenu?.title ?? '',
+                            style: const TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey)),
-                        cursorColor: ColorRes.grey,
-                        style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black)),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black)),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 20),
                   const Text("Food's Price",
@@ -148,31 +132,22 @@ class _AddAlertWidgetState extends State<AddAlertWidget> {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: ColorRes.grey.withOpacity(0.2)),
-                    child: TextFormField(
-                        controller: priceCon,
-                        keyboardType: TextInputType.phone,
-                        decoration: const InputDecoration(
-                            contentPadding: EdgeInsets.only(bottom: 12),
-                            enabledBorder: InputBorder.none,
-                            disabledBorder: InputBorder.none,
-                            errorBorder: InputBorder.none,
-                            focusedErrorBorder: InputBorder.none,
-                            border: InputBorder.none,
-                            hintText: "RM",
-                            hintStyle: TextStyle(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(cateMenu?.price ?? "",
+                            style: const TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey)),
-                        cursorColor: ColorRes.grey,
-                        style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black)),
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black)),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 50),
-                    child: CustomButton(text: "Add", onPressed: () {}),
+                    child: CustomButton(text: "Edit", onPressed: () {}),
                   ),
                 ],
               ),

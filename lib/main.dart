@@ -16,12 +16,23 @@ import 'package:jood/pages/wrapper.dart';
 import 'package:jood/services/auth.dart';
 import 'package:provider/provider.dart';
 
-void main() async {
+import 'pages/menu/provider/menu_provider/menu_provider.dart';
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure WidgetsBinding is initialized
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   ); // Initialize Firebase
-   runApp(MyApp());
+
+
+runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => MenuProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -44,7 +55,7 @@ class MyApp extends StatelessWidget {
 
 
         },
-        home: Wrapper(),
+        home: const Wrapper(),
       ),
     );
   }
