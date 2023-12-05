@@ -25,8 +25,6 @@ class _CategoryMenuState extends State<MenuPage> {
   }
 
  
-
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.sizeOf(context);
@@ -180,8 +178,6 @@ class _CategoryMenuState extends State<MenuPage> {
                                               color: ColorRes.cateBorder)),
                                     );
                                   }
-                                
-                        
                         }),
                   )
                 ],

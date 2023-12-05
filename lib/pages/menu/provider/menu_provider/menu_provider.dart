@@ -8,9 +8,12 @@ import '../response_wrapper/response_wrapper.dart';
 
 
 final FirebaseFirestore firestore = FirebaseFirestore.instance;
+// Table name in DB
 final CollectionReference menuCollectionRef = firestore.collection('menu');
 
 class MenuProvider extends ChangeNotifier {
+
+  // added product in DB
   Future menuCreate({
     String? img,
     String? foodName,
@@ -26,9 +29,6 @@ class MenuProvider extends ChangeNotifier {
 
     try {
       await menuCollectionRef.add(preams);
-      // DocumentReference menuRef = await menuCollectionRef.add(preams);
-      // MenuModel menuModel =  MenuModel(img: img!, title: foodName!, price: foodPrice!);
-
       response.statusCode = 200;
       showSuccessToast('Add Successfully!');
       await fetchMenu();
@@ -60,13 +60,6 @@ class MenuProvider extends ChangeNotifier {
     }
   }
 }
-
-
-
-///
-
-
-
 
 showSuccessToast(String message) {
   Fluttertoast.showToast(

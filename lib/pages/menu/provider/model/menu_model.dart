@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../menu_provider/menu_provider.dart';
 
+// date conversion (json=>dart)
 class MenuModel {
   String? img;
   String? title;
