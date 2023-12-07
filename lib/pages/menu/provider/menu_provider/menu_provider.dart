@@ -64,6 +64,76 @@ class MenuProvider extends ChangeNotifier {
     }
   }
 
+  //! ==================== |> Edit / Update food <| ====================
+  Future menuUpdate({
+    String? id,
+    XFile? img,
+    String? imgPath,
+    String? foodName,
+    String? foodPrice,
+    BuildContext? context,
+  }) async {
+    Response response = Response();
+
+    try {
+      if (img != null) {
+        var imgFile = File(img.path);
+        var stgRef = menuStorageRef.child('$img.jpg');
+
+        /// Upload image to Firebase Storage
+        await stgRef.putFile(imgFile);
+
+        /// Get the download URL after the upload is complete
+        TaskSnapshot taskSnapshot = await stgRef.putFile(imgFile);
+        String imgUrl = await taskSnapshot.ref.getDownloadURL();
+        log('Image Download Url is: $imgUrl');
+
+        //! ========================
+        Map<String, dynamic> preams = {};
+        if (id != null) {
+          preams['id'] = id;
+        } else {
+          preams['id'] = menuCollectionRef.doc().id;
+        }
+        preams['image'] = imgUrl;
+        preams['food_name'] = foodName;
+        preams['food_price'] = foodPrice;
+        log('==@ Preams: $preams');
+
+        await menuCollectionRef.doc(id).set(preams);
+
+        response.statusCode == 200;
+        showSuccessToast('Update Successfully!');
+        await fetchMenu();
+        notifyListeners();
+      } else {
+        //! ========================
+        Map<String, dynamic> preams = {};
+        if (id != null) {
+          preams['id'] = id;
+        } else {
+          preams['id'] = menuCollectionRef.doc().id;
+        }
+        preams['image'] = imgPath;
+        preams['food_name'] = foodName;
+        preams['food_price'] = foodPrice;
+        log('==@ Preams: $preams');
+
+        await menuCollectionRef.doc(id).set(preams);
+
+        response.statusCode == 200;
+        showSuccessToast('Update Successfully!');
+        await fetchMenu();
+        notifyListeners();
+      }
+    } catch (e) {
+      response.statusCode == 500;
+      showFailedToast('Failed');
+      notifyListeners();
+    }
+  }
+
+  /* 
   Future menuUpdate({
     String? id,
     XFile? img,
@@ -107,7 +177,7 @@ class MenuProvider extends ChangeNotifier {
       showFailedToast('Failed');
       notifyListeners();
     }
-  }
+  } */
 
   Future menuDelete({
     String? id,

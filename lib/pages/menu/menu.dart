@@ -107,7 +107,9 @@ class _CategoryMenuState extends State<MenuPage> {
                                           horizontal: 15),
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(20),
-                                        child: Image.asset(
+                                        child: 
+                                        
+                                        Image.network(
                                           menuProvider.menuList[index].img ??
                                               '',
                                           height: 100,
