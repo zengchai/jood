@@ -71,11 +71,13 @@ class _OrderPageState extends State<OrderPage> {
                           width: 120,
                           height: 120,
                         ),
-                        title: Text(orderItem.name),
+                        title: Text(orderItem.foodName),
                         subtitle: Text(orderItem.price.toStringAsFixed(2)),
                       ),
                       SizedBox(height: 20),
-                      // Add some spacing between ListTile and TextField
+
+                      //DO THE STARS THING
+
                       reviewForm(),
                     ],
                   ),
