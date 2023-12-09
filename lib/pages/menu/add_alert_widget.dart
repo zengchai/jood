@@ -1,7 +1,10 @@
+import 'package:circular_badge_avatar/circular_badge_avatar.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:jood/pages/menu/overlay.dart';
 import 'package:jood/pages/menu/provider/menu_provider/menu_provider.dart';
 import 'package:provider/provider.dart';
-
+import 'package:circular_badge_avatar/helper/bottomsheet_image_picker.dart';
 import './utils/constants/colors_resources.dart';
 import './utils/constants/images.dart';
 import 'custom_button.dart';
@@ -17,7 +20,8 @@ class _AddAlertWidgetState extends State<AddAlertWidget> {
   TextEditingController foodNameCon = TextEditingController();
   TextEditingController priceCon = TextEditingController();
 
-  
+  XFile? imageSource1;
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.sizeOf(context);
@@ -55,7 +59,7 @@ class _AddAlertWidgetState extends State<AddAlertWidget> {
                         Navigator.pop(context);
                       },
                       icon:
-                          const Icon(Icons.close, color: ColorRes.buttonColor)),
+                      const Icon(Icons.close, color: ColorRes.buttonColor)),
                 ),
               ],
             ),
@@ -71,20 +75,23 @@ class _AddAlertWidgetState extends State<AddAlertWidget> {
                           fontWeight: FontWeight.w400,
                           color: Colors.black)),
                   const SizedBox(height: 5),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Image.asset(
-                          Images.vegetable,
+                      Flexible(
+                        child: SizedBox(
                           height: 100,
-                          width: 120,
-                          fit: BoxFit.cover,
+                          child: CircularBadgeAvatar(
+                            needImagePickerIcon: false,
+                            circleBorderRadius: 20,
+                            imagePath: imageSource1, // imagePath only accept XFile
+                          ),
                         ),
                       ),
                     ],
                   ),
+
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 80),
                     child: ElevatedButton(
@@ -96,7 +103,18 @@ class _AddAlertWidgetState extends State<AddAlertWidget> {
                             ),
                             maximumSize: Size(size.width, 20),
                             minimumSize: Size(size.width, 20)),
-                        onPressed: () {},
+                        onPressed: () async {
+                          final file =  await showModalBottomSheet<XFile?>(
+                              context: context,
+                              builder: (context) {
+                                return const BottomSheetImagePicker();
+                              });
+
+                          setState(() {
+                            imageSource1 = file;
+                          });
+                        },
+
                         child: const Text("Change Image",
                             style: TextStyle(
                                 fontSize: 12,
@@ -176,21 +194,28 @@ class _AddAlertWidgetState extends State<AddAlertWidget> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 50),
                     child: CustomButton(
-                      text: "Add",
-                       onPressed: () async{
-              
-                        await Provider.of<MenuProvider>(context, listen: false)
-                         .menuCreate(
-                          img: Images.vegetable,
-                          foodName: foodNameCon.text.trim(),
-                          foodPrice: priceCon.text.trim(),
-                          context: context
-                        );
+                        text: "Add",
+                        onPressed: () async{
 
-                        
-                        Navigator.pop(context);
-                       }
-                       ),
+                          if(imageSource1 != null || foodNameCon.text.isNotEmpty || priceCon.text.isNotEmpty){
+
+                            await context.showOverlayLoader(
+                                loadingWidget: const OverlayLoadingIndicator(),
+                                asyncFunction: ()async{
+                                  await Provider.of<MenuProvider>(context, listen: false).menuCreate(
+                                      img: imageSource1,
+                                      foodName: foodNameCon.text.trim(),
+                                      foodPrice: priceCon.text.trim(),
+                                      context: context
+                                  );
+                                }
+                            );
+                            Navigator.pop(context);
+                          }else{
+                            showFailedToast("Image, food name & price are required!!");
+                          }
+                        }
+                    ),
                   ),
                 ],
               ),
