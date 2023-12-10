@@ -224,40 +224,40 @@ class _PaymentState extends State<Payment> {
     );
   }
 
-  // void _incrementQuantity(CartItem foodItem) {
-  //   setState(() {
-  //     foodItem.quantity++;
-  //   });
-  // }
+  void _incrementQuantity(CartItem foodItem) {
+    setState(() {
+      foodItem.quantity++;
+    });
+  }
 
-  // void _decrementQuantity(CartItem foodItem) {
-  //   setState(() {
-  //     if (foodItem.quantity > 0) {
-  //       foodItem.quantity--;
-  //     }
-  //   });
-  // }
+  void _decrementQuantity(CartItem foodItem) {
+    setState(() {
+      if (foodItem.quantity > 0) {
+        foodItem.quantity--;
+      }
+    });
+  }
 
-  void _incrementQuantity(CartItem cartItem) {
-  setState(() {
-    cartItem.quantity++;
-    // Update quantity in Firestore
-    DatabaseService(uid: '').updateCartItem(cartItem);
-  });
-}
+//   void _incrementQuantity(CartItem cartItem) {
+//   setState(() {
+//     cartItem.quantity++;
+//     // Update quantity in Firestore
+//     DatabaseService(uid: '').updateCartItem(cartItem);
+//   });
+// }
 
-void _decrementQuantity(CartItem cartItem) {
-  setState(() {
-    if (cartItem.quantity > 1) {
-      cartItem.quantity--;
-      // Update quantity in Firestore
-      DatabaseService(uid: '').updateCartItem(cartItem);
-    } else {
-      // If quantity is 1, remove the item from the cart
-      _removeCartItem(cartItem);
-    }
-  });
-}
+// void _decrementQuantity(CartItem cartItem) {
+//   setState(() {
+//     if (cartItem.quantity > 1) {
+//       cartItem.quantity--;
+//       // Update quantity in Firestore
+//       DatabaseService(uid: '').updateCartItem(cartItem);
+//     } else {
+//       // If quantity is 1, remove the item from the cart
+//       _removeCartItem(cartItem);
+//     }
+//   });
+// }
 
 void _removeCartItem(CartItem cartItem) {
   setState(() {
