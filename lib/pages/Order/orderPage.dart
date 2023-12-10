@@ -2,7 +2,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:jood/pages/Order/reviewForm.dart';
+import 'package:jood/pages/order/reviewForm.dart';
 import 'package:jood/pages/payment/payment.dart';
 import 'package:jood/services/auth.dart';
 import 'package:jood/services/database.dart';
