@@ -4,6 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:jood/pages/menu/overlay.dart';
 import 'package:jood/pages/menu/provider/menu_provider/menu_provider.dart';
+import 'package:jood/pages/shoppingcart/CartItem.dart';
+import 'package:jood/services/database.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/users.dart';
@@ -107,9 +109,7 @@ class _CategoryMenuState extends State<MenuPage> {
                                           horizontal: 15),
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(20),
-                                        child: 
-                                        
-                                        Image.network(
+                                        child: Image.network(
                                           menuProvider.menuList[index].img ??
                                               '',
                                           height: 100,
@@ -144,7 +144,25 @@ class _CategoryMenuState extends State<MenuPage> {
                                           Expanded(
                                             child: CustomButton(
                                                 text: "Add to cart",
-                                                onPressed: () {
+                                                onPressed: () async {
+                                                  await DatabaseService(uid: '')
+                                                      .addToCart(
+                                                          menuProvider
+                                                                  .menuList[
+                                                                      index]
+                                                                  .title ??
+                                                              "",
+                                                          menuProvider
+                                                                  .menuList[
+                                                                      index]
+                                                                  .img ??
+                                                              '',
+                                                          double.tryParse(menuProvider
+                                                                      .menuList[
+                                                                          index]
+                                                                      .price ??
+                                                                  '') ??
+                                                              0.0);
                                                 }),
                                           ),
                                         ],
@@ -257,7 +275,6 @@ class _CategoryMenuState extends State<MenuPage> {
                                               fontWeight: FontWeight.w400,
                                               color: Colors.black),
                                           textAlign: TextAlign.center),
-
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 5),
@@ -302,7 +319,6 @@ class _CategoryMenuState extends State<MenuPage> {
                                           ],
                                         ),
                                       ),
-                                      
                                     ],
                                   ),
                                 );

@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:jood/pages/shoppingcart/CartItem.dart';
 import 'package:jood/services/auth.dart';
+import 'package:collection/collection.dart';
+import 'package:jood/services/database.dart';
 
 class CustomStepIndicator extends StatelessWidget {
   final int currentStep;
@@ -56,19 +60,19 @@ class CustomStepIndicator extends StatelessWidget {
   }
 }
 
-class FoodItem {
-  final String name;
-  final String image;
-  int quantity;
-  final double price;
+// class FoodItem {
+//   final String name;
+//   final String image;
+//   int quantity;
+//   final double price;
 
-  FoodItem({
-    required this.name,
-    required this.image,
-    required this.quantity,
-    required this.price,
-  });
-}
+//   FoodItem({
+//     required this.name,
+//     required this.image,
+//     required this.quantity,
+//     required this.price,
+//   });
+// }
 
 class Payment extends StatefulWidget {
   @override
@@ -80,14 +84,17 @@ class _PaymentState extends State<Payment> {
   final AuthService _auth = AuthService();
   int _selectedIndex = 2;
 
+// Updated: Maintain a list of selected food items in the cart
+  List<CartItem> cartItems = [];
+
   // replace with real data
-  List<FoodItem> foodItems = [
-    FoodItem(name: 'FriedMee', image: 'assets/friedmee.jpeg', quantity: 2, price: 7.0),
-    FoodItem(name: 'FriedRice', image: 'assets/friedrice.jpeg', quantity: 1, price: 6.0),
-  ];
+  // List<FoodItem> foodItems = [
+  //   FoodItem(name: 'FriedMee', image: 'assets/friedmee.jpeg', quantity: 2, price: 7.0),
+  //   FoodItem(name: 'FriedRice', image: 'assets/friedrice.jpeg', quantity: 1, price: 6.0),
+  // ];
 
   double calculateTotalPrice() {
-    return foodItems.fold(0, (sum, item) => sum + item.price * item.quantity);
+    return cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
   }
 
   @override
@@ -99,25 +106,44 @@ class _PaymentState extends State<Payment> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CustomStepIndicator(currentStep: currentStep), // Add the step indicator
+            CustomStepIndicator(
+                currentStep: currentStep), // Add the step indicator
             Text(
-              'Food Items',
+              'CART',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: foodItems.length,
-                itemBuilder: (context, index) {
-                  return _buildFoodItemCard(foodItems[index]);
-                },
-              ),
+            // Expanded(
+            //   child: ListView.builder(
+            //     itemCount: cartItems.length,
+            //     itemBuilder: (context, index) {
+            //       return _buildFoodItemCard(cartItems[index]);
+            //     },
+            //   ),
+            // ),
+            StreamBuilder<List<CartItem>>(
+              stream: DatabaseService(uid: '').getCartItems(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator(); // Loading indicator
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  List<CartItem> cartItems = snapshot.data ?? [];
+                  // Display and manipulate cart items in the UI
+                  return Column(
+                    children: cartItems.map((item) {
+                      return _buildFoodItemCard(item);
+                    }).toList(),
+                  );
+                }
+              },
             ),
             SizedBox(height: 16),
             _buildTotalPrice(),
             SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () async{
+              onPressed: () async {
                 // Navigate to another page for payment
                 await Navigator.pushNamed(context, '/method');
               },
@@ -140,11 +166,11 @@ class _PaymentState extends State<Payment> {
     );
   }
 
-  Widget _buildFoodItemCard(FoodItem foodItem) {
+  Widget _buildFoodItemCard(CartItem foodItem) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8),
       child: ListTile(
-        leading: Image.asset(
+        leading: Image.network(
           foodItem.image,
           width: 60,
           height: 60,
@@ -179,7 +205,8 @@ class _PaymentState extends State<Payment> {
   }
 
   Widget _buildTotalPrice() {
-    double totalPrice = calculateTotalPrice();
+    double totalPrice =
+        cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,25 +217,56 @@ class _PaymentState extends State<Payment> {
         ),
         Text(
           '\$$totalPrice',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+          style: TextStyle(
+              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
         ),
       ],
     );
   }
 
-  void _incrementQuantity(FoodItem foodItem) {
-    setState(() {
-      foodItem.quantity++;
-    });
-  }
+  // void _incrementQuantity(CartItem foodItem) {
+  //   setState(() {
+  //     foodItem.quantity++;
+  //   });
+  // }
 
-  void _decrementQuantity(FoodItem foodItem) {
-    setState(() {
-      if (foodItem.quantity > 0) {
-        foodItem.quantity--;
-      }
-    });
-  }
+  // void _decrementQuantity(CartItem foodItem) {
+  //   setState(() {
+  //     if (foodItem.quantity > 0) {
+  //       foodItem.quantity--;
+  //     }
+  //   });
+  // }
+
+  void _incrementQuantity(CartItem cartItem) {
+  setState(() {
+    cartItem.quantity++;
+    // Update quantity in Firestore
+    DatabaseService(uid: '').updateCartItem(cartItem);
+  });
+}
+
+void _decrementQuantity(CartItem cartItem) {
+  setState(() {
+    if (cartItem.quantity > 1) {
+      cartItem.quantity--;
+      // Update quantity in Firestore
+      DatabaseService(uid: '').updateCartItem(cartItem);
+    } else {
+      // If quantity is 1, remove the item from the cart
+      _removeCartItem(cartItem);
+    }
+  });
+}
+
+void _removeCartItem(CartItem cartItem) {
+  setState(() {
+    // Remove the item from the cart locally
+    cartItems.remove(cartItem);
+    // Remove the item from Firestore
+    DatabaseService(uid: '').removeCartItem(cartItem);
+  });
+}
 
   void _onItemTapped(int index) {
     setState(() {

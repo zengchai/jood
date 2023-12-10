@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:jood/models/userprofile.dart';
 import 'package:jood/pages/Order/orderPage.dart';
+import 'package:jood/pages/shoppingcart/CartItem.dart';
 import 'package:jood/services/auth.dart';
 
 class DatabaseService {
@@ -16,8 +17,11 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('orders');
   final CollectionReference reviewCollection =
       FirebaseFirestore.instance.collection('reviews');
+  final CollectionReference cartCollection =
+      FirebaseFirestore.instance.collection('cart');
 
-  Future setUserData(String uid,String name,String email,String matricnum,String phonenum,String address) async {
+  Future setUserData(String uid, String name, String email, String matricnum,
+      String phonenum, String address) async {
     return await Jood.doc(uid).set({
       'uid': uid,
       'name': name,
@@ -34,7 +38,8 @@ class DatabaseService {
     });
   }
 
-  Future updateUserData(String name,String email,String matricnum,String phonenum,String address) async {
+  Future updateUserData(String name, String email, String matricnum,
+      String phonenum, String address) async {
     return await Jood.doc(uid).update({
       'uid': uid,
       'name': name,
@@ -91,6 +96,40 @@ class DatabaseService {
 
     // Commit the batch operation
     await batch.commit();
+  }
+
+  // Function to add a food item to the cart
+  Future<void> addToCart(
+      String foodName, String foodImage, double foodPrice) async {
+    // Convert foodPrice to double if it's a String
+    final double parsedPrice = foodPrice is String
+        ? double.tryParse(foodPrice as String) ?? 0.0
+        : (foodPrice as num).toDouble();
+
+    await cartCollection.add({
+      'foodName': foodName,
+      'foodImage': foodImage,
+      'foodPrice': parsedPrice,
+      'quantity': 1, // Initial quantity
+    });
+
+    
+  }
+
+  // Function to retrieve cart items
+  Stream<List<CartItem>> getCartItems() {
+    return cartCollection.snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        var data = doc.data() as Map<String, dynamic>;
+        return CartItem(
+          name: data['foodName'] ?? '',
+          image: data['foodImage'] ?? '',
+          quantity: (data['quantity'] ?? 0)
+              .toInt(), // Handle null or use a default value
+          price: data['foodPrice'] ?? 0.0, // Handle null or use a default value
+        );
+      }).toList();
+    });
   }
 
 // Add a method to retrieve ongoing orders
@@ -163,5 +202,4 @@ class DatabaseService {
       return null; // You might want to return a default or empty profile in case of an error
     }
   }
-
 }
