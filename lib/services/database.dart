@@ -112,8 +112,6 @@ class DatabaseService {
       'foodPrice': parsedPrice,
       'quantity': 1, // Initial quantity
     });
-
-    
   }
 
   // Function to retrieve cart items
