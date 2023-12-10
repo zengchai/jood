@@ -66,14 +66,15 @@ class _ReceiptState extends State<Receipt> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       backgroundColor: Colors.brown[50],
       body: Padding(
-        padding: const EdgeInsets.all(50.0),
+        padding: const EdgeInsets.all(30.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CustomStepIndicator(currentStep: currentStep),
-            SizedBox(height: 30),
+            SizedBox(height: 10),
             _buildConfirmationSection(),
             Divider(height: 30, thickness: 2),
             _buildPaymentDetails(),
