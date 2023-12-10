@@ -101,6 +101,7 @@ class _PaymentState extends State<Payment> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.brown[50],
+      appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Column(
@@ -259,14 +260,14 @@ class _PaymentState extends State<Payment> {
 //   });
 // }
 
-void _removeCartItem(CartItem cartItem) {
-  setState(() {
-    // Remove the item from the cart locally
-    cartItems.remove(cartItem);
-    // Remove the item from Firestore
-    DatabaseService(uid: '').removeCartItem(cartItem);
-  });
-}
+// void _removeCartItem(CartItem cartItem) {
+//   setState(() {
+//     // Remove the item from the cart locally
+//     cartItems.remove(cartItem);
+//     // Remove the item from Firestore
+//     DatabaseService(uid: '').removeCartItem(cartItem);
+//   });
+// }
 
   void _onItemTapped(int index) {
     setState(() {

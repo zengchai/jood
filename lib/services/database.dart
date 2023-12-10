@@ -112,8 +112,6 @@ class DatabaseService {
       'foodPrice': parsedPrice,
       'quantity': 1, // Initial quantity
     });
-
-    
   }
 
   // Function to retrieve cart items
@@ -202,4 +200,6 @@ class DatabaseService {
       return null; // You might want to return a default or empty profile in case of an error
     }
   }
+
+  setPaymentData(String s, String t) {}
 }
