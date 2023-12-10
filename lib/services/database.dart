@@ -136,7 +136,7 @@ class DatabaseService {
   }
 
 // Convert a single document snapshot to a UserProfile
-  UserProfile _userProfileFromSnapshot(DocumentSnapshot snapshot) {
+ UserProfile _userProfileFromSnapshot(DocumentSnapshot snapshot) {
     var userData = snapshot.data() as Map<String, dynamic>;
     return UserProfile(
       uid: userData['uid'] ?? '',

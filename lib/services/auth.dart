@@ -48,7 +48,7 @@ class AuthService {
   }
 
   // register with email & password
-  Future registerWithEmailAndPassword (String email, String password, String name) async {
+  Future registerWithEmailAndPassword (String email, String password, String name,BuildContext context) async {
     try{
       UserCredential result  = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       User? users = result.user;
@@ -59,10 +59,30 @@ class AuthService {
       await DatabaseService(uid: users!.uid).updateReviewData('', '', '');
       return _userFromFirebaseUser(users);
     } catch (e) {
-      print(e.toString());
-      return null;
-    }
+      if (e is FirebaseAuthException) {
+      showDialog(
+        context: context, // Make sure to have access to the current context
+        builder: (BuildContext context) {
+          return WarningAlert(title: 'Error',subtitle: '${e.message}');
+        },
+      );
+    }}
   }
+
+  Future<void> resetPassword(String email,BuildContext context) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      print('Password reset email sent successfully');
+    } catch (e) {
+      if (e is FirebaseAuthException) {
+        showDialog(
+          context: context, // Make sure to have access to the current context
+          builder: (BuildContext context) {
+            return WarningAlert(title: 'Error',subtitle: '${e.message}');
+          },
+        );
+    }
+  }}
 
   Future ongoingOrder(List<OrderItem> orderItem) async {
     try {
@@ -89,12 +109,18 @@ class AuthService {
   }
 
   // sign out
-  Future signOut() async {
+  Future signOut(BuildContext context) async {
     try {
       return await _auth.signOut();
     } catch (e) {
-      print(e.toString());
-      return null;
+      if (e is FirebaseAuthException) {
+        showDialog(
+          context: context, // Make sure to have access to the current context
+          builder: (BuildContext context) {
+            return WarningAlert(title: 'Error',subtitle: '${e.message}');
+          },
+        );
+      }
     }
   }
 
@@ -121,7 +147,7 @@ class AuthService {
         showDialog(
           context: context, // Make sure to have access to the current context
           builder: (BuildContext context) {
-            return WarningAlert();
+            return WarningAlert(title: 'Deleted',subtitle: 'The account has been deleted',);
           },
         );
         return await FirebaseAuth.instance.signOut();
@@ -129,11 +155,9 @@ class AuthService {
         showDialog(
           context: context, // Make sure to have access to the current context
           builder: (BuildContext context) {
-            return WarningAlert();
+            return WarningAlert(title: 'Error', subtitle: e.toString(),);
           },
         );
-        print("Error deleting user account: $e");
-
       }
     }
   }

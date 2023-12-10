@@ -94,6 +94,7 @@ class _PaymentState extends State<Payment> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.brown[50],
+      appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Column(

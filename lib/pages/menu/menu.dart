@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:jood/pages/menu/provider/menu_provider/menu_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +20,8 @@ class MenuPage extends StatefulWidget {
 class _CategoryMenuState extends State<MenuPage> {
 
 
+  late String formattedDate;
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +33,8 @@ class _CategoryMenuState extends State<MenuPage> {
     Size size = MediaQuery.sizeOf(context);
     bool showCustomer = true;
     final currentUser = Provider.of<AppUsers?>(context);
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('yyyy-MM-dd').format(now);
 
     if(currentUser!.uid =='TnDmXCiJINXWdNBhfZvuAFCuaSL2'){
       showCustomer = false;
@@ -49,6 +54,7 @@ class _CategoryMenuState extends State<MenuPage> {
           child: Consumer<MenuProvider>(
             builder: (context, menuProvider, child) {
               return showCustomer ?
+
               // if he/she is a customer
               Column(
                 children: [
@@ -58,14 +64,11 @@ class _CategoryMenuState extends State<MenuPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("EDIT MENU",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black)),
                         Row(
                           children: [
+                            SizedBox(width: 10,),
                             Icon(Icons.date_range_outlined),
+                            SizedBox(width: 10,),
                             Text("19/11/2023",
                                 style: TextStyle(
                                     fontSize: 16,
@@ -140,6 +143,7 @@ class _CategoryMenuState extends State<MenuPage> {
                                           child: CustomButton(
                                               text: "Add to cart",
                                               onPressed: () {
+
                                                 // showDialog(
                                                 //     context: context,
                                                 //     builder: (context) {
