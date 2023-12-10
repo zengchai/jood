@@ -19,13 +19,13 @@ import 'package:provider/provider.dart';
 import 'pages/menu/provider/menu_provider/menu_provider.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Ensure WidgetsBinding is initialized
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Ensure WidgetsBinding is initialized
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   ); // Initialize Firebase
 
-
-runApp(
+  runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => MenuProvider()),
@@ -40,11 +40,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamProvider<AppUsers?>.value(
-      catchError: (User,user) {},
+      // ignore: body_might_complete_normally_nullable
+      catchError: (User, user) {},
       value: AuthService().changeuser,
       initialData: null,
       child: MaterialApp(
-        routes: {'/authenticate': (context) => Authenticate(),
+        routes: {
+          '/authenticate': (context) => Authenticate(),
           '/home': (context) => Home(),
           '/signin': (context) => SignIn(),
           '/signup': (context) => Register(),
@@ -52,8 +54,6 @@ class MyApp extends StatelessWidget {
           '/editprofile': (context) => EditProfile(),
           '/method': (context) => MethodPage(),
           '/receipt': (context) => Receipt(),
-
-
         },
         home: const Wrapper(),
       ),

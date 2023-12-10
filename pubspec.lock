@@ -105,6 +105,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
+<<<<<<< HEAD
   cross_file:
     dependency: transitive
     description:
@@ -121,6 +122,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.3"
+=======
+>>>>>>> d1008a6c4d4ab438fcb80621bdb3d2b28ec9aa85
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -456,6 +459,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.11.0"
+<<<<<<< HEAD
   mime:
     dependency: transitive
     description:
@@ -464,6 +468,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+=======
+>>>>>>> d1008a6c4d4ab438fcb80621bdb3d2b28ec9aa85
   nested:
     dependency: transitive
     description:
@@ -693,6 +699,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.0"
+<<<<<<< HEAD
   win32:
     dependency: transitive
     description:
@@ -712,3 +719,8 @@ packages:
 sdks:
   dart: ">=3.2.0 <4.0.0"
   flutter: ">=3.10.0"
+=======
+sdks:
+  dart: ">=3.2.0-194.0.dev <4.0.0"
+  flutter: ">=3.3.0"
+>>>>>>> d1008a6c4d4ab438fcb80621bdb3d2b28ec9aa85
