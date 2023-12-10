@@ -45,8 +45,15 @@ class DatabaseService {
     });
   }
 
-  Future updatePaymentData(String Pmethod, String amount) async {
+  Future setPaymentData(String Pmethod, String amount) async {
     return await paymentCollection.doc(uid).set({
+      'Pmethod': Pmethod,
+      'amount': amount,
+    });
+  }
+
+  Future updatePaymentData(String Pmethod, String amount) async {
+    return await paymentCollection.doc(uid).update({
       'Pmethod': Pmethod,
       'amount': amount,
     });
@@ -161,6 +168,17 @@ class DatabaseService {
       // Handle errors here
       print("Error fetching user profile: $e");
       return null; // You might want to return a default or empty profile in case of an error
+    }
+  }
+
+  Future<Map<String, dynamic>?> getPaymentData() async {
+    try {
+      DocumentSnapshot<Object?> snapshot =
+      await paymentCollection.doc(uid).get();
+      return snapshot.data() as Map<String, dynamic>?; // Adjust the return type based on your data structure
+    } catch (e) {
+      print("Error fetching payment data: $e");
+      return null;
     }
   }
 
