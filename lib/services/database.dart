@@ -167,4 +167,14 @@ class DatabaseService {
     }
   }
 
+  Stream<List<String>> foodReviewsStream() {
+    return reviewCollection.doc("hhi").snapshots().map((snapshot) {
+      var data = snapshot.data() as Map<String, dynamic>;
+      List<String> foodReviews = List<String>.from(data['RfoodReview'] ?? []);
+      return foodReviews;
+    });
+  }
+
+
+
 }
