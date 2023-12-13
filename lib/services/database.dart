@@ -98,6 +98,15 @@ class DatabaseService {
     await batch.commit();
   }
 
+  Future setCartData(String name, String image, int quantity, double price) async {
+    return await cartCollection.doc(uid).set({
+      'name': name,
+      'image': image,
+      'quantity': quantity,
+      'price': price,
+    });
+  }
+
   // Function to add a food item to the cart
   Future<void> addToCart(
       String foodName, String foodImage, double foodPrice) async {

@@ -4,6 +4,9 @@ import 'package:jood/pages/shoppingcart/CartItem.dart';
 import 'package:jood/services/auth.dart';
 import 'package:collection/collection.dart';
 import 'package:jood/services/database.dart';
+import 'package:provider/provider.dart';
+
+import '../../models/users.dart';
 
 class CustomStepIndicator extends StatelessWidget {
   final int currentStep;
@@ -60,20 +63,6 @@ class CustomStepIndicator extends StatelessWidget {
   }
 }
 
-// class FoodItem {
-//   final String name;
-//   final String image;
-//   int quantity;
-//   final double price;
-
-//   FoodItem({
-//     required this.name,
-//     required this.image,
-//     required this.quantity,
-//     required this.price,
-//   });
-// }
-
 class Payment extends StatefulWidget {
   @override
   _PaymentState createState() => _PaymentState();
@@ -86,12 +75,6 @@ class _PaymentState extends State<Payment> {
 
 // Updated: Maintain a list of selected food items in the cart
   List<CartItem> cartItems = [];
-
-  // replace with real data
-  // List<FoodItem> foodItems = [
-  //   FoodItem(name: 'FriedMee', image: 'assets/friedmee.jpeg', quantity: 2, price: 7.0),
-  //   FoodItem(name: 'FriedRice', image: 'assets/friedrice.jpeg', quantity: 1, price: 6.0),
-  // ];
 
   double calculateTotalPrice() {
     return cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
@@ -123,7 +106,7 @@ class _PaymentState extends State<Payment> {
             //   ),
             // ),
             StreamBuilder<List<CartItem>>(
-              stream: DatabaseService(uid: '').getCartItems(),
+              stream: DatabaseService(uid: Provider.of<AppUsers?>(context)!.uid).getCartItems(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return CircularProgressIndicator(); // Loading indicator

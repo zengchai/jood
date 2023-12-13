@@ -145,8 +145,7 @@ class _CategoryMenuState extends State<MenuPage> {
                                             child: CustomButton(
                                                 text: "Add to cart",
                                                 onPressed: () async {
-                                                  await DatabaseService(uid: '')
-                                                      .addToCart(
+                                                  await DatabaseService(uid: Provider.of<AppUsers?>(context)!.uid).addToCart(
                                                           menuProvider
                                                                   .menuList[
                                                                       index]
