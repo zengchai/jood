@@ -57,15 +57,17 @@ class DatabaseService {
     });
   }
 
-  Future updateReviewData(String review) async { //UPDATE REVIEW DATA ON THE SAME ORDER
+  Future updateReviewData(String review) async {
+    //UPDATE REVIEW DATA ON THE SAME ORDER
     return await reviewCollection.doc("hhi").update({
-      'RfoodReview' : FieldValue.arrayUnion([review]),
+      'RfoodReview': FieldValue.arrayUnion([review]),
     });
   }
 
-  Future setReviewData(String review) async { //SET REVIEW DATA WHEN ADD MORE FOOD
+  Future setReviewData(String review) async {
+    //SET REVIEW DATA WHEN ADD MORE FOOD
     return await reviewCollection.doc("hhi").set({
-      'RfoodReview' : FieldValue.arrayUnion([review]),
+      'RfoodReview': FieldValue.arrayUnion([review]),
     });
   }
 
@@ -111,10 +113,10 @@ class DatabaseService {
 
     final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
     await cartCollection.doc(uid).set({
-      'item$timestamp': FieldValue.arrayUnion([foodName,foodImage,parsedPrice,1]), // Initial quantity
+      'item$timestamp': FieldValue.arrayUnion(
+          [foodName, foodImage, parsedPrice, 1]), // Initial quantity
     }, SetOptions(merge: true));
   }
-
 
   // Function to retrieve cart items
   Stream<List<CartItem>> getCartItems() {
@@ -126,7 +128,8 @@ class DatabaseService {
       var data = snapshot.data() as Map<String, dynamic>;
 
       // Retrieve all keys from the data map
-      List<String> itemKeys = data.keys.where((key) => key.startsWith('item')).toList();
+      List<String> itemKeys =
+          data.keys.where((key) => key.startsWith('item')).toList();
 
       if (itemKeys.isEmpty) {
         return []; // Return an empty list if there are no item keys
@@ -157,27 +160,51 @@ class DatabaseService {
     });
   }
 
-
-
-
-// Add a method to retrieve ongoing orders
-  Stream<List<OrderItem>> get ongoingOrderItems {
+// Add a method to retrieve customer orders
+  Stream<List<Map<String, dynamic>>> getCustomerOrder() {
     return orderCollection
-        .doc(uid)
-        .collection('ongoing_orders')
+        .doc("H4zCS1bQB8DxpvqzOexp")
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        var data = doc.data() as Map<String, dynamic>;
-        return OrderItem(
-          orderID: doc.id,
-          foodName: data['name'] ?? '',
-          image: data['image'] ?? '',
-          quantity: data['quantity'] ?? 0,
-          price: data['price'] ?? 0.0,
-          status: data['status'] ?? '',
-        );
-      }).toList();
+      if (!snapshot.exists) {
+        return []; // Return an empty list if the document doesn't exist
+      }
+
+      var data = snapshot.data() as Map<String, dynamic>;
+
+      // Retrieve all keys from the data map
+      List<String> orderkeys =
+          data.keys.where((key) => key.startsWith('order')).toList();
+
+      if (orderkeys.isEmpty) {
+        return []; // Return an empty list if there are no item keys
+      }
+
+      // Map the item keys to a list of CartItem objects
+      List<Map<String, dynamic>> orderItems = orderkeys
+          .map((key) {
+            dynamic order = data[key];
+            print('Order: $order');
+            if (order == null || order is! List<dynamic> || order.length < 4) {
+              return {
+                'FoodImage': "Invalid Item Format",
+                'FoodName': 'error_image.jpg',
+                'FoodPrice': 0.0,
+                'FoodQuantity': 0,
+              };
+            }
+
+            return {
+              'FoodImage': order[0] as String,
+              'FoodName': order[1] as String,
+              'FoodPrice': (order[2] as num).toDouble(),
+              'FoodQuantity': (order[3] as num).toInt(),
+            };
+          })
+          .cast<Map<String, dynamic>>()
+          .toList();
+
+      return orderItems;
     });
   }
 
@@ -203,7 +230,7 @@ class DatabaseService {
   }
 
 // Convert a single document snapshot to a UserProfile
- UserProfile _userProfileFromSnapshot(DocumentSnapshot snapshot) {
+  UserProfile _userProfileFromSnapshot(DocumentSnapshot snapshot) {
     var userData = snapshot.data() as Map<String, dynamic>;
     return UserProfile(
       uid: userData['uid'] ?? '',
@@ -238,8 +265,6 @@ class DatabaseService {
       return foodReviews;
     });
   }
-
-
 
   setPaymentData(String s, String t) {}
 }
