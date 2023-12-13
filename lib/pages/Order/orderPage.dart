@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:jood/models/users.dart';
+import 'package:jood/pages/Order/orderItem.dart';
 import 'package:jood/pages/order/reviewForm.dart';
 import 'package:jood/pages/payment/payment.dart';
 import 'package:jood/services/auth.dart';
@@ -17,36 +18,7 @@ class OrderPage extends StatefulWidget {
   State<OrderPage> createState() => _OrderPageState();
 }
 
-class OrderItem {
-  final String orderID;
-  final String foodName;
-  final String image;
-  int quantity;
-  final double price;
-  final String status;
-
-  OrderItem({
-    required this.orderID,
-    required this.foodName,
-    required this.image,
-    required this.quantity,
-    required this.price,
-    required this.status,
-  });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'foodName': foodName,
-      'quantity': quantity,
-      'price': price,
-      'status': status,
-      'timestamp': FieldValue.serverTimestamp(),
-    };
-  }
-}
-
 class _OrderPageState extends State<OrderPage> {
-  DatabaseService databaseService = DatabaseService(uid: 'currentUserId');
   final _formKey = GlobalKey<FormState>();
   late final String review;
   late PageController _pageController;
@@ -70,7 +42,7 @@ class _OrderPageState extends State<OrderPage> {
                     children: [
                       ListTile(
                         leading: Image.asset(
-                          orderItem.image,
+                          orderItem.foodImage,
                           width: 120,
                           height: 120,
                         ),
@@ -93,34 +65,34 @@ class _OrderPageState extends State<OrderPage> {
     );
   }
 
-  List<OrderItem> ongoingItems = [
-    OrderItem(
-        orderID: '#1234',
-        foodName: 'Fried Mee',
-        image: 'assets/friedmee.jpeg',
-        quantity: 2,
-        price: 7.0,
-        status: 'Order Preparing'),
-    OrderItem(
-        orderID: '#2345',
-        foodName: 'Fried Rice',
-        image: 'assets/friedrice.jpeg',
-        quantity: 1,
-        price: 6.0,
-        status: 'Order Preparing'),
-    // Add more ongoing items as needed
-  ];
+  // List<OrderItem> ongoingItems = [
+  //   OrderItem(
+  //       orderID: '#1234',
+  //       foodName: 'Fried Mee',
+  //       image: 'assets/friedmee.jpeg',
+  //       quantity: 2,
+  //       price: 7.0,
+  //       status: 'Order Preparing'),
+  //   OrderItem(
+  //       orderID: '#2345',
+  //       foodName: 'Fried Rice',
+  //       image: 'assets/friedrice.jpeg',
+  //       quantity: 1,
+  //       price: 6.0,
+  //       status: 'Order Preparing'),
+  //   // Add more ongoing items as needed
+  // ];
 
-  List<OrderItem> historyItems = [
-    OrderItem(
-        orderID: '#5678',
-        foodName: 'Fried Rice',
-        image: 'assets/friedrice.jpeg',
-        quantity: 1,
-        price: 6.0,
-        status: 'Order Delivered'),
-    // Add more history items as needed
-  ];
+  // List<OrderItem> historyItems = [
+  //   OrderItem(
+  //       orderID: '#5678',
+  //       foodName: 'Fried Rice',
+  //       image: 'assets/friedrice.jpeg',
+  //       quantity: 1,
+  //       price: 6.0,
+  //       status: 'Order Delivered'),
+  //   // Add more history items as needed
+  // ];
 
   // Date
   late DateTime currentDate = DateTime.now();
@@ -151,7 +123,6 @@ class _OrderPageState extends State<OrderPage> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.sizeOf(context);
     bool showCustomer = true;
     final currentUser = Provider.of<AppUsers?>(context);
 
@@ -243,8 +214,8 @@ class _OrderPageState extends State<OrderPage> {
                         });
                       },
                       children: [
-                        _buildOrderList(ongoingItems, false),
-                        _buildOrderList(historyItems, true),
+                        //_buildOrderList(false),
+                        //_buildOrderList(true),
                       ],
                     ),
                   ),
@@ -326,8 +297,32 @@ class _OrderPageState extends State<OrderPage> {
                         });
                       },
                       children: [
-                        _buildOrderList(ongoingItems, false),
-                        _buildOrderList(historyItems, true),
+                        StreamBuilder<List<OrderItem>>(
+                          // stream: DatabaseService(uid: currentUser!.uid)
+                          stream: DatabaseService(uid: currentUser!.uid)
+                              .getCustomerOrder(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return Text("Error: ${snapshot.error}");
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return Text("No data available");
+                            } else {
+                              List<OrderItem> orderData = snapshot.data ?? [];
+
+                              // Display and manipulate cart items in the UI
+                              return Column(
+                                children: orderData.map((orderItem) {
+                                  return _buildOrderItemCard(orderItem, false);
+                                }).toList(),
+                              );
+                            }
+                          },
+                        ),
+                        //_buildOrderList(true),
                       ],
                     ),
                   ),
@@ -335,76 +330,74 @@ class _OrderPageState extends State<OrderPage> {
               ));
   }
 
-  Widget _buildOrderList(List<OrderItem> items, bool isHistoryPage) {
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: items.length,
-      itemBuilder: (BuildContext context, int index) {
-        return _buildOrderItemCard(items[index], isHistoryPage);
-      },
-    );
-  }
+  // Widget _buildOrderList(bool isHistoryPage) {
+  //   return StreamBuilder<List<Map<String, dynamic>>>(
+  //     stream: DatabaseService(uid: currentUser!.uid).getCustomerOrder(),
+  //     builder: (context, snapshot) {
+  //       if (snapshot.connectionState == ConnectionState.waiting) {
+  //         return CircularProgressIndicator();
+  //       } else if (snapshot.hasError) {
+  //         return Text("Error: ${snapshot.error}");
+  //       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+  //         return Text("No data available");
+  //       } else {
+  //         List<Map<String, dynamic>> orderData = snapshot.data ?? [];
+
+  //         return ListView.builder(
+  //           itemCount: orderData.length,
+  //           itemBuilder: (context, index) {
+  //             var data = orderData[index];
+
+  //             // Display the retrieved data
+  //             return ListTile(
+  //               title: Text(data['foodName']),
+  //               subtitle: Text('Price: ${data['foodPrice']}'),
+  //               leading: Image.network(data['foodImage']),
+  //               // Add other fields as needed
+  //             );
+  //           },
+  //         );
+  //       }
+  //     },
+  //   );
+  // }
 
   Widget _buildOrderItemCard(OrderItem orderItem, bool isHistoryPage) {
     return Container(
-      margin: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.fromLTRB(15, 8, 0, 0),
-            height: 32,
-            width: 400,
-            decoration: BoxDecoration(
-              color: Color.fromRGBO(226, 193, 142, 1),
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30), topRight: Radius.circular(30)),
-            ),
-            child: Text('${orderItem.orderID}',
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                )),
-          ),
-          Container(
-            width: 400,
-            decoration: BoxDecoration(
-              color: Color.fromRGBO(248, 232, 209, 1),
-              borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                  bottomRight: Radius.circular(30)),
-            ),
-            child: ListTile(
-              contentPadding: EdgeInsets.all(8),
-              leading: Image.asset(
-                orderItem.image,
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
-              ),
-              title: Text(orderItem.foodName),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Quantity: ${orderItem.quantity}'),
-                      Text('Price: \$${orderItem.price.toStringAsFixed(2)}'),
-                      Text('Status: ${orderItem.status}'),
-                      if (isHistoryPage) // Conditionally show the review button
-                        ElevatedButton(
-                          onPressed: () {
-                            _popupReview(orderItem);
-                          },
-                          child: Text('Give Review'),
-                        ),
-                    ],
+      width: 400,
+      decoration: BoxDecoration(
+        color: Color.fromRGBO(248, 232, 209, 1),
+        borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
+      ),
+      child: ListTile(
+        contentPadding: EdgeInsets.all(8),
+        leading: Image.network(
+          orderItem.foodImage,
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+        ),
+        title: Text(orderItem.foodName),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Quantity: ${orderItem.quantity}'),
+                Text('Price: \$${orderItem.price.toStringAsFixed(2)}'),
+                if (isHistoryPage) // Conditionally show the review button
+                  ElevatedButton(
+                    onPressed: () {
+                      //_popupReview(orderItem);
+                    },
+                    child: Text('Give Review'),
                   ),
-                ],
-              ),
+              ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

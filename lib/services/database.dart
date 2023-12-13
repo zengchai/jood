@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:jood/models/userprofile.dart';
+import 'package:jood/pages/Order/orderItem.dart';
 import 'package:jood/pages/Order/orderPage.dart';
 import 'package:jood/pages/shoppingcart/CartItem.dart';
 import 'package:jood/services/auth.dart';
@@ -14,7 +15,7 @@ class DatabaseService {
   final CollectionReference paymentCollection =
       FirebaseFirestore.instance.collection('payments');
   final CollectionReference orderCollection =
-      FirebaseFirestore.instance.collection('orders');
+      FirebaseFirestore.instance.collection('Order');
   final CollectionReference reviewCollection =
       FirebaseFirestore.instance.collection('reviews');
   final CollectionReference cartCollection =
@@ -71,37 +72,37 @@ class DatabaseService {
     });
   }
 
-  Future updateOngoingOrder(List<OrderItem> orderItem) async {
-    final batch = FirebaseFirestore.instance.batch();
+  // Future updateOngoingOrder(List<OrderItem> orderItem) async {
+  //   final batch = FirebaseFirestore.instance.batch();
 
-    for (var order in orderItem) {
-      final orderDocRef = orderCollection
-          .doc(uid)
-          .collection('ongoing_orders')
-          .doc(order.orderID);
+  //   for (var order in orderItem) {
+  //     final orderDocRef = orderCollection
+  //         .doc(uid)
+  //         .collection('ongoing_orders')
+  //         .doc(order.orderID);
 
-      batch.set(orderDocRef, order.toMap());
-    }
+  //     batch.set(orderDocRef, order.toMap());
+  //   }
 
-    // Commit the batch operation
-    await batch.commit();
-  }
+  //   // Commit the batch operation
+  //   await batch.commit();
+  // }
 
-  Future updateOrderHistory(List<OrderItem> orderItem) async {
-    final batch = FirebaseFirestore.instance.batch();
+  // Future updateOrderHistory(List<OrderItem> orderItem) async {
+  //   final batch = FirebaseFirestore.instance.batch();
 
-    for (var order in orderItem) {
-      final orderDocRef = orderCollection
-          .doc(uid)
-          .collection('order_history')
-          .doc(order.orderID);
+  //   for (var order in orderItem) {
+  //     final orderDocRef = orderCollection
+  //         .doc(uid)
+  //         .collection('order_history')
+  //         .doc(order.orderID);
 
-      batch.set(orderDocRef, order.toMap());
-    }
+  //     batch.set(orderDocRef, order.toMap());
+  //   }
 
-    // Commit the batch operation
-    await batch.commit();
-  }
+  //   // Commit the batch operation
+  //   await batch.commit();
+  // }
 
   // Function to add a food item to the cart
   Future<void> addToCart(
@@ -161,7 +162,7 @@ class DatabaseService {
   }
 
 // Add a method to retrieve customer orders
-  Stream<List<Map<String, dynamic>>> getCustomerOrder() {
+  Stream<List<OrderItem>> getCustomerOrder() {
     return orderCollection
         .doc("H4zCS1bQB8DxpvqzOexp")
         .snapshots()
@@ -174,60 +175,81 @@ class DatabaseService {
 
       // Retrieve all keys from the data map
       List<String> orderkeys =
-          data.keys.where((key) => key.startsWith('order')).toList();
+          data.keys.where((key) => key.startsWith('Order')).toList();
 
       if (orderkeys.isEmpty) {
         return []; // Return an empty list if there are no item keys
       }
 
-      // Map the item keys to a list of CartItem objects
-      List<Map<String, dynamic>> orderItems = orderkeys
-          .map((key) {
-            dynamic order = data[key];
-            print('Order: $order');
-            if (order == null || order is! List<dynamic> || order.length < 4) {
-              return {
-                'FoodImage': "Invalid Item Format",
-                'FoodName': 'error_image.jpg',
-                'FoodPrice': 0.0,
-                'FoodQuantity': 0,
-              };
-            }
+      // Map the item keys to a list of orderItems objects
+      // List<OrderItem> orderItems = orderkeys
+      //     .map((key) {
+      //       dynamic orderItem = data[key];
+      //       print('Order: $orderItem');
+      //       if (orderItem == null ||
+      //           orderItem is! List<dynamic> ||
+      //           orderItem.length < 4) {
+      //         return {
+      //           'FoodImage': "Invalid Item Format",
+      //           'FoodName': 'error_image.jpg',
+      //           'FoodPrice': 0.0,
+      //           'FoodQuantity': 0,
+      //         };
+      //       }
 
-            return {
-              'FoodImage': order[0] as String,
-              'FoodName': order[1] as String,
-              'FoodPrice': (order[2] as num).toDouble(),
-              'FoodQuantity': (order[3] as num).toInt(),
-            };
-          })
-          .cast<Map<String, dynamic>>()
-          .toList();
+      //       return {
+      //         'FoodImage': orderItem[0] as String,
+      //         'FoodName': orderItem[1] as String,
+      //         'FoodPrice': (orderItem[2] as num).toDouble(),
+      //         'FoodQuantity': (orderItem[3] as num).toInt(),
+      //       };
+      //     })
+      //     .cast<Map<String, dynamic>>()
+      //     .toList();
+      List<OrderItem> orderItems = orderkeys.map((key) {
+        dynamic item = data[key];
+        print('Item: $item');
+        if (item == null || item is! List<dynamic> || item.length < 4) {
+          return OrderItem(
+            foodName: 'Invalid Item Format',
+            foodImage: 'error_image.jpg',
+            quantity: 0,
+            price: 0.0,
+          );
+        }
+
+        return OrderItem(
+          foodName: item[1] as String,
+          foodImage: item[0] as String,
+          quantity: (item[3] as num).toInt(),
+          price: (item[2] as num).toDouble(),
+        );
+      }).toList();
 
       return orderItems;
     });
   }
 
-// Add a method to retrieve order history
-  Stream<List<OrderItem>> get orderHistoryItems {
-    return orderCollection
-        .doc(uid)
-        .collection('order_history')
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        var data = doc.data() as Map<String, dynamic>;
-        return OrderItem(
-          orderID: doc.id,
-          foodName: data['name'] ?? '',
-          image: data['image'] ?? '',
-          quantity: data['quantity'] ?? 0,
-          price: data['price'] ?? 0.0,
-          status: data['status'] ?? '',
-        );
-      }).toList();
-    });
-  }
+// // Add a method to retrieve order history
+//   Stream<List<OrderItem>> get orderHistoryItems {
+//     return orderCollection
+//         .doc(uid)
+//         .collection('order_history')
+//         .snapshots()
+//         .map((snapshot) {
+//       return snapshot.docs.map((doc) {
+//         var data = doc.data() as Map<String, dynamic>;
+//         return OrderItem(
+//           orderID: doc.id,
+//           foodName: data['name'] ?? '',
+//           image: data['image'] ?? '',
+//           quantity: data['quantity'] ?? 0,
+//           price: data['price'] ?? 0.0,
+//           status: data['status'] ?? '',
+//         );
+//       }).toList();
+//     });
+//   }
 
 // Convert a single document snapshot to a UserProfile
   UserProfile _userProfileFromSnapshot(DocumentSnapshot snapshot) {
