@@ -10,7 +10,6 @@ import 'package:jood/services/database.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/users.dart';
-import '../Order/orderPage.dart';
 import './utils/constants/colors_resources.dart';
 import 'add_alert_widget.dart';
 import 'custom_button.dart';
@@ -208,18 +207,14 @@ class _CategoryMenuState extends State<MenuPage> {
                                     child: ClipRRect(
                                       borderRadius:
                                       BorderRadius.circular(20),
-                                      child: InkWell(
-                                        onTap: () {
-                                          print('Image Clicked!');
-                                          _popupViewReview(menuProvider, index);
-                                        },
-                                        child: Image.network(
+                                      child: Image.asset(
                                         menuProvider.menuList[index].img ?? '',
                                         height: 100,
                                         width: size.width,
                                         fit: BoxFit.cover,
                                       ),
-                                    ),),),
+                                    ),
+                                  ),
                                   const SizedBox(height: 3),
                                   Text(
                                     menuProvider.menuList[index].title ?? "",
@@ -363,7 +358,6 @@ class _CategoryMenuState extends State<MenuPage> {
                                               fontWeight: FontWeight.w400,
                                               color: Colors.black),
                                           textAlign: TextAlign.center),
-
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 5),
@@ -408,7 +402,6 @@ class _CategoryMenuState extends State<MenuPage> {
                                           ],
                                         ),
                                       ),
-                                      
                                     ],
                                   ),
                                 );
