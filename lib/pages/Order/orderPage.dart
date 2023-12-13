@@ -2,10 +2,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:jood/models/users.dart';
 import 'package:jood/pages/order/reviewForm.dart';
 import 'package:jood/pages/payment/payment.dart';
 import 'package:jood/services/auth.dart';
 import 'package:jood/services/database.dart';
+import 'package:provider/provider.dart';
 
 //frf
 class OrderPage extends StatefulWidget {
@@ -91,7 +93,6 @@ class _OrderPageState extends State<OrderPage> {
     );
   }
 
-
   List<OrderItem> ongoingItems = [
     OrderItem(
         orderID: '#1234',
@@ -150,105 +151,188 @@ class _OrderPageState extends State<OrderPage> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.sizeOf(context);
+    bool showCustomer = true;
+    final currentUser = Provider.of<AppUsers?>(context);
+
+    if (currentUser!.uid == 'TnDmXCiJINXWdNBhfZvuAFCuaSL2') {
+      showCustomer = false;
+    } else {
+      showCustomer = true;
+    }
+
     //Date
     DateTime currentDate = DateTime.now();
     String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "MY ORDER",
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 0, 0, 0),
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Icon(
-                      Icons.calendar_today,
-                      color: Colors.black,
+        backgroundColor: Colors.white,
+        body: showCustomer
+            ?
+            //if he/she is customer
+            Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "MY ORDER",
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 0, 0, 0),
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Icon(
+                              Icons.calendar_today,
+                              color: Colors.black,
+                            ),
+                            SizedBox(width: 4.0),
+                            Text(
+                              formattedDate,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 4.0),
-                    Text(
-                      formattedDate,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        TextButton(
+                          onPressed: () => _navigateToPage(0),
+                          style: TextButton.styleFrom(
+                            backgroundColor: _currentPageIndex == 0
+                                ? Color.fromARGB(255, 250, 169,
+                                    63) // Highlight the selected button
+                                : null,
+                          ),
+                          child: Text('Ongoing'),
+                        ),
+                        TextButton(
+                          onPressed: () => _navigateToPage(1),
+                          style: TextButton.styleFrom(
+                            backgroundColor: _currentPageIndex == 1
+                                ? Color.fromARGB(255, 250, 169,
+                                    63) // Highlight the selected button
+                                : null,
+                          ),
+                          child: Text('History'),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                TextButton(
-                  onPressed: () => _navigateToPage(0),
-                  style: TextButton.styleFrom(
-                    backgroundColor: _currentPageIndex == 0
-                        ? Color.fromARGB(
-                            255, 250, 169, 63) // Highlight the selected button
-                        : null,
                   ),
-                  child: Text('Ongoing'),
-                ),
-                TextButton(
-                  onPressed: () => _navigateToPage(1),
-                  style: TextButton.styleFrom(
-                    backgroundColor: _currentPageIndex == 1
-                        ? Color.fromARGB(
-                            255, 250, 169, 63) // Highlight the selected button
-                        : null,
+                  Expanded(
+                    child: PageView(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentPageIndex = index;
+                        });
+                      },
+                      children: [
+                        _buildOrderList(ongoingItems, false),
+                        _buildOrderList(historyItems, true),
+                      ],
+                    ),
                   ),
-                  child: Text('History'),
-                ),
-                // TextButton(
-                //   onPressed: () async {
-                //     await AuthService().ongoingOrder(ongoingItems);
-                //   },
-                //   child: Text('1'),
-                // ),
-                // TextButton(
-                //   onPressed: () async {
-                //     await AuthService().orderHistory(historyItems);
-                //   },
-                //   child: Text('2'),
-                // ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentPageIndex = index;
-                });
-              },
-              children: [
-                _buildOrderList(ongoingItems, false),
-                _buildOrderList(historyItems, true),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+                ],
+              )
+            :
+
+            //if he/she is admin
+            Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "MY ORDER",
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 0, 0, 0),
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Icon(
+                              Icons.calendar_today,
+                              color: Colors.black,
+                            ),
+                            SizedBox(width: 4.0),
+                            Text(
+                              formattedDate,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        TextButton(
+                          onPressed: () => _navigateToPage(0),
+                          style: TextButton.styleFrom(
+                            backgroundColor: _currentPageIndex == 0
+                                ? Color.fromARGB(255, 250, 169,
+                                    63) // Highlight the selected button
+                                : null,
+                          ),
+                          child: Text('Incoming'),
+                        ),
+                        TextButton(
+                          onPressed: () => _navigateToPage(1),
+                          style: TextButton.styleFrom(
+                            backgroundColor: _currentPageIndex == 1
+                                ? Color.fromARGB(255, 250, 169,
+                                    63) // Highlight the selected button
+                                : null,
+                          ),
+                          child: Text('History'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: PageView(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentPageIndex = index;
+                        });
+                      },
+                      children: [
+                        _buildOrderList(ongoingItems, false),
+                        _buildOrderList(historyItems, true),
+                      ],
+                    ),
+                  ),
+                ],
+              ));
   }
 
   Widget _buildOrderList(List<OrderItem> items, bool isHistoryPage) {
