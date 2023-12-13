@@ -55,7 +55,7 @@ class AuthService {
 
       //create a new document for the new user with the uid
       await DatabaseService(uid: users!.uid).setUserData(users.uid, name, email,'','','');
-      await DatabaseService(uid: users!.uid).updatePaymentData('TnG', '0.00');
+      await DatabaseService(uid: users!.uid).setPaymentData('TnG', '0.00');
       await DatabaseService(uid: users!.uid).updateReviewData('', '', '');
       return _userFromFirebaseUser(users);
     } catch (e) {
@@ -136,7 +136,6 @@ class AuthService {
     }
   }
 
-
   Future deleteUserAccount(BuildContext context) async {
     User? user = FirebaseAuth.instance.currentUser;
 
@@ -158,6 +157,7 @@ class AuthService {
             return WarningAlert(title: 'Error', subtitle: e.toString(),);
           },
         );
+        print("Error deleting user account: $e");
       }
     }
   }

@@ -17,6 +17,7 @@ class CustomButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
             backgroundColor: ColorRes.buttonColor,
             elevation: 0,
+            padding: EdgeInsets.zero,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
@@ -29,8 +30,8 @@ class CustomButton extends StatelessWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Colors.white
-            )
-        )
+            ),
+        ),
     );
   }
 }
