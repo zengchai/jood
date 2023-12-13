@@ -207,11 +207,23 @@ class _CategoryMenuState extends State<MenuPage> {
                                     child: ClipRRect(
                                       borderRadius:
                                       BorderRadius.circular(20),
-                                      child: Image.asset(
-                                        menuProvider.menuList[index].img ?? '',
+                                      child: CachedNetworkImage(
                                         height: 100,
                                         width: size.width,
-                                        fit: BoxFit.cover,
+                                        fit: BoxFit.fill,
+                                        imageUrl: menuProvider
+                                            .menuList[index].img ??
+                                            '',
+                                        placeholder: (context, url) {
+                                          log("Placeholder for image: $url");
+                                          return const Center(
+                                              child:
+                                              CircularProgressIndicator());
+                                        },
+                                        errorWidget: (context, url, error) {
+                                          log("Error loading image: $url, $error");
+                                          return const Icon(Icons.error);
+                                        },
                                       ),
                                     ),
                                   ),
@@ -252,7 +264,7 @@ class _CategoryMenuState extends State<MenuPage> {
                                       ],
                                     ),
                                   )
-                                    ],
+                                ],
                               ),
                             );
                         }),
