@@ -4,6 +4,7 @@ import 'package:jood/services/database.dart';
 import 'package:jood/shared/loading.dart';
 import 'package:provider/provider.dart';
 
+import '../../constants/warningalert.dart';
 import '../../models/userprofile.dart';
 import '../../models/users.dart';
 
@@ -26,7 +27,14 @@ class _EditProfileState extends State<EditProfile> {
   @override
   Widget build(BuildContext context) {
     final FocusNode _focusNode = FocusNode();
-
+    void _showPanel2(String title, String subtitle) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return WarningAlert(title: title,subtitle: subtitle,);
+        },
+      );
+    };
     void _showPanel(){
       showDialog(
         context: context,
@@ -150,11 +158,18 @@ class _EditProfileState extends State<EditProfile> {
                     SizedBox(height:40.0),
                     editEnable ? ElevatedButton(
                           onPressed: () async{
+                            if(nameController.text.isEmpty||matricController.text.isEmpty||phonenumController.text.isEmpty||addressController.text.isEmpty){
+                              _showPanel2("Error","Some field is empty. Please check the field an make sure all the details are filled in.");
+                            }
+                            else if(matricController.text.length <= 8){
+                              _showPanel2("Error","The format of your matric number might be wrong. It should looks something like A23EC2311.");
+                            }
+                            else{
                             await DatabaseService(uid: user!.uid).updateUserData(nameController.text , emailController.text ,matricController.text ,phonenumController.text ,addressController.text);
                             setState(() {
                               editEnable = false;
                             });
-                            _showPanel(); // Close the dialog after updating
+                            _showPanel();} // Close the dialog after updating
                           },
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B).withOpacity(0.75),),

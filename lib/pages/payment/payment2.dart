@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../models/users.dart';
+import '../../services/database.dart';
 
 class CustomStepIndicator extends StatelessWidget {
   final int currentStep;
@@ -68,6 +71,7 @@ class _MethodPageState extends State<MethodPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.brown[50],
+      appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(50.0),
         child: Column(
@@ -119,6 +123,9 @@ class PaymentOptionCard extends StatelessWidget {
         ),
         trailing: ElevatedButton(
           onPressed: () async{
+            String selectedPaymentMethod = optionName;
+            await DatabaseService(uid: Provider.of<AppUsers?>(context,listen: false)!.uid).updatePaymentData(selectedPaymentMethod,"20");
+
             // Navigate to another page for payment
             await Navigator.pushNamed(context, '/receipt');
           },

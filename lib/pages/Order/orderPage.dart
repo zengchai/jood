@@ -216,18 +216,18 @@ class _OrderPageState extends State<OrderPage> {
                   ),
                   child: Text('History'),
                 ),
-                TextButton(
-                  onPressed: () async {
-                    await AuthService().ongoingOrder(ongoingItems);
-                  },
-                  child: Text('1'),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    await AuthService().orderHistory(historyItems);
-                  },
-                  child: Text('2'),
-                ),
+                // TextButton(
+                //   onPressed: () async {
+                //     await AuthService().ongoingOrder(ongoingItems);
+                //   },
+                //   child: Text('1'),
+                // ),
+                // TextButton(
+                //   onPressed: () async {
+                //     await AuthService().orderHistory(historyItems);
+                //   },
+                //   child: Text('2'),
+                // ),
               ],
             ),
           ),

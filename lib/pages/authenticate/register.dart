@@ -30,6 +30,7 @@ class _RegisterState extends State<Register> {
         appBar: AppBar(
           backgroundColor: Color(0xFF7b5916).withOpacity(0.75),
           elevation: 0.0,
+          title: Text("Sign Up"),
           actions: <Widget>[],
         ),
         body: ListView(
@@ -120,7 +121,7 @@ class _RegisterState extends State<Register> {
                             setState(() {
                               loading = true;
                             });
-                            dynamic result = await _auth.registerWithEmailAndPassword(email, password, name);
+                            dynamic result = await _auth.registerWithEmailAndPassword(email, password, name, context);
                             if(result == null){
                               setState(() {
                                 loading = false;

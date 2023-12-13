@@ -72,9 +72,7 @@ class _HomeState extends State<Home> {
           );
         },
       );
-    }
-
-    ;
+    };
 
     bool showCustomer = true;
     final currentUser = Provider.of<AppUsers?>(context);
@@ -135,7 +133,7 @@ class _HomeState extends State<Home> {
                 onPressed: () async {
                   await Navigator.pushNamed(context, '/cart');
                 },
-                icon: Icon(Icons.shopping_bag_outlined,
+                icon: Icon(Icons.add_shopping_cart,
                   color: Color(0xFF3C312B).withOpacity(0.75),
                 ),
                 label: Text(''))
@@ -173,14 +171,6 @@ class _HomeState extends State<Home> {
         backgroundColor: Colors.white,
         elevation: 0.0,
         actions: <Widget>[
-          TextButton.icon(
-              onPressed: () async {
-                await Navigator.pushNamed(context, '/cart');
-              },
-              icon: Icon(Icons.shopping_bag_outlined,
-                color: Color(0xFF3C312B).withOpacity(0.75),
-              ),
-              label: Text(''))
         ],
       ),
       body: IndexedStack(
