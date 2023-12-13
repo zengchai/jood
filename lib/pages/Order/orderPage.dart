@@ -7,7 +7,6 @@ import 'package:jood/pages/payment/payment.dart';
 import 'package:jood/services/auth.dart';
 import 'package:jood/services/database.dart';
 
-//frf
 class OrderPage extends StatefulWidget {
   const OrderPage({Key? key}) : super(key: key);
 
