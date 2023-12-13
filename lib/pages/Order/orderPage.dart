@@ -214,7 +214,31 @@ class _OrderPageState extends State<OrderPage> {
                         });
                       },
                       children: [
-                        //_buildOrderList(false),
+                        StreamBuilder<List<OrderItem>>(
+                          // stream: DatabaseService(uid: currentUser!.uid)
+                          stream: DatabaseService(uid: currentUser!.uid)
+                              .getCustomerOrder(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return Text("Error: ${snapshot.error}");
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return Text("No data available");
+                            } else {
+                              List<OrderItem> orderData = snapshot.data ?? [];
+
+                              // Display and manipulate cart items in the UI
+                              return Column(
+                                children: orderData.map((orderItem) {
+                                  return _buildOrderItemCard(orderItem, false);
+                                }).toList(),
+                              );
+                            }
+                          },
+                        ),
                         //_buildOrderList(true),
                       ],
                     ),
@@ -297,31 +321,39 @@ class _OrderPageState extends State<OrderPage> {
                         });
                       },
                       children: [
-                        StreamBuilder<List<OrderItem>>(
-                          // stream: DatabaseService(uid: currentUser!.uid)
-                          stream: DatabaseService(uid: currentUser!.uid)
-                              .getCustomerOrder(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return CircularProgressIndicator();
-                            } else if (snapshot.hasError) {
-                              return Text("Error: ${snapshot.error}");
-                            } else if (!snapshot.hasData ||
-                                snapshot.data!.isEmpty) {
-                              return Text("No data available");
-                            } else {
-                              List<OrderItem> orderData = snapshot.data ?? [];
+                        StreamBuilder<List<List<OrderItem>>>(
+                            // stream: DatabaseService(uid: currentUser!.uid)
+                            stream: DatabaseService(uid: currentUser!.uid)
+                                .getSellerOrder(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return Text("Error: ${snapshot.error}");
+                              } else if (!snapshot.hasData ||
+                                  snapshot.data!.isEmpty) {
+                                return Text("No data available");
+                              } else {
+                                List<List<OrderItem>> allOrders =
+                                    snapshot.data ?? [];
+                                return ListView.builder(
+                                  itemCount: allOrders.length,
+                                  itemBuilder: (context, index) {
+                                    List<OrderItem> orderItems =
+                                        allOrders[index];
 
-                              // Display and manipulate cart items in the UI
-                              return Column(
-                                children: orderData.map((orderItem) {
-                                  return _buildOrderItemCard(orderItem, false);
-                                }).toList(),
-                              );
-                            }
-                          },
-                        ),
+                                    // Display and manipulate cart items in the UI
+                                    return Column(
+                                      children: orderItems.map((orderItem) {
+                                        return _buildOrderItemCard(
+                                            orderItem, false);
+                                      }).toList(),
+                                    );
+                                  },
+                                );
+                              }
+                            }),
                         //_buildOrderList(true),
                       ],
                     ),
@@ -364,12 +396,11 @@ class _OrderPageState extends State<OrderPage> {
 
   Widget _buildOrderItemCard(OrderItem orderItem, bool isHistoryPage) {
     return Container(
+      margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
       width: 400,
       decoration: BoxDecoration(
-        color: Color.fromRGBO(248, 232, 209, 1),
-        borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
-      ),
+          color: Color.fromRGBO(248, 232, 209, 1),
+          borderRadius: BorderRadius.circular(10)),
       child: ListTile(
         contentPadding: EdgeInsets.all(8),
         leading: Image.network(
@@ -402,3 +433,66 @@ class _OrderPageState extends State<OrderPage> {
     );
   }
 }
+
+// return Container(
+//       margin: const EdgeInsets.all(16.0),
+//       child: Column(
+//         children: [
+//           Container(
+//             padding: const EdgeInsets.fromLTRB(15, 8, 0, 0),
+//             height: 32,
+//             width: 400,
+//             decoration: BoxDecoration(
+//               color: Color.fromRGBO(226, 193, 142, 1),
+//               borderRadius: BorderRadius.only(
+//                   topLeft: Radius.circular(30), topRight: Radius.circular(30)),
+//             ),
+//             child: Text('${orderItem.orderID}',
+//                 style: TextStyle(
+//                   fontSize: 16.0,
+//                   fontWeight: FontWeight.bold,
+//                 )),
+//           ),
+//           Container(
+//             width: 400,
+//             decoration: BoxDecoration(
+//               color: Color.fromRGBO(248, 232, 209, 1),
+//               borderRadius: BorderRadius.only(
+//                   bottomLeft: Radius.circular(30),
+//                   bottomRight: Radius.circular(30)),
+//             ),
+//             child: ListTile(
+//               contentPadding: EdgeInsets.all(8),
+//               leading: Image.asset(
+//                 orderItem.image,
+//                 width: 60,
+//                 height: 60,
+//                 fit: BoxFit.cover,
+//               ),
+//               title: Text(orderItem.foodName),
+//               subtitle: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       Text('Quantity: ${orderItem.quantity}'),
+//                       Text('Price: \$${orderItem.price.toStringAsFixed(2)}'),
+//                       Text('Status: ${orderItem.status}'),
+//                       if (isHistoryPage) // Conditionally show the review button
+//                         ElevatedButton(
+//                           onPressed: () {
+//                             _popupReview(orderItem);
+//                           },
+//                           child: Text('Give Review'),
+//                         ),
+//                     ],
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }

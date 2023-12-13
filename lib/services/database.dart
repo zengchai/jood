@@ -181,31 +181,6 @@ class DatabaseService {
         return []; // Return an empty list if there are no item keys
       }
 
-      // Map the item keys to a list of orderItems objects
-      // List<OrderItem> orderItems = orderkeys
-      //     .map((key) {
-      //       dynamic orderItem = data[key];
-      //       print('Order: $orderItem');
-      //       if (orderItem == null ||
-      //           orderItem is! List<dynamic> ||
-      //           orderItem.length < 4) {
-      //         return {
-      //           'FoodImage': "Invalid Item Format",
-      //           'FoodName': 'error_image.jpg',
-      //           'FoodPrice': 0.0,
-      //           'FoodQuantity': 0,
-      //         };
-      //       }
-
-      //       return {
-      //         'FoodImage': orderItem[0] as String,
-      //         'FoodName': orderItem[1] as String,
-      //         'FoodPrice': (orderItem[2] as num).toDouble(),
-      //         'FoodQuantity': (orderItem[3] as num).toInt(),
-      //       };
-      //     })
-      //     .cast<Map<String, dynamic>>()
-      //     .toList();
       List<OrderItem> orderItems = orderkeys.map((key) {
         dynamic item = data[key];
         print('Item: $item');
@@ -230,6 +205,48 @@ class DatabaseService {
     });
   }
 
+  // Add a method to retrieve all customer orders for seller
+  Stream<List<List<OrderItem>>> getSellerOrder() {
+    return orderCollection.snapshots().map((querySnapshot) {
+      List<List<OrderItem>> allOrders = [];
+
+      for (var doc in querySnapshot.docs) {
+        if (doc.exists) {
+          var data = doc.data() as Map<String, dynamic>;
+
+          // Retrieve all keys from the data map
+          List<String> orderkeys =
+              data.keys.where((key) => key.startsWith('Order')).toList();
+
+          if (orderkeys.isNotEmpty) {
+            List<OrderItem> orderItems = orderkeys.map((key) {
+              dynamic item = data[key];
+
+              if (item == null || item is! List<dynamic> || item.length < 4) {
+                return OrderItem(
+                  foodName: 'Invalid Item Format',
+                  foodImage: 'error_image.jpg',
+                  quantity: 0,
+                  price: 0.0,
+                );
+              }
+
+              return OrderItem(
+                foodName: item[1] as String,
+                foodImage: item[0] as String,
+                quantity: (item[3] as num).toInt(),
+                price: (item[2] as num).toDouble(),
+              );
+            }).toList();
+
+            allOrders.add(orderItems);
+          }
+        }
+      }
+
+      return allOrders;
+    });
+  }
 // // Add a method to retrieve order history
 //   Stream<List<OrderItem>> get orderHistoryItems {
 //     return orderCollection
