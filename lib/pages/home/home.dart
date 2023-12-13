@@ -21,6 +21,8 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 
+  List<String> foodReviews = [];
+
   int _selectedIndex = 0;
   TextEditingController addressController = TextEditingController();
 
@@ -141,7 +143,7 @@ class _HomeState extends State<Home> {
           index: _selectedIndex,
           children: [
             // Page 1 content
-            MenuPage(),
+            MenuPage(foodReviews: foodReviews),
             // Page 2 content
             OrderPage(),
             ProfilePage(),
@@ -175,7 +177,7 @@ class _HomeState extends State<Home> {
         index: _selectedIndex,
         children: [
           // Page 1 content
-          MenuPage(),
+          MenuPage(foodReviews: foodReviews),
           // Page 2 content
           OrderPage(),
           ProfilePage(),

@@ -14,9 +14,16 @@ import './utils/constants/colors_resources.dart';
 import 'add_alert_widget.dart';
 import 'custom_button.dart';
 import 'edit_aleart_widget.dart';
+import 'package:jood/services/database.dart';
 
 class MenuPage extends StatefulWidget {
-  const MenuPage({super.key});
+  //const MenuPage({super.key});
+
+  final List<String> foodReviews;
+
+  const MenuPage({Key? key, required this.foodReviews}) : super(key: key);
+
+
 
   @override
   State<MenuPage> createState() => _CategoryMenuState();
@@ -27,11 +34,97 @@ class _CategoryMenuState extends State<MenuPage> {
 
   late String formattedDate;
 
+
+  DatabaseService databaseService = DatabaseService(uid: 'your_user_id');
+  List<String> foodReviews = [];
+
+
+
+  void _popupViewReview(MenuProvider menuProvider, int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Review'),
+          contentPadding: EdgeInsets.all(0),
+          content: SingleChildScrollView(
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          leading: Image.asset(
+                            menuProvider.menuList[index].img ?? '',
+                            width: 120,
+                            height: 120,
+                          ),
+                          title: Text(menuProvider.menuList[index].title ?? ""),
+                          subtitle: Text(
+                            menuProvider.menuList[index].price ?? '',
+                          ),
+                        ),
+                        SizedBox(height: 20),
+
+                        //DO THE STARS THING
+                        Column(
+                          children: [
+                            for (String review in foodReviews)
+                              Container(
+                                margin: EdgeInsets.symmetric(vertical: 5),
+                                padding: EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.grey),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: ListTile(
+                                  title: Text(review),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+
+
+
+
   @override
   void initState() {
     super.initState();
     Provider.of<MenuProvider>(context, listen: false).fetchMenu();
+    databaseService.foodReviewsStream().listen((List<String> reviews) {
+      setState(() {
+        foodReviews = reviews;
+      });
+    });
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -114,23 +207,11 @@ class _CategoryMenuState extends State<MenuPage> {
                                     child: ClipRRect(
                                       borderRadius:
                                       BorderRadius.circular(20),
-                                      child: CachedNetworkImage(
+                                      child: Image.asset(
+                                        menuProvider.menuList[index].img ?? '',
                                         height: 100,
                                         width: size.width,
-                                        fit: BoxFit.fill,
-                                        imageUrl: menuProvider
-                                            .menuList[index].img ??
-                                            '',
-                                        placeholder: (context, url) {
-                                          log("Placeholder for image: $url");
-                                          return const Center(
-                                              child:
-                                              CircularProgressIndicator());
-                                        },
-                                        errorWidget: (context, url, error) {
-                                          log("Error loading image: $url, $error");
-                                          return const Icon(Icons.error);
-                                        },
+                                        fit: BoxFit.cover,
                                       ),
                                     ),
                                   ),
@@ -171,7 +252,7 @@ class _CategoryMenuState extends State<MenuPage> {
                                       ],
                                     ),
                                   )
-                                ],
+                                    ],
                               ),
                             );
                         }),

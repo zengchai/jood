@@ -57,12 +57,15 @@ class DatabaseService {
     });
   }
 
-  Future updateReviewData(
-      String RfoodName, String RfoodPrice, String RfoodReview) async {
-    return await reviewCollection.doc(uid).set({
-      'RfoodName': RfoodName,
-      'RfoodPrice': RfoodPrice,
-      'RfoodReview': RfoodReview
+  Future updateReviewData(String review) async { //UPDATE REVIEW DATA ON THE SAME ORDER
+    return await reviewCollection.doc("hhi").update({
+      'RfoodReview' : FieldValue.arrayUnion([review]),
+    });
+  }
+
+  Future setReviewData(String review) async { //SET REVIEW DATA WHEN ADD MORE FOOD
+    return await reviewCollection.doc("hhi").set({
+      'RfoodReview' : FieldValue.arrayUnion([review]),
     });
   }
 
@@ -227,6 +230,16 @@ class DatabaseService {
       return null; // You might want to return a default or empty profile in case of an error
     }
   }
+
+  Stream<List<String>> foodReviewsStream() {
+    return reviewCollection.doc("hhi").snapshots().map((snapshot) {
+      var data = snapshot.data() as Map<String, dynamic>;
+      List<String> foodReviews = List<String>.from(data['RfoodReview'] ?? []);
+      return foodReviews;
+    });
+  }
+
+
 
   setPaymentData(String s, String t) {}
 }

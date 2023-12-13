@@ -39,8 +39,8 @@ class _reviewFormState extends State<reviewForm> {
           SizedBox(height: 5),
           ElevatedButton(
             onPressed: () async{
-              //await DatabaseService(uid: users!.uid).updateReviewData('','','review');
-              await DatabaseService(uid: currentUser!.uid).updateReviewData('','', review);
+              await DatabaseService(uid: currentUser!.uid).updateReviewData(review);
+              Navigator.of(context).pop();
             },
             child: Text('Submit'),
           ),

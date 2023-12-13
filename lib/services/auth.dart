@@ -56,7 +56,7 @@ class AuthService {
       //create a new document for the new user with the uid
       await DatabaseService(uid: users!.uid).setUserData(users.uid, name, email,'','','');
       await DatabaseService(uid: users!.uid).setPaymentData('TnG', '0.00');
-      await DatabaseService(uid: users!.uid).updateReviewData('', '', '');
+      await DatabaseService(uid: users!.uid).updateReviewData('');
       return _userFromFirebaseUser(users);
     } catch (e) {
       if (e is FirebaseAuthException) {
@@ -109,18 +109,12 @@ class AuthService {
   }
 
   // sign out
-  Future signOut(BuildContext context) async {
+  Future signOut() async {
     try {
       return await _auth.signOut();
     } catch (e) {
-      if (e is FirebaseAuthException) {
-        showDialog(
-          context: context, // Make sure to have access to the current context
-          builder: (BuildContext context) {
-            return WarningAlert(title: 'Error',subtitle: '${e.message}');
-          },
-        );
-      }
+      print(e.toString());
+      return null;
     }
   }
 
@@ -136,6 +130,7 @@ class AuthService {
     }
   }
 
+
   Future deleteUserAccount(BuildContext context) async {
     User? user = FirebaseAuth.instance.currentUser;
 
@@ -146,7 +141,7 @@ class AuthService {
         showDialog(
           context: context, // Make sure to have access to the current context
           builder: (BuildContext context) {
-            return WarningAlert(title: 'Deleted',subtitle: 'The account has been deleted',);
+            return WarningAlert(title: 'Error',subtitle: 'asdsa');
           },
         );
         return await FirebaseAuth.instance.signOut();
@@ -154,10 +149,11 @@ class AuthService {
         showDialog(
           context: context, // Make sure to have access to the current context
           builder: (BuildContext context) {
-            return WarningAlert(title: 'Error', subtitle: e.toString(),);
+            return WarningAlert(title: 'Error',subtitle: 'ssad');
           },
         );
         print("Error deleting user account: $e");
+
       }
     }
   }

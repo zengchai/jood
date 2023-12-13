@@ -93,7 +93,7 @@ class _PaymentState extends State<ProfilePage> {
                   SizedBox(height: 20,),
                   ElevatedButton(
                     onPressed: () async{
-                      await _auth.signOut(context);
+                      await _auth.signOut();
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B).withOpacity(0.75),),
@@ -144,7 +144,7 @@ class _PaymentState extends State<ProfilePage> {
                 SizedBox(height: 30,),
                 ElevatedButton(
                   onPressed: () async{
-                    await _auth.signOut(context);
+                    await _auth.signOut();
                   },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B).withOpacity(0.75),),

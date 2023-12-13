@@ -49,7 +49,7 @@ class _OrderPageState extends State<OrderPage> {
   late PageController _pageController;
   int _currentPageIndex = 0;
 
-  void _popupReview() {
+  void _popupReview(OrderItem orderItem) {
     showDialog(
       context: context,
       builder: (context) {
@@ -67,15 +67,17 @@ class _OrderPageState extends State<OrderPage> {
                     children: [
                       ListTile(
                         leading: Image.asset(
-                          'assets/friedmee.jpeg',
+                          orderItem.image,
                           width: 120,
                           height: 120,
                         ),
-                        title: Text("Fried Mee"),
-                        subtitle: Text('RM7.0'),
+                        title: Text(orderItem.foodName),
+                        subtitle: Text(orderItem.price.toStringAsFixed(2)),
                       ),
                       SizedBox(height: 20),
-                      // Add some spacing between ListTile and TextField
+
+                      //DO THE STARS THING
+
                       reviewForm(),
                     ],
                   ),
@@ -87,6 +89,7 @@ class _OrderPageState extends State<OrderPage> {
       },
     );
   }
+
 
   List<OrderItem> ongoingItems = [
     OrderItem(
@@ -306,7 +309,7 @@ class _OrderPageState extends State<OrderPage> {
                       if (isHistoryPage) // Conditionally show the review button
                         ElevatedButton(
                           onPressed: () {
-                            _popupReview();
+                            _popupReview(orderItem);
                           },
                           child: Text('Give Review'),
                         ),
