@@ -108,8 +108,8 @@ class _PaymentState extends State<Payment> {
       appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
-        child: ListView(
-          children: [Column(
+        child: ListView(children: [
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CustomStepIndicator(
@@ -157,7 +157,7 @@ class _PaymentState extends State<Payment> {
               ),
             ],
           ),
-          ]),
+        ]),
       ),
 
       //bottomNavigationBar=============================

@@ -23,22 +23,15 @@ class MenuPage extends StatefulWidget {
 
   const MenuPage({Key? key, required this.foodReviews}) : super(key: key);
 
-
-
   @override
   State<MenuPage> createState() => _CategoryMenuState();
 }
 
 class _CategoryMenuState extends State<MenuPage> {
-
-
   late String formattedDate;
-
 
   DatabaseService databaseService = DatabaseService(uid: 'your_user_id');
   List<String> foodReviews = [];
-
-
 
   void _popupViewReview(MenuProvider menuProvider, int index) {
     showDialog(
@@ -58,7 +51,7 @@ class _CategoryMenuState extends State<MenuPage> {
                     child: Column(
                       children: [
                         ListTile(
-                          leading: Image.asset(
+                          leading: Image.network(
                             menuProvider.menuList[index].img ?? '',
                             width: 120,
                             height: 120,
@@ -107,11 +100,6 @@ class _CategoryMenuState extends State<MenuPage> {
     );
   }
 
-
-
-
-
-
   @override
   void initState() {
     super.initState();
@@ -122,9 +110,6 @@ class _CategoryMenuState extends State<MenuPage> {
       });
     });
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -148,117 +133,137 @@ class _CategoryMenuState extends State<MenuPage> {
           // await fetchMenuData();
         },
         child: SafeArea(
-          child: Consumer<MenuProvider>(
-            builder: (context, menuProvider, child) {
-              return showCustomer ?
+          child:
+              Consumer<MenuProvider>(builder: (context, menuProvider, child) {
+            return showCustomer
+                ?
 
-              // if he/she is a customer
-              Column(
-                children: [
-                  const SizedBox(height: 20),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
+                // if he/she is a customer
+                Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            SizedBox(width: 10,),
-                            Icon(Icons.date_range_outlined),
-                            SizedBox(width: 10,),
-                            Text("19/11/2023",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.black)),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Icon(Icons.date_range_outlined),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text("19/11/2023",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black)),
+                              ],
+                            )
                           ],
-                        )
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Expanded(
-                    child: GridView.builder(
-                        itemCount: menuProvider.menuList.length,
-                        shrinkWrap: true,
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            mainAxisExtent: 225),
-                        itemBuilder: (ctx, index) {
-                            return Container(
-                              height: 230,
-                              width: size.width,
-                              padding:
-                              const EdgeInsets.symmetric(vertical: 8),
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 1, color: ColorRes.cateBorder),
-                                  borderRadius: BorderRadius.circular(20),
-                                  color: ColorRes.cateBack),
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 15),
-                                    child: ClipRRect(
-                                      borderRadius:
-                                      BorderRadius.circular(20),
-                                      child: Image.asset(
-                                        menuProvider.menuList[index].img ?? '',
-                                        height: 100,
-                                        width: size.width,
-                                        fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Expanded(
+                        child: GridView.builder(
+                            itemCount: menuProvider.menuList.length,
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 10,
+                                    mainAxisExtent: 225),
+                            itemBuilder: (ctx, index) {
+                              return Container(
+                                height: 230,
+                                width: size.width,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 1, color: ColorRes.cateBorder),
+                                    borderRadius: BorderRadius.circular(20),
+                                    color: ColorRes.cateBack),
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: Image.network(
+                                          menuProvider.menuList[index].img ??
+                                              '',
+                                          height: 100,
+                                          width: size.width,
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 3),
-                                  Text(
-                                    menuProvider.menuList[index].title ?? "",
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.black),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Text(menuProvider.menuList[index].price ?? '',
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      menuProvider.menuList[index].title ?? "",
                                       style: const TextStyle(
                                           fontSize: 16,
-                                          fontWeight: FontWeight.w400,
+                                          fontWeight: FontWeight.w500,
                                           color: Colors.black),
-                                      textAlign: TextAlign.center),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: CustomButton(
-                                              text: "Add to cart",
-                                              onPressed: () async {
-                                                await DatabaseService(uid: currentUser.uid).addToCart(
-                                                    menuProvider.menuList[index].title ??"",
-                                                    menuProvider.menuList[index].img ??'',
-                                                    double.tryParse(
-                                                        menuProvider.menuList[index].price ??
-                                                        '') ??
-                                                        0.0);
-                                              }),
-                                        ),
-                                      ],
+                                      textAlign: TextAlign.center,
                                     ),
-                                  )
-                                    ],
-                              ),
-                            );
-                        }),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                        menuProvider.menuList[index].price ??
+                                            '',
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.black),
+                                        textAlign: TextAlign.center),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: CustomButton(
+                                                text: "Add to cart",
+                                                onPressed: () async {
+                                                  await DatabaseService(
+                                                          uid: currentUser.uid)
+                                                      .addToCart(
+                                                          menuProvider
+                                                                  .menuList[
+                                                                      index]
+                                                                  .title ??
+                                                              "",
+                                                          menuProvider
+                                                                  .menuList[
+                                                                      index]
+                                                                  .img ??
+                                                              '',
+                                                          double.tryParse(menuProvider
+                                                                      .menuList[
+                                                                          index]
+                                                                      .price ??
+                                                                  '') ??
+                                                              0.0);
+                                                }),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            }),
+                      )
+                    ],
                   )
-                ],
-              ) :
+                :
 
                 // if he/she is an admin
                 Column(
