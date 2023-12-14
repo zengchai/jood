@@ -21,6 +21,8 @@ class OrderPage extends StatefulWidget {
 
 class _OrderPageState extends State<OrderPage> {
   final _formKey = GlobalKey<FormState>();
+  late DateTime selectedDate = DateTime.now();
+  late String formattedDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
   late final String review;
   late PageController _pageController;
   int _currentPageIndex = 0;
@@ -65,9 +67,6 @@ class _OrderPageState extends State<OrderPage> {
       },
     );
   }
-
-  late DateTime selectedDate = DateTime.now();
-  late String formattedDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
 
 // Date picker for filter
   void _showDatePicker() async {

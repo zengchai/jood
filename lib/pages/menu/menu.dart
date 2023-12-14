@@ -31,7 +31,7 @@ class MenuPage extends StatefulWidget {
 
 class _CategoryMenuState extends State<MenuPage> {
   //Date
-  late DateTime currentDate = DateTime.now();
+  DateTime currentDate = DateTime.now();
   late String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
 
   DatabaseService databaseService = DatabaseService(uid: 'your_user_id');

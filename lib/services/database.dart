@@ -132,7 +132,7 @@ class DatabaseService {
 // Add a method to retrieve customer orders
   Stream<List<OrderItem>> getCustomerOrder(String? selectedDate) {
     return orderCollection
-        .doc("H4zCS1bQB8DxpvqzOexp")
+        .doc("YPtrr2iImE3geHVfuhjw")
         .snapshots()
         .map((snapshot) {
       if (!snapshot.exists) {
@@ -166,7 +166,7 @@ class DatabaseService {
 
         // Format DateTime as "dd/MM/yyyy"
         String formattedDate =
-            "${dateTime.day + 1}/${dateTime.month}/${dateTime.year}";
+            "${(dateTime.day + 1).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
 
         return OrderItem(
           foodName: item[1] as String,
@@ -218,7 +218,15 @@ class DatabaseService {
 
               // Format DateTime as "dd/MM/yyyy"
               String formattedDate =
-                  "${dateTime.day + 1}/${dateTime.month}/${dateTime.year}";
+                  "${(dateTime.day + 1).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
+
+              // if (dateTime.day == 1) {
+              //   formattedDate =
+              //       "${(dateTime.day).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
+              // } else {
+              //   formattedDate =
+              //       "${(dateTime.day + 1).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
+              // }
 
               return OrderItem(
                   foodName: item[1] as String,
