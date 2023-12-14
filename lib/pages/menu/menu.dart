@@ -114,8 +114,9 @@ class _CategoryMenuState extends State<MenuPage> {
     Size size = MediaQuery.sizeOf(context);
     bool showCustomer = true;
     final currentUser = Provider.of<AppUsers?>(context);
-    DateTime _currentDate = DateTime.now();
-    late String formattedDate = DateFormat('dd/MM/yyyy').format(_currentDate);
+    //Date
+    DateTime currentDate = DateTime.now();
+    String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
 
     if (currentUser!.uid == 'TnDmXCiJINXWdNBhfZvuAFCuaSL2') {
       showCustomer = false;
@@ -161,8 +162,7 @@ class _CategoryMenuState extends State<MenuPage> {
                                   color: Colors.black,
                                 ),
                                 SizedBox(width: 4.0),
-                                Text(
-                                  formattedDate,
+                                Text(formattedDate,
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 15.0,
@@ -290,7 +290,7 @@ class _CategoryMenuState extends State<MenuPage> {
                             Row(
                               children: [
                                 Icon(Icons.date_range_outlined),
-                                Text("19/11/2023",
+                                Text(formattedDate,
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w400,
