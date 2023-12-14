@@ -9,6 +9,7 @@ import 'package:jood/pages/payment/payment.dart';
 import 'package:jood/services/auth.dart';
 import 'package:jood/services/database.dart';
 import 'package:provider/provider.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 //frf
 class OrderPage extends StatefulWidget {
@@ -65,38 +66,40 @@ class _OrderPageState extends State<OrderPage> {
     );
   }
 
-  // List<OrderItem> ongoingItems = [
-  //   OrderItem(
-  //       orderID: '#1234',
-  //       foodName: 'Fried Mee',
-  //       image: 'assets/friedmee.jpeg',
-  //       quantity: 2,
-  //       price: 7.0,
-  //       status: 'Order Preparing'),
-  //   OrderItem(
-  //       orderID: '#2345',
-  //       foodName: 'Fried Rice',
-  //       image: 'assets/friedrice.jpeg',
-  //       quantity: 1,
-  //       price: 6.0,
-  //       status: 'Order Preparing'),
-  //   // Add more ongoing items as needed
-  // ];
+  late DateTime selectedDate = DateTime.now();
+  late String formattedDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
 
-  // List<OrderItem> historyItems = [
-  //   OrderItem(
-  //       orderID: '#5678',
-  //       foodName: 'Fried Rice',
-  //       image: 'assets/friedrice.jpeg',
-  //       quantity: 1,
-  //       price: 6.0,
-  //       status: 'Order Delivered'),
-  //   // Add more history items as needed
-  // ];
+// Date picker for filter
+  void _showDatePicker() async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2030),
+    );
+
+    // Check if the user picked a date or canceled
+    if (pickedDate != null) {
+      // User picked a date
+      setState(() {
+        // Exclude the time component
+        selectedDate =
+            DateTime(pickedDate.year, pickedDate.month, pickedDate.day);
+      });
+
+// Update formattedDate
+      formattedDate = DateFormat('dd/MM/yyyy').format(selectedDate);
+    } else {
+      // User canceled the operation
+      // You can handle this case as needed, e.g., do nothing or show a message
+      print('Date picking canceled');
+    }
+  }
 
   // Date
-  late DateTime currentDate = DateTime.now();
-  late String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
+  //DateTime selectedDate = DateTime.now();
+  // late Stream<List<OrderItem>> _orderStreamCustomer;
+  // late Stream<List<List<OrderItem>>> _orderStreamSeller;
 
   @override
   void initState() {
@@ -132,10 +135,6 @@ class _OrderPageState extends State<OrderPage> {
       showCustomer = true;
     }
 
-    //Date
-    DateTime currentDate = DateTime.now();
-    String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
-
     return Scaffold(
         backgroundColor: Colors.white,
         body: showCustomer
@@ -164,12 +163,24 @@ class _OrderPageState extends State<OrderPage> {
                               color: Colors.black,
                             ),
                             SizedBox(width: 4.0),
-                            Text(
-                              formattedDate,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15.0,
-                                fontWeight: FontWeight.bold,
+                            // Text(
+                            //   formattedDate,
+                            //   style: TextStyle(
+                            //     color: Colors.black,
+                            //     fontSize: 15.0,
+                            //     fontWeight: FontWeight.bold,
+                            //   ),
+                            // ),
+                            MaterialButton(
+                              onPressed: _showDatePicker,
+                              color: Colors.amber,
+                              child: Text(
+                                formattedDate,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
@@ -217,7 +228,7 @@ class _OrderPageState extends State<OrderPage> {
                         StreamBuilder<List<OrderItem>>(
                           // stream: DatabaseService(uid: currentUser!.uid)
                           stream: DatabaseService(uid: currentUser!.uid)
-                              .getCustomerOrder(),
+                              .getCustomerOrder(formattedDate),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
@@ -324,7 +335,7 @@ class _OrderPageState extends State<OrderPage> {
                         StreamBuilder<List<List<OrderItem>>>(
                             // stream: DatabaseService(uid: currentUser!.uid)
                             stream: DatabaseService(uid: currentUser!.uid)
-                                .getSellerOrder(),
+                                .getSellerOrder(selectedDate: (formattedDate)),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {

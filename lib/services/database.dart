@@ -162,7 +162,7 @@ class DatabaseService {
   }
 
 // Add a method to retrieve customer orders
-  Stream<List<OrderItem>> getCustomerOrder() {
+  Stream<List<OrderItem>> getCustomerOrder(String? selectedDate) {
     return orderCollection
         .doc("H4zCS1bQB8DxpvqzOexp")
         .snapshots()
@@ -186,27 +186,42 @@ class DatabaseService {
         print('Item: $item');
         if (item == null || item is! List<dynamic> || item.length < 4) {
           return OrderItem(
-            foodName: 'Invalid Item Format',
-            foodImage: 'error_image.jpg',
-            quantity: 0,
-            price: 0.0,
-          );
+              foodName: 'Invalid Item Format',
+              foodImage: 'error_image.jpg',
+              quantity: 0,
+              price: 0.0,
+              orderDate: "Invalid date");
         }
+
+        // Convert Timestamp to DateTime
+        DateTime dateTime = (item[4] as Timestamp).toDate();
+
+        // Format DateTime as "dd/MM/yyyy"
+        String formattedDate =
+            "${dateTime.day + 1}/${dateTime.month}/${dateTime.year}";
 
         return OrderItem(
           foodName: item[1] as String,
           foodImage: item[0] as String,
           quantity: (item[3] as num).toInt(),
           price: (item[2] as num).toDouble(),
+          orderDate: formattedDate,
         );
       }).toList();
+
+      //to filter the date
+      if (selectedDate != null) {
+        orderItems = orderItems
+            .where((orderItem) => orderItem.orderDate == selectedDate)
+            .toList();
+      }
 
       return orderItems;
     });
   }
 
   // Add a method to retrieve all customer orders for seller
-  Stream<List<List<OrderItem>>> getSellerOrder() {
+  Stream<List<List<OrderItem>>> getSellerOrder({String? selectedDate}) {
     return orderCollection.snapshots().map((querySnapshot) {
       List<List<OrderItem>> allOrders = [];
 
@@ -224,24 +239,38 @@ class DatabaseService {
 
               if (item == null || item is! List<dynamic> || item.length < 4) {
                 return OrderItem(
-                  foodName: 'Invalid Item Format',
-                  foodImage: 'error_image.jpg',
-                  quantity: 0,
-                  price: 0.0,
-                );
+                    foodName: 'Invalid Item Format',
+                    foodImage: 'error_image.jpg',
+                    quantity: 0,
+                    price: 0.0,
+                    orderDate: "Invalid date");
               }
+              // Convert Timestamp to DateTime
+              DateTime dateTime = (item[4] as Timestamp).toDate();
+
+              // Format DateTime as "dd/MM/yyyy"
+              String formattedDate =
+                  "${dateTime.day + 1}/${dateTime.month}/${dateTime.year}";
 
               return OrderItem(
-                foodName: item[1] as String,
-                foodImage: item[0] as String,
-                quantity: (item[3] as num).toInt(),
-                price: (item[2] as num).toDouble(),
-              );
+                  foodName: item[1] as String,
+                  foodImage: item[0] as String,
+                  quantity: (item[3] as num).toInt(),
+                  price: (item[2] as num).toDouble(),
+                  orderDate: formattedDate);
             }).toList();
 
             allOrders.add(orderItems);
           }
         }
+      }
+
+      //to filter the date
+      if (selectedDate != null) {
+        allOrders = allOrders
+            .where((orderItems) => orderItems
+                .any((orderItem) => (orderItem.orderDate) == selectedDate))
+            .toList();
       }
 
       return allOrders;

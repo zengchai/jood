@@ -45,6 +45,7 @@ dependencies:
   circular_badge_avatar: ^0.1.2
   cached_network_image: ^3.3.0
   firebase_storage: ^11.5.3
+  table_calendar: ^3.0.9
 
 dev_dependencies:
   flutter_test:
