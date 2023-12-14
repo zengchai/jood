@@ -72,38 +72,6 @@ class DatabaseService {
     });
   }
 
-  // Future updateOngoingOrder(List<OrderItem> orderItem) async {
-  //   final batch = FirebaseFirestore.instance.batch();
-
-  //   for (var order in orderItem) {
-  //     final orderDocRef = orderCollection
-  //         .doc(uid)
-  //         .collection('ongoing_orders')
-  //         .doc(order.orderID);
-
-  //     batch.set(orderDocRef, order.toMap());
-  //   }
-
-  //   // Commit the batch operation
-  //   await batch.commit();
-  // }
-
-  // Future updateOrderHistory(List<OrderItem> orderItem) async {
-  //   final batch = FirebaseFirestore.instance.batch();
-
-  //   for (var order in orderItem) {
-  //     final orderDocRef = orderCollection
-  //         .doc(uid)
-  //         .collection('order_history')
-  //         .doc(order.orderID);
-
-  //     batch.set(orderDocRef, order.toMap());
-  //   }
-
-  //   // Commit the batch operation
-  //   await batch.commit();
-  // }
-
   // Function to add a food item to the cart
   Future<void> addToCart(
       String foodName, String foodImage, double foodPrice) async {
@@ -260,42 +228,29 @@ class DatabaseService {
                   orderDate: formattedDate);
             }).toList();
 
+            // Filter orders by selectedDate for each order individually
+            if (selectedDate != null) {
+              orderItems = orderItems
+                  .where((orderItem) => orderItem.orderDate == selectedDate)
+                  .toList();
+            }
+
             allOrders.add(orderItems);
           }
         }
       }
 
-      //to filter the date
-      if (selectedDate != null) {
-        allOrders = allOrders
-            .where((orderItems) => orderItems
-                .any((orderItem) => (orderItem.orderDate) == selectedDate))
-            .toList();
-      }
+      // //to filter the date
+      // if (selectedDate != null) {
+      //   allOrders = allOrders
+      //       .where((orderItems) => orderItems
+      //           .any((orderItem) => (orderItem.orderDate) == selectedDate))
+      //       .toList();
+      // }
 
       return allOrders;
     });
   }
-// // Add a method to retrieve order history
-//   Stream<List<OrderItem>> get orderHistoryItems {
-//     return orderCollection
-//         .doc(uid)
-//         .collection('order_history')
-//         .snapshots()
-//         .map((snapshot) {
-//       return snapshot.docs.map((doc) {
-//         var data = doc.data() as Map<String, dynamic>;
-//         return OrderItem(
-//           orderID: doc.id,
-//           foodName: data['name'] ?? '',
-//           image: data['image'] ?? '',
-//           quantity: data['quantity'] ?? 0,
-//           price: data['price'] ?? 0.0,
-//           status: data['status'] ?? '',
-//         );
-//       }).toList();
-//     });
-//   }
 
 // Convert a single document snapshot to a UserProfile
   UserProfile _userProfileFromSnapshot(DocumentSnapshot snapshot) {

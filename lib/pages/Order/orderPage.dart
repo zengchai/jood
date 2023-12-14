@@ -274,12 +274,16 @@ class _OrderPageState extends State<OrderPage> {
                               color: Colors.black,
                             ),
                             SizedBox(width: 4.0),
-                            Text(
-                              formattedDate,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15.0,
-                                fontWeight: FontWeight.bold,
+                            MaterialButton(
+                              onPressed: _showDatePicker,
+                              color: Colors.amber,
+                              child: Text(
+                                formattedDate,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
@@ -327,7 +331,7 @@ class _OrderPageState extends State<OrderPage> {
                         StreamBuilder<List<List<OrderItem>>>(
                             // stream: DatabaseService(uid: currentUser!.uid)
                             stream: DatabaseService(uid: currentUser!.uid)
-                                .getSellerOrder(selectedDate: (formattedDate)),
+                                .getSellerOrder(selectedDate: formattedDate),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
@@ -364,38 +368,6 @@ class _OrderPageState extends State<OrderPage> {
                 ],
               ));
   }
-
-  // Widget _buildOrderList(bool isHistoryPage) {
-  //   return StreamBuilder<List<Map<String, dynamic>>>(
-  //     stream: DatabaseService(uid: currentUser!.uid).getCustomerOrder(),
-  //     builder: (context, snapshot) {
-  //       if (snapshot.connectionState == ConnectionState.waiting) {
-  //         return CircularProgressIndicator();
-  //       } else if (snapshot.hasError) {
-  //         return Text("Error: ${snapshot.error}");
-  //       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-  //         return Text("No data available");
-  //       } else {
-  //         List<Map<String, dynamic>> orderData = snapshot.data ?? [];
-
-  //         return ListView.builder(
-  //           itemCount: orderData.length,
-  //           itemBuilder: (context, index) {
-  //             var data = orderData[index];
-
-  //             // Display the retrieved data
-  //             return ListTile(
-  //               title: Text(data['foodName']),
-  //               subtitle: Text('Price: ${data['foodPrice']}'),
-  //               leading: Image.network(data['foodImage']),
-  //               // Add other fields as needed
-  //             );
-  //           },
-  //         );
-  //       }
-  //     },
-  //   );
-  // }
 
   Widget _buildOrderItemCard(OrderItem orderItem, bool isHistoryPage) {
     return Container(
@@ -436,66 +408,3 @@ class _OrderPageState extends State<OrderPage> {
     );
   }
 }
-
-// return Container(
-//       margin: const EdgeInsets.all(16.0),
-//       child: Column(
-//         children: [
-//           Container(
-//             padding: const EdgeInsets.fromLTRB(15, 8, 0, 0),
-//             height: 32,
-//             width: 400,
-//             decoration: BoxDecoration(
-//               color: Color.fromRGBO(226, 193, 142, 1),
-//               borderRadius: BorderRadius.only(
-//                   topLeft: Radius.circular(30), topRight: Radius.circular(30)),
-//             ),
-//             child: Text('${orderItem.orderID}',
-//                 style: TextStyle(
-//                   fontSize: 16.0,
-//                   fontWeight: FontWeight.bold,
-//                 )),
-//           ),
-//           Container(
-//             width: 400,
-//             decoration: BoxDecoration(
-//               color: Color.fromRGBO(248, 232, 209, 1),
-//               borderRadius: BorderRadius.only(
-//                   bottomLeft: Radius.circular(30),
-//                   bottomRight: Radius.circular(30)),
-//             ),
-//             child: ListTile(
-//               contentPadding: EdgeInsets.all(8),
-//               leading: Image.asset(
-//                 orderItem.image,
-//                 width: 60,
-//                 height: 60,
-//                 fit: BoxFit.cover,
-//               ),
-//               title: Text(orderItem.foodName),
-//               subtitle: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       Text('Quantity: ${orderItem.quantity}'),
-//                       Text('Price: \$${orderItem.price.toStringAsFixed(2)}'),
-//                       Text('Status: ${orderItem.status}'),
-//                       if (isHistoryPage) // Conditionally show the review button
-//                         ElevatedButton(
-//                           onPressed: () {
-//                             _popupReview(orderItem);
-//                           },
-//                           child: Text('Give Review'),
-//                         ),
-//                     ],
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }

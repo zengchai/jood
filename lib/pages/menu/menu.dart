@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -28,6 +30,10 @@ class MenuPage extends StatefulWidget {
 }
 
 class _CategoryMenuState extends State<MenuPage> {
+  //Date
+  late DateTime currentDate = DateTime.now();
+  late String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
+
   DatabaseService databaseService = DatabaseService(uid: 'your_user_id');
   List<String> foodReviews = [];
 
@@ -114,9 +120,6 @@ class _CategoryMenuState extends State<MenuPage> {
     Size size = MediaQuery.sizeOf(context);
     bool showCustomer = true;
     final currentUser = Provider.of<AppUsers?>(context);
-    //Date
-    DateTime currentDate = DateTime.now();
-    String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
 
     if (currentUser!.uid == 'TnDmXCiJINXWdNBhfZvuAFCuaSL2') {
       showCustomer = false;
@@ -141,8 +144,8 @@ class _CategoryMenuState extends State<MenuPage> {
                 Column(
                     children: [
                       const SizedBox(height: 20),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 15),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -162,7 +165,8 @@ class _CategoryMenuState extends State<MenuPage> {
                                   color: Colors.black,
                                 ),
                                 SizedBox(width: 4.0),
-                                Text(formattedDate,
+                                Text(
+                                  formattedDate,
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 15.0,
@@ -179,7 +183,7 @@ class _CategoryMenuState extends State<MenuPage> {
                         child: GridView.builder(
                             itemCount: menuProvider.menuList.length,
                             shrinkWrap: true,
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 2,
@@ -277,26 +281,37 @@ class _CategoryMenuState extends State<MenuPage> {
                 Column(
                     children: [
                       const SizedBox(height: 20),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 15),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("EDIT MENU",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black)),
+                            Text(
+                              "EDIT MENU",
+                              style: TextStyle(
+                                color: Color.fromARGB(255, 0, 0, 0),
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Icon(Icons.date_range_outlined),
-                                Text(formattedDate,
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.black)),
+                                Icon(
+                                  Icons.calendar_today,
+                                  color: Colors.black,
+                                ),
+                                SizedBox(width: 4.0),
+                                Text(
+                                  formattedDate,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ],
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -305,7 +320,7 @@ class _CategoryMenuState extends State<MenuPage> {
                         child: GridView.builder(
                             itemCount: menuProvider.menuList.length + 1,
                             shrinkWrap: true,
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 2,
