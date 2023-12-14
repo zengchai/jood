@@ -87,6 +87,7 @@ class DatabaseService {
     }, SetOptions(merge: true));
   }
 
+//ffdfdfdf
   // Function to retrieve cart items
   Stream<List<CartItem>> getCartItems() {
     return cartCollection.doc(uid).snapshots().map((snapshot) {

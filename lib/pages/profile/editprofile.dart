@@ -161,11 +161,8 @@ class _EditProfileState extends State<EditProfile> {
                             if(nameController.text.isEmpty||matricController.text.isEmpty||phonenumController.text.isEmpty||addressController.text.isEmpty){
                               _showPanel2("Error","Some field is empty. Please check the field an make sure all the details are filled in.");
                             }
-                            else if (!RegExp(r'^[A-Za-z]\d{2}[A-Za-z]{2}\d{4}$').hasMatch(matricController.text)) {
-                              _showPanel2("Error", "Invalid matric number format. It should start with a letter, followed by 2 digits, 2 letters, and finally 4 digits.");
-                            }
-                            else if (!RegExp(r'^01[0-9]{8,10}$').hasMatch(phonenumController.text)) {
-                              _showPanel2("Error", "Invalid phone number format. It should start with '01' and have a length greater than 10.");
+                            else if(matricController.text.length <= 8){
+                              _showPanel2("Error","The format of your matric number might be wrong. It should looks something like A23EC2311.");
                             }
                             else{
                             await DatabaseService(uid: user!.uid).updateUserData(nameController.text , emailController.text ,matricController.text ,phonenumController.text ,addressController.text);
