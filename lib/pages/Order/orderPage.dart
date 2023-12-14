@@ -163,14 +163,6 @@ class _OrderPageState extends State<OrderPage> {
                               color: Colors.black,
                             ),
                             SizedBox(width: 4.0),
-                            // Text(
-                            //   formattedDate,
-                            //   style: TextStyle(
-                            //     color: Colors.black,
-                            //     fontSize: 15.0,
-                            //     fontWeight: FontWeight.bold,
-                            //   ),
-                            // ),
                             MaterialButton(
                               onPressed: _showDatePicker,
                               color: Colors.amber,
@@ -267,7 +259,7 @@ class _OrderPageState extends State<OrderPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "MY ORDER",
+                          "CUSTOMER'S ORDER",
                           style: TextStyle(
                             color: Color.fromARGB(255, 0, 0, 0),
                             fontSize: 18.0,
