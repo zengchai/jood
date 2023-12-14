@@ -36,7 +36,6 @@ class _CategoryMenuState extends State<MenuPage> {
 
   DatabaseService databaseService = DatabaseService(uid: 'your_user_id');
   List<String> foodReviews = [];
-
   void _popupViewReview(MenuProvider menuProvider, int index) {
     showDialog(
       context: context,
