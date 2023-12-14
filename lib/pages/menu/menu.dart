@@ -244,7 +244,7 @@ class _CategoryMenuState extends State<MenuPage> {
                                                 text: "Add to cart",
                                                 onPressed: () async {
                                                   await DatabaseService(
-                                                          uid: currentUser.uid)
+                                                          uid: currentUser!.uid)
                                                       .addToCart(
                                                           menuProvider
                                                                   .menuList[
