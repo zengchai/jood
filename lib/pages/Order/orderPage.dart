@@ -11,7 +11,6 @@ import 'package:jood/services/database.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-//frf
 class OrderPage extends StatefulWidget {
   const OrderPage({Key? key}) : super(key: key);
 

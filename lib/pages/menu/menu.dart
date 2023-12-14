@@ -31,12 +31,11 @@ class MenuPage extends StatefulWidget {
 
 class _CategoryMenuState extends State<MenuPage> {
   //Date
-  DateTime currentDate = DateTime.now();
+  late DateTime currentDate = DateTime.now();
   late String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
 
   DatabaseService databaseService = DatabaseService(uid: 'your_user_id');
   List<String> foodReviews = [];
-
   void _popupViewReview(MenuProvider menuProvider, int index) {
     showDialog(
       context: context,
@@ -245,7 +244,7 @@ class _CategoryMenuState extends State<MenuPage> {
                                                 text: "Add to cart",
                                                 onPressed: () async {
                                                   await DatabaseService(
-                                                          uid: currentUser.uid)
+                                                          uid: currentUser!.uid)
                                                       .addToCart(
                                                           menuProvider
                                                                   .menuList[

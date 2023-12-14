@@ -114,12 +114,18 @@ class AuthService {
   // }
 
   // sign out
-  Future signOut() async {
+  Future signOut(BuildContext context) async {
     try {
       return await _auth.signOut();
     } catch (e) {
-      print(e.toString());
-      return null;
+      if (e is FirebaseAuthException) {
+        showDialog(
+          context: context, // Make sure to have access to the current context
+          builder: (BuildContext context) {
+            return WarningAlert(title: 'Error',subtitle: '${e.message}');
+          },
+        );
+      }
     }
   }
 
@@ -145,7 +151,7 @@ class AuthService {
         showDialog(
           context: context, // Make sure to have access to the current context
           builder: (BuildContext context) {
-            return WarningAlert(title: 'Error', subtitle: 'asdsa');
+            return WarningAlert(title: 'Deleted',subtitle: 'The account has been deleted',);
           },
         );
         return await FirebaseAuth.instance.signOut();
@@ -153,7 +159,7 @@ class AuthService {
         showDialog(
           context: context, // Make sure to have access to the current context
           builder: (BuildContext context) {
-            return WarningAlert(title: 'Error', subtitle: 'ssad');
+            return WarningAlert(title: 'Error', subtitle: e.toString(),);
           },
         );
         print("Error deleting user account: $e");
