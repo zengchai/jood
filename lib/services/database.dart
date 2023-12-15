@@ -153,13 +153,15 @@ class DatabaseService {
       List<OrderItem> orderItems = orderkeys.map((key) {
         dynamic item = data[key];
         print('Item: $item');
-        if (item == null || item is! List<dynamic> || item.length < 4) {
+        if (item == null || item is! List<dynamic> || item.length < 6) {
           return OrderItem(
+              orderID: 'Invalid orderID',
               foodName: 'Invalid Item Format',
               foodImage: 'error_image.jpg',
               quantity: 0,
               price: 0.0,
-              orderDate: "Invalid date");
+              orderDate: "Invalid date",
+              status: "Preparing");
         }
 
         // Convert Timestamp to DateTime
@@ -170,11 +172,13 @@ class DatabaseService {
             "${(dateTime.day).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
 
         return OrderItem(
+          orderID: item[6] as String,
           foodName: item[1] as String,
           foodImage: item[0] as String,
           quantity: (item[3] as num).toInt(),
           price: (item[2] as num).toDouble(),
           orderDate: formattedDate,
+          status: item[5] as String,
         );
       }).toList();
 
@@ -206,13 +210,15 @@ class DatabaseService {
             List<OrderItem> orderItems = orderkeys.map((key) {
               dynamic item = data[key];
 
-              if (item == null || item is! List<dynamic> || item.length < 4) {
+              if (item == null || item is! List<dynamic> || item.length < 6) {
                 return OrderItem(
+                    orderID: 'Invalid orderID',
                     foodName: 'Invalid Item Format',
                     foodImage: 'error_image.jpg',
                     quantity: 0,
                     price: 0.0,
-                    orderDate: "Invalid date");
+                    orderDate: "Invalid date",
+                    status: "Preparing");
               }
               // Convert Timestamp to DateTime
               DateTime dateTime = (item[4] as Timestamp).toDate();
@@ -222,11 +228,13 @@ class DatabaseService {
                   "${(dateTime.day).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
 
               return OrderItem(
+                  orderID: item[6] as String,
                   foodName: item[1] as String,
                   foodImage: item[0] as String,
                   quantity: (item[3] as num).toInt(),
                   price: (item[2] as num).toDouble(),
-                  orderDate: formattedDate);
+                  orderDate: formattedDate,
+                  status: item[5] as String);
             }).toList();
 
             // Filter orders by selectedDate for each order individually
@@ -241,16 +249,52 @@ class DatabaseService {
         }
       }
 
-      // //to filter the date
-      // if (selectedDate != null) {
-      //   allOrders = allOrders
-      //       .where((orderItems) => orderItems
-      //           .any((orderItem) => (orderItem.orderDate) == selectedDate))
-      //       .toList();
-      // }
-
       return allOrders;
     });
+  }
+
+//method to update the order status
+  Future<void> updateOrderStatus(String orderId, String status) async {
+    //ltr need update Order$orderId once ZE update
+
+    // return await orderCollection.doc("H4zCS1bQB8DxpvqzOexp").set({
+    //   {'Order$orderId.status': status},
+    //   SetOptions(merge: true),
+    // });
+    try {
+      // Fetch the existing order data
+      DocumentSnapshot<Object?> orderSnapshot =
+          await orderCollection.doc("H4zCS1bQB8DxpvqzOexp").get();
+      var orderData = orderSnapshot.data() as Map<String, dynamic>;
+
+      // Check if the array exists and has at least 6 elements
+      //'Order$orderId.status' = Ordertime$stamp/Order$ID
+      // Update the status at index 5 in the array
+      orderData['Order$orderId'][5] = status;
+
+      // // Update the order in the database
+      await orderCollection.doc("H4zCS1bQB8DxpvqzOexp").update(orderData);
+
+      // if (orderData.containsKey('Order') &&
+      //     orderData['Order'] is List &&
+      //     orderData['Order'].length >= 6) {
+      //   // Toggle the status between "Preparing" and "Complete"
+      //   String currentStatus = orderData['Order$orderId'][5];
+      //   String newStatus =
+      //       (currentStatus == 'Preparing') ? 'Complete' : 'Preparing';
+
+      //   // Update the status at index 5 in the array
+      //   orderData['Order$orderId'][5] = newStatus;
+
+      //   // Update the order in the database
+      //   await orderCollection.doc("H4zCS1bQB8DxpvqzOexp").update(orderData);
+      // } else {
+      //   print("Invalid order structure or missing status field.");
+      // }
+    } catch (e) {
+      print("Error updating order status: $e");
+      // Handle errors here
+    }
   }
 
 // Convert a single document snapshot to a UserProfile

@@ -211,14 +211,13 @@ class _OrderPageState extends State<OrderPage> {
                                 List<OrderItem> orderData = snapshot.data ?? [];
                                 return ListView.builder(
                                   itemCount: orderData.length,
-                                  itemBuilder: (context, index) {
+                                  itemBuilder: (
+                                    context,
+                                    index,
+                                  ) {
                                     // Display and manipulate cart items in the UI
-                                    return Column(
-                                      children: orderData.map((orderItem) {
-                                        return _buildOrderItemCard(
-                                            orderItem, false);
-                                      }).toList(),
-                                    );
+                                    return _buildOrderItemCard(orderData[index],
+                                        false, currentUser!.uid);
                                   },
                                 );
                               }
@@ -300,7 +299,7 @@ class _OrderPageState extends State<OrderPage> {
                                     return Column(
                                       children: orderItems.map((orderItem) {
                                         return _buildOrderItemCard(
-                                            orderItem, true);
+                                            orderItem, true, currentUser!.uid);
                                       }).toList(),
                                     );
                                   },
@@ -314,7 +313,8 @@ class _OrderPageState extends State<OrderPage> {
               ));
   }
 
-  Widget _buildOrderItemCard(OrderItem orderItem, bool isAdmin) {
+  Widget _buildOrderItemCard(
+      OrderItem orderItem, bool isAdmin, String currentUserid) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
       width: 400,
@@ -338,13 +338,36 @@ class _OrderPageState extends State<OrderPage> {
               children: [
                 Text('Quantity: ${orderItem.quantity}'),
                 Text('Price: \$${orderItem.price.toStringAsFixed(2)}'),
-                if (!isAdmin)
-                  ElevatedButton(
-                    onPressed: () {
-                      _popupReview(orderItem);
+                if (isAdmin)
+                  DropdownButton<String>(
+                    value: '${orderItem.status}',
+                    onChanged: (newStatus) async {
+                      if (newStatus == 'Complete') {
+                        // Update the order status in the database
+                        await DatabaseService(uid: currentUserid)
+                            .updateOrderStatus(orderItem.orderID, newStatus!);
+                      }
+
+                      // Update the status in the local UI state
+                      setState(() {
+                        orderItem.status = newStatus!;
+                      });
                     },
-                    child: Text('Give Review'),
+                    items: <String>['Preparing', 'Complete']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
                   ),
+                if (!isAdmin) Text('Status: ${orderItem.status}'),
+                ElevatedButton(
+                  onPressed: () {
+                    _popupReview(orderItem);
+                  },
+                  child: Text('Give Review'),
+                ),
               ],
             ),
           ],
