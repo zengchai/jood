@@ -119,8 +119,11 @@ class _OrderPageState extends State<OrderPage> {
       // User picked a date
       setState(() {
         // Exclude the time component
-        selectedDate =
-            DateTime(pickedDate.year, pickedDate.month, pickedDate.day);
+        selectedDate = DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+        );
       });
 
 // Update formattedDate

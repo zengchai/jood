@@ -166,18 +166,8 @@ class DatabaseService {
         DateTime dateTime = (item[4] as Timestamp).toDate();
 
         // Format DateTime as "dd/MM/yyyy"
-        //String formattedDate =
-        //   "${(dateTime.day + 1).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
-
-        String formattedDate;
-
-        if (dateTime.day != 1) {
-          formattedDate =
-              "${(dateTime.day + 1).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
-        } else {
-          formattedDate =
-              "${(dateTime.day + 1).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
-        }
+        String formattedDate =
+            "${(dateTime.day).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
 
         return OrderItem(
           foodName: item[1] as String,
@@ -229,15 +219,7 @@ class DatabaseService {
 
               // Format DateTime as "dd/MM/yyyy"
               String formattedDate =
-                  "${(dateTime.day + 1).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
-
-              // if (dateTime.day == 1) {
-              //   formattedDate =
-              //       "${(dateTime.day).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
-              // } else {
-              //   formattedDate =
-              //       "${(dateTime.day + 1).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
-              // }
+                  "${(dateTime.day).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
 
               return OrderItem(
                   foodName: item[1] as String,
