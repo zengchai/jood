@@ -35,6 +35,7 @@ class _CategoryMenuState extends State<MenuPage> {
 
 
   void _popupViewReview(MenuProvider menuProvider, int index) {
+    String? foodID = menuProvider.menuList[index].id;
     showDialog(
       context: context,
       builder: (context) {
@@ -52,11 +53,23 @@ class _CategoryMenuState extends State<MenuPage> {
                     child: Column(
                       children: [
                         ListTile(
-                          leading: Image.asset(
-                            menuProvider.menuList[index].img ?? '',
-                            width: 120,
-                            height: 120,
-                          ),
+                          leading: CachedNetworkImage(
+                            height: 130,
+                            width: 90,
+                            fit: BoxFit.fill,
+                            imageUrl: menuProvider
+                            .menuList[index].img ?? '',
+                          placeholder: (context, url) {
+                            log("Placeholder for image: $url");
+                            return const Center(
+                            child:
+                            CircularProgressIndicator());
+                          },
+                          errorWidget: (context, url, error) {
+                            log("Error loading image: $url, $error");
+                            return const Icon(Icons.error);
+                          },
+                        ),
                           title: Text(menuProvider.menuList[index].title ?? ""),
                           subtitle: Text(
                             menuProvider.menuList[index].price ?? '',
@@ -65,21 +78,33 @@ class _CategoryMenuState extends State<MenuPage> {
                         SizedBox(height: 20),
 
                         //DO THE STARS THING
-                        Column(
-                          children: [
-                            for (String review in foodReviews)
-                              Container(
-                                margin: EdgeInsets.symmetric(vertical: 5),
-                                padding: EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: ListTile(
-                                  title: Text(review),
-                                ),
-                              ),
-                          ],
+                        StreamBuilder<List<String>>(
+                          stream: databaseService.foodReviewsStream(foodID!),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              List<String> reviews = snapshot.data ?? [];
+                              return Column(
+                                children: [
+                                  for (String review in reviews)
+                                    Container(
+                                      margin: EdgeInsets.symmetric(vertical: 5),
+                                      padding: EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.grey),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: ListTile(
+                                        title: Text(review),
+                                      ),
+                                    ),
+                                ],
+                              );
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -102,22 +127,12 @@ class _CategoryMenuState extends State<MenuPage> {
   }
 
 
-
-
-
-
   @override
   void initState() {
     super.initState();
     Provider.of<MenuProvider>(context, listen: false).fetchMenu();
-    databaseService.foodReviewsStream().listen((List<String> reviews) {
-      setState(() {
-        foodReviews = reviews;
-      });
-    });
+
   }
-
-
 
 
   @override
@@ -204,7 +219,6 @@ class _CategoryMenuState extends State<MenuPage> {
 
                                   child: InkWell(
                                     onTap: () {
-                                      print('Image Clicked!');
                                       _popupViewReview(menuProvider, index);
                                     },
                                     child: CachedNetworkImage(
@@ -328,23 +342,29 @@ class _CategoryMenuState extends State<MenuPage> {
                                   child: ClipRRect(
                                     borderRadius:
                                     BorderRadius.circular(20),
-                                    child: CachedNetworkImage(
-                                      height: 100,
-                                      width: size.width,
-                                      fit: BoxFit.fill,
-                                      imageUrl: menuProvider
-                                          .menuList[index].img ??
-                                          '',
-                                      placeholder: (context, url) {
-                                        log("Placeholder for image: $url");
-                                        return const Center(
-                                            child:
-                                            CircularProgressIndicator());
+
+                                    child: InkWell(
+                                      onTap: () {
+                                        _popupViewReview(menuProvider, index);
                                       },
-                                      errorWidget: (context, url, error) {
-                                        log("Error loading image: $url, $error");
-                                        return const Icon(Icons.error);
-                                      },
+                                      child: CachedNetworkImage(
+                                        height: 100,
+                                        width: size.width,
+                                        fit: BoxFit.fill,
+                                        imageUrl: menuProvider
+                                            .menuList[index].img ??
+                                            '',
+                                        placeholder: (context, url) {
+                                          log("Placeholder for image: $url");
+                                          return const Center(
+                                              child:
+                                              CircularProgressIndicator());
+                                        },
+                                        errorWidget: (context, url, error) {
+                                          log("Error loading image: $url, $error");
+                                          return const Icon(Icons.error);
+                                        },
+                                      ),
                                     ),
                                   ),
                                 ),

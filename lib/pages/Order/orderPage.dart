@@ -6,6 +6,10 @@ import 'package:jood/pages/order/reviewForm.dart';
 import 'package:jood/pages/payment/payment.dart';
 import 'package:jood/services/auth.dart';
 import 'package:jood/services/database.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+
+import '../menu/provider/menu_provider/menu_provider.dart';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({Key? key}) : super(key: key);
@@ -50,6 +54,9 @@ class _OrderPageState extends State<OrderPage> {
   int _currentPageIndex = 0;
 
   void _popupReview(OrderItem orderItem) {
+
+    double rating = 0;
+
     showDialog(
       context: context,
       builder: (context) {
@@ -76,9 +83,44 @@ class _OrderPageState extends State<OrderPage> {
                       ),
                       SizedBox(height: 20),
 
+                      RatingBar.builder(
+                        initialRating: rating,
+                        minRating: 1,
+                        direction: Axis.horizontal,
+                        allowHalfRating: false,
+                        itemCount: 5,
+                        itemSize: 30.0,
+                        itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                        itemBuilder: (context, _) => Icon(
+                          Icons.star,
+                          color: Colors.amber,
+                        ),
+                        onRatingUpdate: (newRating) {
+                          setState(() {
+                            rating = newRating;
+                          });
+                        },
+                      ),
+
+                      SizedBox(height: 20),
+
                       //DO THE STARS THING
 
+
                       reviewForm(),
+
+                      ElevatedButton(
+                        onPressed: () {
+                          // Use the 'rating' variable to submit the rating
+                          print('Selected Rating: $rating');
+
+                          // TODO: Implement logic to submit the rating to the database
+                          // databaseService.submitRating(orderItem.foodID, rating);
+
+                          Navigator.of(context).pop(); // Close the dialog
+                        },
+                        child: Text('Submit Review'),
+                      ),
                     ],
                   ),
                 ),

@@ -57,15 +57,15 @@ class DatabaseService {
     });
   }
 
-  Future updateReviewData(String review) async { //UPDATE REVIEW DATA ON THE SAME ORDER
-    return await reviewCollection.doc("hhi").update({
+  Future updateReviewData(String foodID, String review) async { //UPDATE REVIEW DATA ON THE SAME ORDER
+    return await reviewCollection.doc(foodID).update({
       'RfoodReview' : FieldValue.arrayUnion([review]),
     });
   }
 
-  Future setReviewData(String review) async { //SET REVIEW DATA WHEN ADD MORE FOOD
-    return await reviewCollection.doc("hhi").set({
-      'RfoodReview' : FieldValue.arrayUnion([review]),
+  Future setReviewData(String foodID) async { //SET REVIEW DATA WHEN ADD MORE FOOD
+    return await reviewCollection.doc(foodID).set({
+      'RfoodReview' : [],
     });
   }
 
@@ -231,14 +231,13 @@ class DatabaseService {
     }
   }
 
-  Stream<List<String>> foodReviewsStream() {
-    return reviewCollection.doc("hhi").snapshots().map((snapshot) {
+  Stream<List<String>> foodReviewsStream(String foodID) {
+    return reviewCollection.doc(foodID).snapshots().map((snapshot) {
       var data = snapshot.data() as Map<String, dynamic>;
       List<String> foodReviews = List<String>.from(data['RfoodReview'] ?? []);
       return foodReviews;
     });
   }
-
 
 
   setPaymentData(String s, String t) {}
