@@ -8,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jood/pages/menu/provider/model/menu_model.dart';
 
+import '../../../../services/database.dart';
 import '../../utils/constants/colors_resources.dart';
 import '../response_wrapper/response_wrapper.dart';
 
@@ -16,6 +17,10 @@ final CollectionReference menuCollectionRef = firestore.collection('menu');
 final Reference menuStorageRef = FirebaseStorage.instance.ref('menu/');
 
 class MenuProvider extends ChangeNotifier {
+
+  String? _foodID;
+  String? get foodID => _foodID;
+
   Future menuCreate({
     String? id,
     XFile? img,
@@ -37,6 +42,8 @@ class MenuProvider extends ChangeNotifier {
       String imgUrl = await taskSnapshot.ref.getDownloadURL();
       log('Image Download Url is: $imgUrl');
 
+      //String foodID = menuCollectionRef.doc().id;
+
       Map<String, dynamic> preams = {};
       if (id != null) {
         preams['id'] = id;
@@ -51,10 +58,18 @@ class MenuProvider extends ChangeNotifier {
 
       await menuCollectionRef.doc(preams['id']).set(preams);
 
+      String foodID = preams['id'];
+      _foodID = foodID;
+
       log('==@ Preams: $preams');
 
       response.statusCode == 200;
       showSuccessToast('Add Successfully!');
+
+      DatabaseService databaseService = DatabaseService(uid: 'currentUserId');
+
+      await databaseService.setReviewData(foodID);
+
       await fetchMenu();
       notifyListeners();
     } catch (e) {

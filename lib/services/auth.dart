@@ -59,7 +59,6 @@ class AuthService {
       await DatabaseService(uid: users!.uid)
           .setUserData(users.uid, name, email, '', '', '');
       await DatabaseService(uid: users!.uid).setPaymentData('TnG', '0.00');
-      await DatabaseService(uid: users!.uid).updateReviewData('');
       return _userFromFirebaseUser(users);
     } catch (e) {
       if (e is FirebaseAuthException) {
