@@ -4,6 +4,7 @@ import 'package:jood/firebase_options.dart';
 import 'package:jood/models/users.dart';
 import 'package:jood/pages/authenticate/authenticate.dart';
 import 'package:jood/pages/authenticate/register.dart';
+import 'package:jood/pages/authenticate/resetPassword.dart';
 import 'package:jood/pages/authenticate/sign_in.dart';
 import 'package:jood/pages/home/home.dart';
 import 'package:jood/pages/payment/payment.dart';
@@ -54,6 +55,9 @@ class MyApp extends StatelessWidget {
           '/editprofile': (context) => EditProfile(),
           '/method': (context) => MethodPage(),
           '/receipt': (context) => Receipt(),
+          '/resetpassword': (context) => ResetPassword(),
+
+
         },
         home: const Wrapper(),
       ),

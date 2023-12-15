@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class WarningAlert extends StatelessWidget {
-  const WarningAlert({Key? key}) : super(key: key);
+  final String title;
+  final String subtitle;
+  const WarningAlert({required this.title,required this.subtitle});
 
   @override
   Widget build(BuildContext context) {
@@ -19,14 +21,14 @@ class WarningAlert extends StatelessWidget {
                 children: [
                   Center(
                     child: Text(
-                      'Deleted',
+                      title,
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
                   SizedBox(height: 30),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
-                    child: Text('The account has been deleted',
+                    child: Text(subtitle,
                         style: TextStyle(fontSize: 15),
                   ),
                   ),

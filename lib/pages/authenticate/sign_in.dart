@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jood/constants/warningalert.dart';
 import 'package:jood/services/auth.dart';
 
 import '../../shared/loading.dart';
@@ -15,21 +16,31 @@ class SignIn extends StatefulWidget {
 
 class _SignInState extends State<SignIn> {
 
+  final TextEditingController _emailController = TextEditingController();
   final AuthService _auth = AuthService();
   bool loading = false;
+  bool error = false;
   final _formKey = GlobalKey<FormState>();
 
   String email = '';
   String password = '';
-  String error = '';
 
   @override
   Widget build(BuildContext context) {
+    void _showPanel() {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return WarningAlert(title:'Error',subtitle: 'Your email or password is wrong',);
+        },
+      );
+    };
     return loading ? Loading() : Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.brown[400],
         elevation: 0.0,
+        title: Text("Sign In"),
         actions: <Widget>[],
       ),
       body: ListView(
@@ -104,7 +115,7 @@ class _SignInState extends State<SignIn> {
                 if(result == null){
                   setState(() {
                     loading = false;
-                    error = 'Your email or password is wrong';
+                    _showPanel();
                   });
                 }
                 else {
@@ -123,9 +134,23 @@ class _SignInState extends State<SignIn> {
               style: TextStyle(color: Colors.white),
             ),
         ),
-            Text(
-            error,
-          )
+      SizedBox(height:30.0),
+      ElevatedButton(
+        onPressed: () async{
+          await Navigator.pushNamed(context, '/resetpassword');
+        },
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B).withOpacity(0.75),),
+          foregroundColor: MaterialStateProperty.all<Color>(Color(0xFFFFFFCC)),
+          minimumSize: MaterialStateProperty.all<Size>(Size(200, 50)),
+        ),
+        child: Text(
+          'Forgot Password',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+
+
     ],
     )
     )),])
