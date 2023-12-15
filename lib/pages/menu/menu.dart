@@ -3,11 +3,13 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:jood/pages/menu/overlay.dart';
+import 'package:intl/intl.dart';
 import 'package:jood/pages/menu/provider/menu_provider/menu_provider.dart';
+import 'package:jood/pages/shoppingcart/CartItem.dart';
+import 'package:jood/services/database.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/users.dart';
-import '../Order/orderPage.dart';
 import './utils/constants/colors_resources.dart';
 import 'add_alert_widget.dart';
 import 'custom_button.dart';
@@ -125,6 +127,8 @@ class _CategoryMenuState extends State<MenuPage> {
     Size size = MediaQuery.sizeOf(context);
     bool showCustomer = true;
     final currentUser = Provider.of<AppUsers?>(context);
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('yyyy-MM-dd').format(now);
 
     if (currentUser!.uid == 'TnDmXCiJINXWdNBhfZvuAFCuaSL2') {
       showCustomer = false;
