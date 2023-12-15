@@ -26,7 +26,6 @@ class _OrderPageState extends State<OrderPage> {
   late DateTime selectedDate = DateTime.now();
   late String formattedDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
   late final String review;
-  late PageController _pageController;
   int _currentPageIndex = 0;
 
   void _popupReview(OrderItem orderItem) {
@@ -48,7 +47,7 @@ class _OrderPageState extends State<OrderPage> {
                   child: Column(
                     children: [
                       ListTile(
-                        leading: Image.asset(
+                        leading: Image.network(
                           orderItem.foodImage,
                           width: 120,
                           height: 120,
@@ -133,34 +132,6 @@ class _OrderPageState extends State<OrderPage> {
     }
   }
 
-  // Date
-  //DateTime selectedDate = DateTime.now();
-  // late Stream<List<OrderItem>> _orderStreamCustomer;
-  // late Stream<List<List<OrderItem>>> _orderStreamSeller;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(initialPage: _currentPageIndex);
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  void _navigateToPage(int pageIndex) {
-    setState(() {
-      _currentPageIndex = pageIndex;
-    });
-    _pageController.animateToPage(
-      pageIndex,
-      duration: Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     bool showCustomer = true;
@@ -180,7 +151,7 @@ class _OrderPageState extends State<OrderPage> {
             Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+                    padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -202,7 +173,7 @@ class _OrderPageState extends State<OrderPage> {
                             SizedBox(width: 4.0),
                             MaterialButton(
                               onPressed: _showDatePicker,
-                              color: Colors.amber,
+                              padding: EdgeInsets.zero,
                               child: Text(
                                 formattedDate,
                                 style: TextStyle(
@@ -217,42 +188,8 @@ class _OrderPageState extends State<OrderPage> {
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        TextButton(
-                          onPressed: () => _navigateToPage(0),
-                          style: TextButton.styleFrom(
-                            backgroundColor: _currentPageIndex == 0
-                                ? Color.fromARGB(255, 250, 169,
-                                    63) // Highlight the selected button
-                                : null,
-                          ),
-                          child: Text('Ongoing'),
-                        ),
-                        TextButton(
-                          onPressed: () => _navigateToPage(1),
-                          style: TextButton.styleFrom(
-                            backgroundColor: _currentPageIndex == 1
-                                ? Color.fromARGB(255, 250, 169,
-                                    63) // Highlight the selected button
-                                : null,
-                          ),
-                          child: Text('History'),
-                        ),
-                      ],
-                    ),
-                  ),
                   Expanded(
                     child: PageView(
-                      controller: _pageController,
-                      onPageChanged: (index) {
-                        setState(() {
-                          _currentPageIndex = index;
-                        });
-                      },
                       children: [
                         StreamBuilder<List<OrderItem>>(
                           // stream: DatabaseService(uid: currentUser!.uid)
@@ -291,7 +228,7 @@ class _OrderPageState extends State<OrderPage> {
             Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+                    padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -313,7 +250,7 @@ class _OrderPageState extends State<OrderPage> {
                             SizedBox(width: 4.0),
                             MaterialButton(
                               onPressed: _showDatePicker,
-                              color: Colors.amber,
+                              padding: EdgeInsets.zero,
                               child: Text(
                                 formattedDate,
                                 style: TextStyle(
@@ -328,42 +265,8 @@ class _OrderPageState extends State<OrderPage> {
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        TextButton(
-                          onPressed: () => _navigateToPage(0),
-                          style: TextButton.styleFrom(
-                            backgroundColor: _currentPageIndex == 0
-                                ? Color.fromARGB(255, 250, 169,
-                                    63) // Highlight the selected button
-                                : null,
-                          ),
-                          child: Text('Incoming'),
-                        ),
-                        TextButton(
-                          onPressed: () => _navigateToPage(1),
-                          style: TextButton.styleFrom(
-                            backgroundColor: _currentPageIndex == 1
-                                ? Color.fromARGB(255, 250, 169,
-                                    63) // Highlight the selected button
-                                : null,
-                          ),
-                          child: Text('History'),
-                        ),
-                      ],
-                    ),
-                  ),
                   Expanded(
                     child: PageView(
-                      controller: _pageController,
-                      onPageChanged: (index) {
-                        setState(() {
-                          _currentPageIndex = index;
-                        });
-                      },
                       children: [
                         StreamBuilder<List<List<OrderItem>>>(
                             // stream: DatabaseService(uid: currentUser!.uid)
@@ -391,14 +294,13 @@ class _OrderPageState extends State<OrderPage> {
                                     return Column(
                                       children: orderItems.map((orderItem) {
                                         return _buildOrderItemCard(
-                                            orderItem, false);
+                                            orderItem, true);
                                       }).toList(),
                                     );
                                   },
                                 );
                               }
                             }),
-                        //_buildOrderList(true),
                       ],
                     ),
                   ),
@@ -406,7 +308,7 @@ class _OrderPageState extends State<OrderPage> {
               ));
   }
 
-  Widget _buildOrderItemCard(OrderItem orderItem, bool isHistoryPage) {
+  Widget _buildOrderItemCard(OrderItem orderItem, bool isAdmin) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
       width: 400,
@@ -430,10 +332,10 @@ class _OrderPageState extends State<OrderPage> {
               children: [
                 Text('Quantity: ${orderItem.quantity}'),
                 Text('Price: \$${orderItem.price.toStringAsFixed(2)}'),
-                if (isHistoryPage) // Conditionally show the review button
+                if (!isAdmin)
                   ElevatedButton(
                     onPressed: () {
-                      //_popupReview(orderItem);
+                      _popupReview(orderItem);
                     },
                     child: Text('Give Review'),
                   ),

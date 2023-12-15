@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -37,8 +39,8 @@ class _CategoryMenuState extends State<MenuPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Review'),
-          contentPadding: EdgeInsets.all(0),
+          title: const Text('Review'),
+          contentPadding: const EdgeInsets.all(0),
           content: SingleChildScrollView(
             child: Container(
               width: MediaQuery.of(context).size.width,
@@ -46,7 +48,8 @@ class _CategoryMenuState extends State<MenuPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 30, horizontal: 20),
                     child: Column(
                       children: [
                         ListTile(
@@ -70,7 +73,7 @@ class _CategoryMenuState extends State<MenuPage> {
                             menuProvider.menuList[index].price ?? '',
                           ),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
                         //DO THE STARS THING
                         StreamBuilder<List<String>>(
@@ -78,7 +81,7 @@ class _CategoryMenuState extends State<MenuPage> {
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return CircularProgressIndicator();
+                              return const CircularProgressIndicator();
                             } else if (snapshot.hasError) {
                               return Text('Error: ${snapshot.error}');
                             } else {
@@ -87,8 +90,9 @@ class _CategoryMenuState extends State<MenuPage> {
                                 children: [
                                   for (String review in reviews)
                                     Container(
-                                      margin: EdgeInsets.symmetric(vertical: 5),
-                                      padding: EdgeInsets.all(8),
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 5),
+                                      padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
                                         border: Border.all(color: Colors.grey),
                                         borderRadius: BorderRadius.circular(8),
@@ -114,7 +118,7 @@ class _CategoryMenuState extends State<MenuPage> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('Close'),
+              child: const Text('Close'),
             ),
           ],
         );
@@ -134,7 +138,7 @@ class _CategoryMenuState extends State<MenuPage> {
     bool showCustomer = true;
     final currentUser = Provider.of<AppUsers?>(context);
     DateTime now = DateTime.now();
-    String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+    String formattedDate = DateFormat('dd/MM/yyyy').format(now);
 
     if (currentUser!.uid == 'TnDmXCiJINXWdNBhfZvuAFCuaSL2') {
       showCustomer = false;
@@ -158,24 +162,35 @@ class _CategoryMenuState extends State<MenuPage> {
                 Column(
                     children: [
                       const SizedBox(height: 20),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 15),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("EDIT MENU",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black)),
+                            Text(
+                              "MENU",
+                              style: TextStyle(
+                                color: Color.fromARGB(255, 0, 0, 0),
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Icon(Icons.date_range_outlined),
-                                Text("19/11/2023",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.black)),
+                                Icon(
+                                  Icons.calendar_today,
+                                  color: Colors.black,
+                                ),
+                                SizedBox(width: 4.0),
+                                Text(
+                                  formattedDate,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ],
                             )
                           ],
@@ -301,24 +316,35 @@ class _CategoryMenuState extends State<MenuPage> {
                 Column(
                     children: [
                       const SizedBox(height: 20),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 15),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("EDIT MENU",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black)),
+                            Text(
+                              "EDIT MENU",
+                              style: TextStyle(
+                                color: Color.fromARGB(255, 0, 0, 0),
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Icon(Icons.date_range_outlined),
-                                Text("19/11/2023",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.black)),
+                                Icon(
+                                  Icons.calendar_today,
+                                  color: Colors.black,
+                                ),
+                                SizedBox(width: 4.0),
+                                Text(
+                                  formattedDate,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ],
                             )
                           ],
