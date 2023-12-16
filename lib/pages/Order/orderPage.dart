@@ -362,12 +362,13 @@ class _OrderPageState extends State<OrderPage> {
                     }).toList(),
                   ),
                 if (!isAdmin) Text('Status: ${orderItem.status}'),
-                ElevatedButton(
-                  onPressed: () {
-                    _popupReview(orderItem);
-                  },
-                  child: Text('Give Review'),
-                ),
+                if (!isAdmin)
+                  ElevatedButton(
+                    onPressed: () {
+                      _popupReview(orderItem);
+                    },
+                    child: Text('Give Review'),
+                  ),
               ],
             ),
           ],
