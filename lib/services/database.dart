@@ -13,8 +13,10 @@ class DatabaseService {
   DatabaseService.noParams();
   final CollectionReference Jood =
       FirebaseFirestore.instance.collection('User');
+  // final CollectionReference orderCollection =
+  //     FirebaseFirestore.instance.collection('orders');
   final CollectionReference orderCollection =
-      FirebaseFirestore.instance.collection('orders');
+      FirebaseFirestore.instance.collection('Order');
   final CollectionReference reviewCollection =
       FirebaseFirestore.instance.collection('reviews');
   final CollectionReference cartCollection =
@@ -52,7 +54,6 @@ class DatabaseService {
     });
   }
 
-
   Future updateReviewData(String foodID, String review) async {
     //UPDATE REVIEW DATA ON THE SAME ORDER
     return await reviewCollection.doc(foodID).update({
@@ -76,7 +77,8 @@ class DatabaseService {
   }
 
   // Function to add a food item to the cart
-  Future<void> addToCart(String foodName, String foodImage, double foodPrice) async {
+  Future<void> addToCart(
+      String foodName, String foodImage, double foodPrice) async {
     // Convert foodPrice to double if it's a String
     final double parsedPrice = foodPrice is String
         ? double.tryParse(foodPrice as String) ?? 0.0
@@ -86,7 +88,8 @@ class DatabaseService {
 
     // Check if the item already exists in the cart
     final DocumentSnapshot<Map<String, dynamic>> cartSnapshot =
-    await cartCollection.doc(uid).get() as DocumentSnapshot<Map<String, dynamic>>;
+        await cartCollection.doc(uid).get()
+            as DocumentSnapshot<Map<String, dynamic>>;
 
     if (cartSnapshot.exists) {
       // If the cart exists, get the current items
@@ -163,7 +166,8 @@ class DatabaseService {
     String status = "Preparing";
 
     // Calculate total price
-    double totalPrice = cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
+    double totalPrice =
+        cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
 
     // Create order ID
     final String orderId = 'Order:${DateTime.now().millisecondsSinceEpoch}';
@@ -186,10 +190,12 @@ class DatabaseService {
     await paidOrderCollection.doc(uid).set({
       orderId: {
         'orderId': orderId,
-        'timestamp': FieldValue.serverTimestamp(), // Set timestamp for date and time
+        'timestamp':
+            FieldValue.serverTimestamp(), // Set timestamp for date and time
         'items': itemsMap, // Store items using the map
         'name': name,
-        'paymentMethod': paymentmethod, // Replace with the actual payment method
+        'paymentMethod':
+            paymentmethod, // Replace with the actual payment method
         'status': status,
         'totalPrice': totalPrice,
       },
@@ -199,7 +205,7 @@ class DatabaseService {
   Future<List<Map<String, dynamic>>> getAllOrderDetails() async {
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
-      await paidOrderCollection.doc(uid).collection('orders').get();
+          await paidOrderCollection.doc(uid).collection('orders').get();
 
       return querySnapshot.docs.map((doc) => doc.data()).toList();
     } catch (e) {
@@ -212,7 +218,11 @@ class DatabaseService {
   Future<Map<String, dynamic>> getOrderDetails(String orderId) async {
     try {
       DocumentSnapshot<Map<String, dynamic>> orderSnapshot =
-      await paidOrderCollection.doc(uid).collection('orders').doc(orderId).get();
+          await paidOrderCollection
+              .doc(uid)
+              .collection('orders')
+              .doc(orderId)
+              .get();
 
       return orderSnapshot.data() ?? {};
     } catch (e) {
@@ -221,11 +231,10 @@ class DatabaseService {
     }
   }
 
-
   Future<void> addCartItem(CartItem cartItem) async {
     final DocumentSnapshot<Map<String, dynamic>> cartSnapshot =
-    await cartCollection.doc(uid).get() as DocumentSnapshot<
-        Map<String, dynamic>>;
+        await cartCollection.doc(uid).get()
+            as DocumentSnapshot<Map<String, dynamic>>;
 
     if (cartSnapshot.exists) {
       // If the cart exists, get the current items
@@ -238,7 +247,12 @@ class DatabaseService {
         final int newQuantity = existingQuantity + 1;
 
         await cartCollection.doc(uid).set({
-          cartItem.name: [cartItem.name, cartItem.image, cartItem.price, newQuantity],
+          cartItem.name: [
+            cartItem.name,
+            cartItem.image,
+            cartItem.price,
+            newQuantity
+          ],
         }, SetOptions(merge: true));
       }
     }
@@ -246,8 +260,8 @@ class DatabaseService {
 
   Future<void> minusCartItem(CartItem cartItem) async {
     final DocumentSnapshot<Map<String, dynamic>> cartSnapshot =
-    await cartCollection.doc(uid).get() as DocumentSnapshot<
-        Map<String, dynamic>>;
+        await cartCollection.doc(uid).get()
+            as DocumentSnapshot<Map<String, dynamic>>;
 
     if (cartSnapshot.exists) {
       // If the cart exists, get the current items
@@ -260,7 +274,12 @@ class DatabaseService {
         final int newQuantity = existingQuantity - 1;
 
         await cartCollection.doc(uid).set({
-          cartItem.name: [cartItem.name, cartItem.image, cartItem.price, newQuantity],
+          cartItem.name: [
+            cartItem.name,
+            cartItem.image,
+            cartItem.price,
+            newQuantity
+          ],
         }, SetOptions(merge: true));
       }
     }
@@ -272,7 +291,6 @@ class DatabaseService {
       '${cartItem.name}': FieldValue.delete(),
     });
   }
-
 
 // Add a method to retrieve customer orders
   Stream<List<OrderItem>> getCustomerOrder(String? selectedDate) {
@@ -288,7 +306,7 @@ class DatabaseService {
 
       // Retrieve all keys from the data map
       List<String> orderkeys =
-      data.keys.where((key) => key.startsWith('Order')).toList();
+          data.keys.where((key) => key.startsWith('Order')).toList();
 
       if (orderkeys.isEmpty) {
         return []; // Return an empty list if there are no item keys
@@ -344,7 +362,7 @@ class DatabaseService {
 
           // Retrieve all keys from the data map
           List<String> orderkeys =
-          data.keys.where((key) => key.startsWith('Order')).toList();
+              data.keys.where((key) => key.startsWith('Order')).toList();
 
           if (orderkeys.isNotEmpty) {
             List<OrderItem> orderItems = orderkeys.map((key) {
@@ -397,10 +415,8 @@ class DatabaseService {
     });
   }
 
-
-
 // Convert a single document snapshot to a UserProfile
- UserProfile _userProfileFromSnapshot(DocumentSnapshot snapshot) {
+  UserProfile _userProfileFromSnapshot(DocumentSnapshot snapshot) {
     var userData = snapshot.data() as Map<String, dynamic>;
     return UserProfile(
       uid: userData['uid'] ?? '',
@@ -427,12 +443,12 @@ class DatabaseService {
       return null; // You might want to return a default or empty profile in case of an error
     }
   }
-  
 
   String _getNameFromSnapshot(DocumentSnapshot snapshot) {
     var userData = snapshot.data() as Map<String, dynamic>;
     return userData['name'] ?? '';
   }
+
   Future<String?> getOrderInfo(String uid) async {
     DocumentSnapshot<Object?> snapshot = await Jood.doc(uid).get();
     String name = _getNameFromSnapshot(snapshot);
@@ -441,8 +457,8 @@ class DatabaseService {
 
   Future<Map<String, dynamic>> retrieveCartItems() async {
     // Get the current cart snapshot
-    final DocumentSnapshot<Object?> cartSnapshot = await cartCollection.doc(
-        uid).get();
+    final DocumentSnapshot<Object?> cartSnapshot =
+        await cartCollection.doc(uid).get();
 
     if (cartSnapshot.exists) {
       var data = cartSnapshot.data() as Map<String, dynamic>;
@@ -480,6 +496,4 @@ class DatabaseService {
     // Return an empty map if there is an error or the cart is empty
     return {};
   }
-
-
 }
