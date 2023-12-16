@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../models/users.dart';
+import '../../services/database.dart';
 class CustomStepIndicator extends StatelessWidget {
   final int currentStep;
 
@@ -163,6 +166,7 @@ class _ReceiptState extends State<Receipt> {
     );
   }
 }
+
 /*
   void _downloadReceipt() {
     // Create a PDF document
