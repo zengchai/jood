@@ -3,14 +3,15 @@ import 'package:provider/provider.dart';
 
 import '../../models/users.dart';
 import '../../services/database.dart';
+import '../menu/provider/menu_provider/menu_provider.dart';
 
 class reviewForm extends StatefulWidget {
+
   const reviewForm({Key? key}) : super(key: key);
 
   @override
   State<reviewForm> createState() => _reviewFormState();
 }
-
 
 
 class _reviewFormState extends State<reviewForm> {
@@ -21,6 +22,9 @@ class _reviewFormState extends State<reviewForm> {
   Widget build(BuildContext context) {
 
     final currentUser = Provider.of<AppUsers?>(context);
+
+    String? foodID = Provider.of<MenuProvider>(context).foodID ?? "";
+    //need to change, foodID need to tally with the food that i clicked
 
     return Form(
       key: _formKey,
@@ -39,8 +43,8 @@ class _reviewFormState extends State<reviewForm> {
           SizedBox(height: 5),
           ElevatedButton(
             onPressed: () async{
-              //await DatabaseService(uid: users!.uid).updateReviewData('','','review');
-              await DatabaseService(uid: currentUser!.uid).updateReviewData('','', review);
+              await DatabaseService(uid: currentUser!.uid).updateReviewData(foodID, review);
+              Navigator.of(context).pop();
             },
             child: Text('Submit'),
           ),

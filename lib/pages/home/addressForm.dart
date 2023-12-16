@@ -47,11 +47,11 @@ class _addressFormState extends State<addressForm> {
                 filled: true,
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(4.0), // Set the border radius here
-                    borderSide: BorderSide(color: Color(0xFFF6B22D).withOpacity(0.25), width: 2.0)
+                    borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.25), width: 2.0)
                 ),
                 focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.0), // Set the border radius here
-                    borderSide: BorderSide(color: Color(0xFFF6B22D).withOpacity(0.75), width: 2.0)
+                    borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
                 )
             ),
             validator: (val) => val!.isEmpty ? 'Enter an address': null,
@@ -63,8 +63,8 @@ class _addressFormState extends State<addressForm> {
               Navigator.pop(context); // Close the dialog after updating
             },
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(Color(0xFFF6B22D).withOpacity(0.75),),
-              foregroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B)),
+              backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B).withOpacity(0.75),),
+              foregroundColor: MaterialStateProperty.all<Color>(Color(0xFFFFFFCC)),
               minimumSize: MaterialStateProperty.all<Size>(Size(200, 50)),
             ),
             child: Text(
