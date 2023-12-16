@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../models/users.dart';
 import '../../services/database.dart';
-
 class CustomStepIndicator extends StatelessWidget {
   final int currentStep;
 
@@ -63,8 +64,6 @@ class Receipt extends StatefulWidget {
 }
 
 class _ReceiptState extends State<Receipt> {
-  Map<String, dynamic> orderDetails =
-      await DatabaseService(uid: yourUid).getOrderDetails(orderId);
   int currentStep = 3;
 
   @override
@@ -138,6 +137,7 @@ class _ReceiptState extends State<Receipt> {
         _buildDetailItem('Date & Time', 'null'),
         _buildDetailItem('Payment Method', 'null'),
         _buildDetailItem('Name', 'null'),
+        _buildDetailItem('Email', 'null'),
       ],
     );
   }
@@ -166,6 +166,7 @@ class _ReceiptState extends State<Receipt> {
     );
   }
 }
+
 /*
   void _downloadReceipt() {
     // Create a PDF document

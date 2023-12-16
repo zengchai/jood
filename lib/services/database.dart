@@ -196,22 +196,27 @@ class DatabaseService {
     }, SetOptions(merge: true));
   }
 
+  Future<List<Map<String, dynamic>>> getAllOrderDetails() async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+      await paidOrderCollection.doc(uid).collection('orders').get();
+
+      return querySnapshot.docs.map((doc) => doc.data()).toList();
+    } catch (e) {
+      print('Error retrieving all order details: $e');
+      return [];
+    }
+  }
+
+  // Method to get a specific order details by orderId
   Future<Map<String, dynamic>> getOrderDetails(String orderId) async {
     try {
       DocumentSnapshot<Map<String, dynamic>> orderSnapshot =
-      await paidOrderCollection.doc(uid).get() as DocumentSnapshot<Map<String, dynamic>>;
+      await paidOrderCollection.doc(uid).collection('orders').doc(orderId).get();
 
-      if (orderSnapshot.exists) {
-        Map<String, dynamic> orderData = orderSnapshot.data() ?? {};
-        if (orderData.containsKey(orderId)) {
-          return orderData[orderId] as Map<String, dynamic>;
-        }
-      }
-
-      // Return an empty map if order not found
-      return {};
+      return orderSnapshot.data() ?? {};
     } catch (e) {
-      print("Error retrieving order details: $e");
+      print('Error retrieving order details: $e');
       return {};
     }
   }
