@@ -15,7 +15,7 @@ class DatabaseService {
   final CollectionReference Jood =
       FirebaseFirestore.instance.collection('User');
   final CollectionReference orderCollection =
-      FirebaseFirestore.instance.collection('orders');
+      FirebaseFirestore.instance.collection('Order');
   final CollectionReference reviewCollection =
       FirebaseFirestore.instance.collection('reviews');
   final CollectionReference cartCollection =
