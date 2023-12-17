@@ -14,8 +14,8 @@ class DatabaseService {
   DatabaseService.noParams();
   final CollectionReference Jood =
       FirebaseFirestore.instance.collection('User');
-  final CollectionReference orderCollection =
-      FirebaseFirestore.instance.collection('Order');
+  // final CollectionReference orderCollection =
+  //     FirebaseFirestore.instance.collection('Order');
   final CollectionReference reviewCollection =
       FirebaseFirestore.instance.collection('reviews');
   final CollectionReference cartCollection =
@@ -183,6 +183,7 @@ class DatabaseService {
           'image': cartItems[i].image,
           'price': cartItems[i].price,
           'quantity': cartItems[i].quantity,
+          'itemID': itemId,
         };
       }
 
@@ -314,8 +315,8 @@ class DatabaseService {
 
 // Add a method to retrieve customer orders
   Stream<List<OrderItem>> getCustomerOrder(String? selectedDate) {
-    return orderCollection
-        .doc("H4zCS1bQB8DxpvqzOexp")
+    return paidOrderCollection
+        .doc(uid) // Replace "uid" with the actual user ID
         .snapshots()
         .map((snapshot) {
       if (!snapshot.exists) {
@@ -324,47 +325,41 @@ class DatabaseService {
 
       var data = snapshot.data() as Map<String, dynamic>;
 
-      // Retrieve all keys from the data map
-      List<String> orderkeys =
+      // Retrieve order keys
+      List<String> orderKeys =
           data.keys.where((key) => key.startsWith('Order')).toList();
 
-      if (orderkeys.isEmpty) {
-        return []; // Return an empty list if there are no item keys
+      if (orderKeys.isEmpty) {
+        return []; // Return an empty list if there are no orders
       }
 
-      List<OrderItem> orderItems = orderkeys.map((key) {
-        dynamic item = data[key];
-        print('Item: $item');
-        if (item == null || item is! List<dynamic> || item.length < 6) {
+      List<OrderItem> orderItems = orderKeys.expand((orderKey) {
+        var orderData = data[orderKey] as Map<String, dynamic>;
+        var itemsData = orderData['items'] as Map<String, dynamic>;
+
+        return itemsData.entries.map((itemEntry) {
+          var itemData = itemEntry.value as Map<String, dynamic>;
+
+          // Convert Timestamp to DateTime
+          DateTime dateTime = (orderData['timestamp'] as Timestamp).toDate();
+
+          // Format DateTime as "dd/MM/yyyy"
+          String formattedDate =
+              "${(dateTime.day).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
+
           return OrderItem(
-              orderID: 'Invalid orderID',
-              foodName: 'Invalid Item Format',
-              foodImage: 'error_image.jpg',
-              quantity: 0,
-              price: 0.0,
-              orderDate: "Invalid date",
-              status: "Preparing");
-        }
-
-        // Convert Timestamp to DateTime
-        DateTime dateTime = (item[4] as Timestamp).toDate();
-
-        // Format DateTime as "dd/MM/yyyy"
-        String formattedDate =
-            "${(dateTime.day).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
-
-        return OrderItem(
-          orderID: item[6] as String,
-          foodName: item[1] as String,
-          foodImage: item[0] as String,
-          quantity: (item[3] as num).toInt(),
-          price: (item[2] as num).toDouble(),
-          orderDate: formattedDate,
-          status: item[5] as String,
-        );
+            orderID: orderData['orderId'] as String,
+            foodName: itemData['name'] as String,
+            foodImage: itemData['image'] as String,
+            quantity: itemData['quantity'] as int,
+            price: itemData['price'] as double,
+            orderDate: formattedDate,
+            status: orderData['status'] as String,
+          );
+        });
       }).toList();
 
-      //to filter the date
+      // Filter by date
       if (selectedDate != null) {
         orderItems = orderItems
             .where((orderItem) => orderItem.orderDate == selectedDate)
@@ -377,7 +372,7 @@ class DatabaseService {
 
   // Add a method to retrieve all customer orders for seller
   Stream<List<List<OrderItem>>> getSellerOrder({String? selectedDate}) {
-    return orderCollection.snapshots().map((querySnapshot) {
+    return paidOrderCollection.snapshots().map((querySnapshot) {
       List<List<OrderItem>> allOrders = [];
 
       for (var doc in querySnapshot.docs) {
@@ -389,34 +384,31 @@ class DatabaseService {
               data.keys.where((key) => key.startsWith('Order')).toList();
 
           if (orderkeys.isNotEmpty) {
-            List<OrderItem> orderItems = orderkeys.map((key) {
-              dynamic item = data[key];
+            List<OrderItem> orderItems = orderkeys.expand((orderKey) {
+              var orderData = data[orderKey] as Map<String, dynamic>;
+              var itemsData = orderData['items'] as Map<String, dynamic>;
 
-              if (item == null || item is! List<dynamic> || item.length < 6) {
+              return itemsData.entries.map((itemEntry) {
+                var itemData = itemEntry.value as Map<String, dynamic>;
+
+                // Convert Timestamp to DateTime
+                DateTime dateTime =
+                    (orderData['timestamp'] as Timestamp).toDate();
+
+                // Format DateTime as "dd/MM/yyyy"
+                String formattedDate =
+                    "${(dateTime.day).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
+
                 return OrderItem(
-                    orderID: 'Invalid orderID',
-                    foodName: 'Invalid Item Format',
-                    foodImage: 'error_image.jpg',
-                    quantity: 0,
-                    price: 0.0,
-                    orderDate: "Invalid date",
-                    status: "Preparing");
-              }
-              // Convert Timestamp to DateTime
-              DateTime dateTime = (item[4] as Timestamp).toDate();
-
-              // Format DateTime as "dd/MM/yyyy"
-              String formattedDate =
-                  "${(dateTime.day).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
-
-              return OrderItem(
-                  orderID: item[6] as String,
-                  foodName: item[1] as String,
-                  foodImage: item[0] as String,
-                  quantity: (item[3] as num).toInt(),
-                  price: (item[2] as num).toDouble(),
+                  orderID: orderData['orderId'] as String,
+                  foodName: itemData['name'] as String,
+                  foodImage: itemData['image'] as String,
+                  quantity: itemData['quantity'] as int,
+                  price: itemData['price'] as double,
                   orderDate: formattedDate,
-                  status: item[5] as String);
+                  status: orderData['status'] as String,
+                );
+              });
             }).toList();
 
             // Filter orders by selectedDate for each order individually
@@ -446,16 +438,19 @@ class DatabaseService {
     try {
       // Fetch the existing order data
       DocumentSnapshot<Object?> orderSnapshot =
-          await orderCollection.doc("H4zCS1bQB8DxpvqzOexp").get();
+          await paidOrderCollection.doc("9KSthNsxuHc0Z8Xrr28bPOQ1wCg1").get();
       var orderData = orderSnapshot.data() as Map<String, dynamic>;
 
       // Check if the array exists and has at least 6 elements
       //'Order$orderId.status' = Ordertime$stamp/Order$ID
       // Update the status at index 5 in the array
-      orderData['Order$orderId'][5] = status;
+      //orderData['Order$orderId'][5] = status;
+      orderData[orderId][5] = status;
 
       // // Update the order in the database
-      await orderCollection.doc("H4zCS1bQB8DxpvqzOexp").update(orderData);
+      await paidOrderCollection
+          .doc("9KSthNsxuHc0Z8Xrr28bPOQ1wCg1")
+          .update(orderData);
 
       // if (orderData.containsKey('Order') &&
       //     orderData['Order'] is List &&
