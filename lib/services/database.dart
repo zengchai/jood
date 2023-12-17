@@ -152,7 +152,6 @@ class DatabaseService {
 
       List<OrderItem> orderItems = orderkeys.map((key) {
         dynamic item = data[key];
-        print('Item: $item');
         if (item == null || item is! List<dynamic> || item.length < 4) {
           return OrderItem(
               foodName: 'Invalid Item Format',
