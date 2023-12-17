@@ -63,20 +63,6 @@ class CustomStepIndicator extends StatelessWidget {
   }
 }
 
-// class FoodItem {
-//   final String name;
-//   final String image;
-//   int quantity;
-//   final double price;
-
-//   FoodItem({
-//     required this.name,
-//     required this.image,
-//     required this.quantity,
-//     required this.price,
-//   });
-// }
-
 class Payment extends StatefulWidget {
   @override
   _PaymentState createState() => _PaymentState();
@@ -89,16 +75,6 @@ class _PaymentState extends State<Payment> {
 
 // Updated: Maintain a list of selected food items in the cart
   List<CartItem> cartItems = [];
-
-  // replace with real data
-  // List<FoodItem> foodItems = [
-  //   FoodItem(name: 'FriedMee', image: 'assets/friedmee.jpeg', quantity: 2, price: 7.0),
-  //   FoodItem(name: 'FriedRice', image: 'assets/friedrice.jpeg', quantity: 1, price: 6.0),
-  // ];
-
-  double calculateTotalPrice() {
-    return cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +148,6 @@ class _PaymentState extends State<Payment> {
       ),
     );
   }
-
   Widget _buildFoodItemCard(CartItem foodItem) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8),
@@ -187,7 +162,7 @@ class _PaymentState extends State<Payment> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Price: \$${foodItem.price}'),
+            Text('Price: RM${foodItem.price.toStringAsFixed(2)}'),
             Row(
               children: [
                 IconButton(
@@ -210,70 +185,74 @@ class _PaymentState extends State<Payment> {
       ),
     );
   }
-
-  Widget _buildTotalPrice() {
-    double totalPrice =
-        cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Total Price:',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        Text(
-          '\$$totalPrice',
-          style: TextStyle(
-              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
-        ),
-      ],
-    );
-  }
-
-  void _incrementQuantity(CartItem foodItem) {
+  void _incrementQuantity(CartItem cartItem) {
+    final currentUser = Provider.of<AppUsers?>(context, listen: false);
     setState(() {
-      foodItem.quantity++;
+      cartItem.quantity++;
     });
+    // Update quantity in Firestore
+    DatabaseService(uid: currentUser!.uid).addCartItem(cartItem);
   }
 
-  void _decrementQuantity(CartItem foodItem) {
+  void _decrementQuantity(CartItem cartItem) {
+    final currentUser = Provider.of<AppUsers?>(context, listen: false);
     setState(() {
-      if (foodItem.quantity > 0) {
-        foodItem.quantity--;
+      if (cartItem.quantity > 1) {
+        cartItem.quantity--;
+        // Update quantity in Firestore
+        DatabaseService(uid: currentUser!.uid).minusCartItem(cartItem);
+      } else {
+        // If quantity is 1, remove the item from the cart
+        _removeCartItem(cartItem, currentUser);
       }
     });
   }
+  void _removeCartItem(CartItem cartItem, AppUsers? currentUser) {
+    setState(() {
+      // Remove the item from the cart locally
+      cartItems.remove(cartItem);
+    });
+    // Remove the item from Firestore
+    DatabaseService(uid: currentUser!.uid).removeCartItem(cartItem);
+  }
 
-//   void _incrementQuantity(CartItem cartItem) {
-//   setState(() {
-//     cartItem.quantity++;
-//     // Update quantity in Firestore
-//     DatabaseService(uid: '').updateCartItem(cartItem);
-//   });
-// }
+  Widget _buildTotalPrice() {
+    final currentUser = Provider.of<AppUsers?>(context, listen: false);
+    return StreamBuilder<List<CartItem>>(
+      stream: DatabaseService(uid: currentUser!.uid).getCartItems(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          List<CartItem> cartItems = snapshot.data ?? [];
+          double totalPrice =
+          cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
 
-// void _decrementQuantity(CartItem cartItem) {
-//   setState(() {
-//     if (cartItem.quantity > 1) {
-//       cartItem.quantity--;
-//       // Update quantity in Firestore
-//       DatabaseService(uid: '').updateCartItem(cartItem);
-//     } else {
-//       // If quantity is 1, remove the item from the cart
-//       _removeCartItem(cartItem);
-//     }
-//   });
-// }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Total Price:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'RM${totalPrice.toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
+              ),
+            ],
+          );
+        }
+      },
+    );
+  }
 
-// void _removeCartItem(CartItem cartItem) {
-//   setState(() {
-//     // Remove the item from the cart locally
-//     cartItems.remove(cartItem);
-//     // Remove the item from Firestore
-//     DatabaseService(uid: '').removeCartItem(cartItem);
-//   });
-// }
+
 
   void _onItemTapped(int index) {
     setState(() {

@@ -119,8 +119,11 @@ class _OrderPageState extends State<OrderPage> {
       // User picked a date
       setState(() {
         // Exclude the time component
-        selectedDate =
-            DateTime(pickedDate.year, pickedDate.month, pickedDate.day);
+        selectedDate = DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+        );
       });
 
 // Update formattedDate
@@ -192,31 +195,34 @@ class _OrderPageState extends State<OrderPage> {
                     child: PageView(
                       children: [
                         StreamBuilder<List<OrderItem>>(
-                          // stream: DatabaseService(uid: currentUser!.uid)
-                          stream: DatabaseService(uid: currentUser!.uid)
-                              .getCustomerOrder(formattedDate),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return CircularProgressIndicator();
-                            } else if (snapshot.hasError) {
-                              return Text("Error: ${snapshot.error}");
-                            } else if (!snapshot.hasData ||
-                                snapshot.data!.isEmpty) {
-                              return Text("No data available");
-                            } else {
-                              List<OrderItem> orderData = snapshot.data ?? [];
-
-                              // Display and manipulate cart items in the UI
-                              return Column(
-                                children: orderData.map((orderItem) {
-                                  return _buildOrderItemCard(orderItem, false);
-                                }).toList(),
-                              );
-                            }
-                          },
-                        ),
-                        //_buildOrderList(true),
+                            // stream: DatabaseService(uid: currentUser!.uid)
+                            stream: DatabaseService(uid: currentUser!.uid)
+                                .getCustomerOrder(formattedDate),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return Text("Error: ${snapshot.error}");
+                              } else if (!snapshot.hasData ||
+                                  snapshot.data!.isEmpty) {
+                                return Text("No data available");
+                              } else {
+                                List<OrderItem> orderData = snapshot.data ?? [];
+                                return ListView.builder(
+                                  itemCount: orderData.length,
+                                  itemBuilder: (context, index) {
+                                    // Display and manipulate cart items in the UI
+                                    return Column(
+                                      children: orderData.map((orderItem) {
+                                        return _buildOrderItemCard(
+                                            orderItem, false);
+                                      }).toList(),
+                                    );
+                                  },
+                                );
+                              }
+                            }),
                       ],
                     ),
                   ),

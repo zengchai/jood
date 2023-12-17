@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:jood/models/userprofile.dart';
-import 'package:jood/pages/Order/orderItem.dart';
 import 'package:jood/pages/Order/orderPage.dart';
 import 'package:jood/pages/shoppingcart/CartItem.dart';
 import 'package:jood/services/auth.dart';
+
+import '../pages/Order/orderItem.dart';
 
 class DatabaseService {
   late final String uid;
@@ -12,14 +14,14 @@ class DatabaseService {
   DatabaseService.noParams();
   final CollectionReference Jood =
       FirebaseFirestore.instance.collection('User');
-  final CollectionReference paymentCollection =
-      FirebaseFirestore.instance.collection('payments');
   final CollectionReference orderCollection =
-      FirebaseFirestore.instance.collection('Order');
+      FirebaseFirestore.instance.collection('orders');
   final CollectionReference reviewCollection =
       FirebaseFirestore.instance.collection('reviews');
   final CollectionReference cartCollection =
       FirebaseFirestore.instance.collection('cart');
+  final CollectionReference paidOrderCollection =
+      FirebaseFirestore.instance.collection('paidorder');
 
   Future setUserData(String uid, String name, String email, String matricnum,
       String phonenum, String address) async {
@@ -51,12 +53,6 @@ class DatabaseService {
     });
   }
 
-  Future updatePaymentData(String Pmethod, String amount) async {
-    return await paymentCollection.doc(uid).set({
-      'Pmethod': Pmethod,
-      'amount': amount,
-    });
-  }
 
   Future updateReviewData(String foodID, String review) async {
     //UPDATE REVIEW DATA ON THE SAME ORDER
@@ -72,22 +68,54 @@ class DatabaseService {
     });
   }
 
+  Stream<List<String>> foodReviewsStream(String foodID) {
+    return reviewCollection.doc(foodID).snapshots().map((snapshot) {
+      var data = snapshot.data() as Map<String, dynamic>;
+      List<String> foodReviews = List<String>.from(data['RfoodReview'] ?? []);
+      return foodReviews;
+    });
+  }
+
   // Function to add a food item to the cart
-  Future<void> addToCart(
-      String foodName, String foodImage, double foodPrice) async {
+  Future<void> addToCart(String foodName, String foodImage, double foodPrice) async {
     // Convert foodPrice to double if it's a String
     final double parsedPrice = foodPrice is String
         ? double.tryParse(foodPrice as String) ?? 0.0
         : (foodPrice as num).toDouble();
 
-    final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-    await cartCollection.doc(uid).set({
-      'item$timestamp': FieldValue.arrayUnion(
-          [foodName, foodImage, parsedPrice, 1]), // Initial quantity
-    }, SetOptions(merge: true));
+    final String itemId = '$foodName';
+
+    // Check if the item already exists in the cart
+    final DocumentSnapshot<Map<String, dynamic>> cartSnapshot =
+    await cartCollection.doc(uid).get() as DocumentSnapshot<Map<String, dynamic>>;
+
+    if (cartSnapshot.exists) {
+      // If the cart exists, get the current items
+      final Map<String, dynamic>? cartData = cartSnapshot.data();
+      final List<dynamic>? existingItems = cartData?[itemId];
+
+      if (existingItems != null) {
+        // If the item exists, update the quantity
+        final int existingQuantity = existingItems[3];
+        final int newQuantity = existingQuantity + 1;
+
+        await cartCollection.doc(uid).set({
+          itemId: [foodName, foodImage, parsedPrice, newQuantity],
+        }, SetOptions(merge: true));
+      } else {
+        // If the item doesn't exist, add it to the cart
+        await cartCollection.doc(uid).set({
+          itemId: [foodName, foodImage, parsedPrice, 1],
+        }, SetOptions(merge: true));
+      }
+    } else {
+      // If the cart doesn't exist, create a new one with the item
+      await cartCollection.doc(uid).set({
+        itemId: [foodName, foodImage, parsedPrice, 1],
+      }, SetOptions(merge: true));
+    }
   }
 
-//ffdfdfdf
   // Function to retrieve cart items
   Stream<List<CartItem>> getCartItems() {
     return cartCollection.doc(uid).snapshots().map((snapshot) {
@@ -98,8 +126,7 @@ class DatabaseService {
       var data = snapshot.data() as Map<String, dynamic>;
 
       // Retrieve all keys from the data map
-      List<String> itemKeys =
-          data.keys.where((key) => key.startsWith('item')).toList();
+      List<String> itemKeys = data.keys.toList();
 
       if (itemKeys.isEmpty) {
         return []; // Return an empty list if there are no item keys
@@ -130,6 +157,146 @@ class DatabaseService {
     });
   }
 
+  Future<String> createOrder(String paymentmethod) async {
+    try {
+      // Retrieve cart items
+      String name = await getOrderInfo(uid) ?? '';
+      List<CartItem> cartItems = await getCartItems().first;
+      String status = "Preparing";
+
+      // Calculate total price
+      double totalPrice = cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
+
+      // Create order ID
+      final String orderId = 'Order${DateFormat('yyyyMMddHHmm').format(DateTime.now())}';
+      // Create a map to store items
+      Map<String, dynamic> itemsMap = {};
+
+      // Populate the map with item details
+      for (int i = 0; i < cartItems.length; i++) {
+        String itemId = 'item_$i'; // Unique identifier for each item
+        itemsMap[itemId] = {
+          'name': cartItems[i].name,
+          'image': cartItems[i].image,
+          'price': cartItems[i].price,
+          'quantity': cartItems[i].quantity,
+        };
+      }
+
+      // Create the order
+      await paidOrderCollection.doc(uid).set({
+        orderId: {
+          'orderId': orderId,
+          'timestamp': FieldValue.serverTimestamp(), // Set timestamp for date and time
+          'items': itemsMap, // Store items using the map
+          'name': name,
+          'paymentMethod': paymentmethod, // Replace with the actual payment method
+          'status': status,
+          'totalPrice': totalPrice,
+        },
+      }, SetOptions(merge: true));
+
+      print('Order created successfully');
+
+      // Return the orderId
+      return orderId;
+    } catch (e) {
+      print("Error creating order: $e");
+      return ''; // Return an empty string in case of an error
+    }
+  }
+  Future<Map<String, dynamic>> getOrderDetails(String orderId) async {
+    try {
+      // Use .get() to fetch the document snapshot
+      DocumentSnapshot orderSnapshot =
+      await paidOrderCollection.doc(uid).get();
+
+      // Check if the document exists
+      if (orderSnapshot.exists) {
+        // Extract the order details from the document data
+        Map<String, dynamic> orderData = orderSnapshot.data() as Map<String, dynamic>;
+
+        // Check if the orderId exists in the document
+        if (orderData.containsKey(orderId)) {
+          // Return the order details for the specified orderId
+          return orderData[orderId] as Map<String, dynamic>;
+        } else {
+          print('Error: OrderId $orderId not found in document');
+        }
+      } else {
+        print('Error: Document does not exist for user $uid');
+      }
+    } catch (e) {
+      print('Error fetching order details: $e');
+    }
+
+    // Return an empty map in case of an error
+    return {};
+  }
+
+  /*String _getPaymentmethodFromSnapshot(DocumentSnapshot snapshot) {
+    var userPaymentMethod = snapshot.data() as Map<String, dynamic>;
+    return userPaymentMethod['PaymentMethod'] ?? '';
+  }
+  Future<String?> getPaymentMethod(String uid) async {
+    DocumentSnapshot<Object?> snapshot = await paidOrderCollection.doc(uid).get();
+    String paymentMethod = _getPaymentmethodFromSnapshot(snapshot);
+    return paymentMethod;
+  }
+  */
+
+  Future<void> addCartItem(CartItem cartItem) async {
+    final DocumentSnapshot<Map<String, dynamic>> cartSnapshot =
+    await cartCollection.doc(uid).get() as DocumentSnapshot<
+        Map<String, dynamic>>;
+
+    if (cartSnapshot.exists) {
+      // If the cart exists, get the current items
+      final Map<String, dynamic>? cartData = cartSnapshot.data();
+      final List<dynamic>? existingItems = cartData?[cartItem.name];
+
+      if (existingItems != null) {
+        // If the item exists, update the quantity
+        final int existingQuantity = existingItems[3];
+        final int newQuantity = existingQuantity + 1;
+
+        await cartCollection.doc(uid).set({
+          cartItem.name: [cartItem.name, cartItem.image, cartItem.price, newQuantity],
+        }, SetOptions(merge: true));
+      }
+    }
+  }
+
+  Future<void> minusCartItem(CartItem cartItem) async {
+    final DocumentSnapshot<Map<String, dynamic>> cartSnapshot =
+    await cartCollection.doc(uid).get() as DocumentSnapshot<
+        Map<String, dynamic>>;
+
+    if (cartSnapshot.exists) {
+      // If the cart exists, get the current items
+      final Map<String, dynamic>? cartData = cartSnapshot.data();
+      final List<dynamic>? existingItems = cartData?[cartItem.name];
+
+      if (existingItems != null) {
+        // If the item exists, update the quantity
+        final int existingQuantity = existingItems[3];
+        final int newQuantity = existingQuantity - 1;
+
+        await cartCollection.doc(uid).set({
+          cartItem.name: [cartItem.name, cartItem.image, cartItem.price, newQuantity],
+        }, SetOptions(merge: true));
+      }
+    }
+  }
+
+  // Function to remove a cart item from Firestore
+  Future<void> removeCartItem(CartItem cartItem) async {
+    await cartCollection.doc(uid).update({
+      '${cartItem.name}': FieldValue.delete(),
+    });
+  }
+
+
 // Add a method to retrieve customer orders
   Stream<List<OrderItem>> getCustomerOrder(String? selectedDate) {
     return orderCollection
@@ -144,7 +311,7 @@ class DatabaseService {
 
       // Retrieve all keys from the data map
       List<String> orderkeys =
-          data.keys.where((key) => key.startsWith('Order')).toList();
+      data.keys.where((key) => key.startsWith('Order')).toList();
 
       if (orderkeys.isEmpty) {
         return []; // Return an empty list if there are no item keys
@@ -165,18 +332,8 @@ class DatabaseService {
         DateTime dateTime = (item[4] as Timestamp).toDate();
 
         // Format DateTime as "dd/MM/yyyy"
-        //String formattedDate =
-        //   "${(dateTime.day + 1).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
-
-        String formattedDate;
-
-        if (dateTime.day != 1) {
-          formattedDate =
-              "${(dateTime.day + 1).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
-        } else {
-          formattedDate =
-              "${(dateTime.day + 1).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
-        }
+        String formattedDate =
+            "${(dateTime.day).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
 
         return OrderItem(
           foodName: item[1] as String,
@@ -209,7 +366,7 @@ class DatabaseService {
 
           // Retrieve all keys from the data map
           List<String> orderkeys =
-              data.keys.where((key) => key.startsWith('Order')).toList();
+          data.keys.where((key) => key.startsWith('Order')).toList();
 
           if (orderkeys.isNotEmpty) {
             List<OrderItem> orderItems = orderkeys.map((key) {
@@ -228,15 +385,7 @@ class DatabaseService {
 
               // Format DateTime as "dd/MM/yyyy"
               String formattedDate =
-                  "${(dateTime.day + 1).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
-
-              // if (dateTime.day == 1) {
-              //   formattedDate =
-              //       "${(dateTime.day).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
-              // } else {
-              //   formattedDate =
-              //       "${(dateTime.day + 1).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
-              // }
+                  "${(dateTime.day).toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}";
 
               return OrderItem(
                   foodName: item[1] as String,
@@ -270,8 +419,10 @@ class DatabaseService {
     });
   }
 
+
+
 // Convert a single document snapshot to a UserProfile
-  UserProfile _userProfileFromSnapshot(DocumentSnapshot snapshot) {
+ UserProfile _userProfileFromSnapshot(DocumentSnapshot snapshot) {
     var userData = snapshot.data() as Map<String, dynamic>;
     return UserProfile(
       uid: userData['uid'] ?? '',
@@ -299,13 +450,57 @@ class DatabaseService {
     }
   }
 
-  Stream<List<String>> foodReviewsStream(String foodID) {
-    return reviewCollection.doc(foodID).snapshots().map((snapshot) {
-      var data = snapshot.data() as Map<String, dynamic>;
-      List<String> foodReviews = List<String>.from(data['RfoodReview'] ?? []);
-      return foodReviews;
-    });
+  String _getNameFromSnapshot(DocumentSnapshot snapshot) {
+    var userData = snapshot.data() as Map<String, dynamic>;
+    return userData['name'] ?? '';
+  }
+  Future<String?> getOrderInfo(String uid) async {
+    DocumentSnapshot<Object?> snapshot = await Jood.doc(uid).get();
+    String name = _getNameFromSnapshot(snapshot);
+    return name;
   }
 
-  setPaymentData(String s, String t) {}
+  Future<Map<String, dynamic>> retrieveCartItems() async {
+    // Get the current cart snapshot
+    final DocumentSnapshot<Object?> cartSnapshot = await cartCollection.doc(
+        uid).get();
+
+    if (cartSnapshot.exists) {
+      var data = cartSnapshot.data() as Map<String, dynamic>;
+
+      // Assuming there is a single item in the cart for simplicity
+      List<String> itemKeys = data.keys.toList();
+
+      if (itemKeys.isNotEmpty) {
+        // Get the item details from the first key
+        dynamic item = data[itemKeys.first];
+
+        // Check if the item is in the correct format
+        if (item != null &&
+            item is List<dynamic> &&
+            item.length >= 4 &&
+            item[0] is String &&
+            item[1] is String &&
+            item[2] is num &&
+            item[3] is num) {
+          String foodName = item[0] as String;
+          String foodImage = item[1] as String;
+          double foodPrice = (item[2] as num).toDouble();
+          int foodQuantity = (item[3] as num).toInt();
+
+          // Store the values in a map and return it
+          return {
+            'foodName': foodName,
+            'foodImage': foodImage,
+            'foodPrice': foodPrice,
+            'foodQuantity': foodQuantity,
+          };
+        }
+      }
+    }
+    // Return an empty map if there is an error or the cart is empty
+    return {};
+  }
+
+
 }

@@ -122,11 +122,11 @@ class PaymentOptionCard extends StatelessWidget {
           ),
         ),
         trailing: ElevatedButton(
-          onPressed: () async{
+          onPressed: () async {
             String selectedPaymentMethod = optionName;
-            await DatabaseService(uid: Provider.of<AppUsers?>(context,listen: false)!.uid).updatePaymentData(selectedPaymentMethod,"20");
-
-            // Navigate to another page for payment
+            print('Selected Payment Method: $selectedPaymentMethod');
+            await DatabaseService(uid: Provider.of<AppUsers?>(context, listen: false)!.uid)
+                .createOrder(selectedPaymentMethod);
             await Navigator.pushNamed(context, '/receipt');
           },
           child: Text('Select'),
