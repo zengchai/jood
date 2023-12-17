@@ -124,6 +124,7 @@ class PaymentOptionCard extends StatelessWidget {
         trailing: ElevatedButton(
           onPressed: () async {
             String selectedPaymentMethod = optionName;
+            print('Selected Payment Method: $selectedPaymentMethod');
             await DatabaseService(uid: Provider.of<AppUsers?>(context, listen: false)!.uid)
                 .createOrder(selectedPaymentMethod);
             await Navigator.pushNamed(context, '/receipt');

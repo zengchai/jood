@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:jood/models/userprofile.dart';
 import 'package:jood/pages/Order/orderPage.dart';
 import 'package:jood/pages/shoppingcart/CartItem.dart';
@@ -13,10 +14,8 @@ class DatabaseService {
   DatabaseService.noParams();
   final CollectionReference Jood =
       FirebaseFirestore.instance.collection('User');
-  // final CollectionReference orderCollection =
-  //     FirebaseFirestore.instance.collection('orders');
   final CollectionReference orderCollection =
-      FirebaseFirestore.instance.collection('Order');
+      FirebaseFirestore.instance.collection('orders');
   final CollectionReference reviewCollection =
       FirebaseFirestore.instance.collection('reviews');
   final CollectionReference cartCollection =
@@ -159,79 +158,98 @@ class DatabaseService {
     });
   }
 
-  //to pass the paidOrder into database
-  Future<void> createOrder(String paymentmethod) async {
-    // Retrieve cart items
-    String name = await getOrderInfo(uid) ?? '';
-    List<CartItem> cartItems = await getCartItems().first;
-    String status = "Preparing";
-
-    // Calculate total price
-    double totalPrice =
-        cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
-
-    // Create order ID
-    final String orderId = 'Order:${DateTime.now().millisecondsSinceEpoch}';
-
-    // Create a map to store items
-    Map<String, dynamic> itemsMap = {};
-
-    // Populate the map with item details
-    for (int i = 0; i < cartItems.length; i++) {
-      String itemId = 'item_$i'; // Unique identifier for each item
-      itemsMap[itemId] = {
-        'name': cartItems[i].name,
-        'image': cartItems[i].image,
-        'price': cartItems[i].price,
-        'quantity': cartItems[i].quantity,
-        'itemId': itemId,
-      };
-    }
-
-    // Create the order
-    await paidOrderCollection.doc(uid).set({
-      orderId: {
-        'orderId': orderId,
-        'timestamp':
-            FieldValue.serverTimestamp(), // Set timestamp for date and time
-        'items': itemsMap, // Store items using the map
-        'name': name,
-        'paymentMethod':
-            paymentmethod, // Replace with the actual payment method
-        'status': status,
-        'totalPrice': totalPrice,
-      },
-    }, SetOptions(merge: true));
-  }
-
-  Future<List<Map<String, dynamic>>> getAllOrderDetails() async {
+  Future<String> createOrder(String paymentmethod) async {
     try {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot =
-          await paidOrderCollection.doc(uid).collection('orders').get();
+      // Retrieve cart items
+      String name = await getOrderInfo(uid) ?? '';
+      List<CartItem> cartItems = await getCartItems().first;
+      String status = "Preparing";
 
-      return querySnapshot.docs.map((doc) => doc.data()).toList();
+      // Calculate total price
+      double totalPrice =
+          cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
+
+      // Create order ID
+      final String orderId =
+          'Order${DateFormat('yyyyMMddHHmm').format(DateTime.now())}';
+      // Create a map to store items
+      Map<String, dynamic> itemsMap = {};
+
+      // Populate the map with item details
+      for (int i = 0; i < cartItems.length; i++) {
+        String itemId = 'item_$i'; // Unique identifier for each item
+        itemsMap[itemId] = {
+          'name': cartItems[i].name,
+          'image': cartItems[i].image,
+          'price': cartItems[i].price,
+          'quantity': cartItems[i].quantity,
+        };
+      }
+
+      // Create the order
+      await paidOrderCollection.doc(uid).set({
+        orderId: {
+          'orderId': orderId,
+          'timestamp':
+              FieldValue.serverTimestamp(), // Set timestamp for date and time
+          'items': itemsMap, // Store items using the map
+          'name': name,
+          'paymentMethod':
+              paymentmethod, // Replace with the actual payment method
+          'status': status,
+          'totalPrice': totalPrice,
+        },
+      }, SetOptions(merge: true));
+
+      print('Order created successfully');
+
+      // Return the orderId
+      return orderId;
     } catch (e) {
-      print('Error retrieving all order details: $e');
-      return [];
+      print("Error creating order: $e");
+      return ''; // Return an empty string in case of an error
     }
   }
 
-  // Method to get a specific order details by orderId
   Future<Map<String, dynamic>> getOrderDetails(String orderId) async {
     try {
-      DocumentSnapshot<Map<String, dynamic>> orderSnapshot =
-          await paidOrderCollection
-              .doc(uid)
-              .collection('orders')
-              .doc(orderId)
-              .get();
+      // Use .get() to fetch the document snapshot
+      DocumentSnapshot orderSnapshot = await paidOrderCollection.doc(uid).get();
 
-      return orderSnapshot.data() ?? {};
+      // Check if the document exists
+      if (orderSnapshot.exists) {
+        // Extract the order details from the document data
+        Map<String, dynamic> orderData =
+            orderSnapshot.data() as Map<String, dynamic>;
+
+        // Check if the orderId exists in the document
+        if (orderData.containsKey(orderId)) {
+          // Return the order details for the specified orderId
+          return orderData[orderId] as Map<String, dynamic>;
+        } else {
+          print('Error: OrderId $orderId not found in document');
+        }
+      } else {
+        print('Error: Document does not exist for user $uid');
+      }
     } catch (e) {
-      print('Error retrieving order details: $e');
-      return {};
+      print('Error fetching order details: $e');
     }
+
+    // Return an empty map in case of an error
+    return {};
   }
+
+  /*String _getPaymentmethodFromSnapshot(DocumentSnapshot snapshot) {
+    var userPaymentMethod = snapshot.data() as Map<String, dynamic>;
+    return userPaymentMethod['PaymentMethod'] ?? '';
+  }
+  Future<String?> getPaymentMethod(String uid) async {
+    DocumentSnapshot<Object?> snapshot = await paidOrderCollection.doc(uid).get();
+    String paymentMethod = _getPaymentmethodFromSnapshot(snapshot);
+    return paymentMethod;
+  }
+  */
 
   Future<void> addCartItem(CartItem cartItem) async {
     final DocumentSnapshot<Map<String, dynamic>> cartSnapshot =
