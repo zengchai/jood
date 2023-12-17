@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/users.dart';
 import '../../services/database.dart';
+
 class CustomStepIndicator extends StatelessWidget {
   final int currentStep;
 
@@ -117,56 +119,106 @@ class _ReceiptState extends State<Receipt> {
       ),
     );
   }
-
   Widget _buildPaymentDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top:10.0),
-          child: Text(
-            'Payment Details',
-            style: TextStyle(
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        SizedBox(height: 10),
-        _buildDetailItem('Order No', 'null'),
-        _buildDetailItem('Date & Time', 'null'),
-        _buildDetailItem('Payment Method', 'null'),
-        _buildDetailItem('Name', 'null'),
-        _buildDetailItem('Email', 'null'),
-      ],
+    final currentUser = Provider.of<AppUsers?>(context);
+    String orderNo = '';
+    String dateTime = '';
+    String paymentMethod = '';
+    String name = '';
+
+    return SingleChildScrollView(
+      child: FutureBuilder<Map<String, dynamic>>(
+        future: createOrderAndFetchDetails(currentUser, paymentMethod),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else {
+            Map<String, dynamic> orderDetails = snapshot.data ?? {};
+
+            // Assign orderDetails to your local variables
+            orderNo = orderDetails['orderId'] ?? '';
+            DateTime orderTimestamp = orderDetails['timestamp']?.toDate() ?? DateTime.now();
+            paymentMethod = orderDetails['paymentMethod'] ?? '';
+            name = orderDetails['name'] ?? '';
+
+            // Format date and time
+            dateTime = DateFormat('dd/MM/yyyy hh:mma').format(orderTimestamp);
+
+            // Return the widget with the updated values
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: Text(
+                    'Payment Details',
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
+                _buildDetailItem('Order No', orderNo),
+                _buildDetailItem('Date & Time', dateTime),
+                _buildDetailItem('Payment Method', paymentMethod),
+                _buildDetailItem('Name', name),
+              ],
+            );
+          }
+        },
+      ),
     );
+  }
+  Future<Map<String, dynamic>> createOrderAndFetchDetails(AppUsers? currentUser, String paymentMethod) async {
+    try {
+      // Create order and get orderId
+      String orderId =
+      await DatabaseService(uid: currentUser!.uid).createOrder(paymentMethod); //need correction
+      print('Order created successfully. OrderId: $orderId');
+
+      // Fetch order details
+      Map<String, dynamic> orderDetails =
+      await DatabaseService(uid: currentUser.uid).getOrderDetails(orderId);
+
+      print('Order details: $orderDetails');
+
+      // Return order details map
+      return orderDetails;
+    } catch (e) {
+      print("Error creating order or fetching details: $e");
+      return {}; // Return an empty map in case of an error
+    }
   }
 
   Widget _buildDetailItem(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 18.0,
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 18.0,
+              ),
             ),
           ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 18.0,
-              fontWeight: FontWeight.bold,
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
       ),
     );
-  }
-}
-
+  }}
 /*
   void _downloadReceipt() {
     // Create a PDF document
