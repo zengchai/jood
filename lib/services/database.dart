@@ -205,8 +205,6 @@ class DatabaseService {
       return ''; // Return an empty string in case of an error
     }
   }
-
-  // Method to get a specific order details by orderId
   Future<Map<String, dynamic>> getOrderDetails(String orderId) async {
     try {
       // Use .get() to fetch the document snapshot
