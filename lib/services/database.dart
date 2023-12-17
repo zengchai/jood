@@ -159,6 +159,7 @@ class DatabaseService {
     });
   }
 
+  //to pass the paidOrder into database
   Future<void> createOrder(String paymentmethod) async {
     // Retrieve cart items
     String name = await getOrderInfo(uid) ?? '';
@@ -183,6 +184,7 @@ class DatabaseService {
         'image': cartItems[i].image,
         'price': cartItems[i].price,
         'quantity': cartItems[i].quantity,
+        'itemId': itemId,
       };
     }
 
