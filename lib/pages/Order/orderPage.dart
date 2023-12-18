@@ -29,81 +29,49 @@ class _OrderPageState extends State<OrderPage> {
   int _currentPageIndex = 0;
 
   void _popupReview(OrderItem orderItem) {
-    double rating = 0;
-
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: Text('Review'),
           contentPadding: EdgeInsets.all(0),
-          content: Container(
-            width: MediaQuery.of(context).size.width,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: Image.network(
-                          orderItem.foodImage,
-                          width: 120,
-                          height: 120,
+          content: SingleChildScrollView(
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          leading: Image.network(
+                            orderItem.foodImage,
+                            width: 120,
+                            height: 120,
+                          ),
+                          title: Text(orderItem.foodName),
+                          subtitle: Text(orderItem.price.toStringAsFixed(2)),
                         ),
-                        title: Text(orderItem.foodName),
-                        subtitle: Text(orderItem.price.toStringAsFixed(2)),
-                      ),
-                      SizedBox(height: 20),
+                        SizedBox(height: 20),
 
-                      RatingBar.builder(
-                        initialRating: rating,
-                        minRating: 1,
-                        direction: Axis.horizontal,
-                        allowHalfRating: false,
-                        itemCount: 5,
-                        itemSize: 30.0,
-                        itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                        itemBuilder: (context, _) => Icon(
-                          Icons.star,
-                          color: Colors.amber,
-                        ),
-                        onRatingUpdate: (newRating) {
-                          setState(() {
-                            rating = newRating;
-                          });
-                        },
-                      ),
+                        //DO THE STARS THING
 
-                      SizedBox(height: 20),
+                        reviewForm(),
 
-                      //DO THE STARS THING
-
-                      reviewForm(),
-
-                      ElevatedButton(
-                        onPressed: () {
-                          // Use the 'rating' variable to submit the rating
-                          print('Selected Rating: $rating');
-
-                          // TODO: Implement logic to submit the rating to the database
-                          // databaseService.submitRating(orderItem.foodID, rating);
-
-                          Navigator.of(context).pop(); // Close the dialog
-                        },
-                        child: Text('Submit Review'),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
       },
     );
   }
+
 
 // Date picker for filter
   void _showDatePicker() async {

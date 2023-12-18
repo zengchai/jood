@@ -76,36 +76,40 @@ class _CategoryMenuState extends State<MenuPage> {
                         const SizedBox(height: 20),
 
                         //DO THE STARS THING
-                        StreamBuilder<List<String>>(
-                          stream: databaseService.foodReviewsStream(foodID!),
+                        StreamBuilder<List<ReviewItem>>(
+                          stream: databaseService.getReviews(foodID!),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
                               return const CircularProgressIndicator();
                             } else if (snapshot.hasError) {
                               return Text('Error: ${snapshot.error}');
                             } else {
-                              List<String> reviews = snapshot.data ?? [];
+                              List<ReviewItem> reviews = snapshot.data ?? [];
                               return Column(
                                 children: [
-                                  for (String review in reviews)
+                                  for (ReviewItem reviewItem in reviews)
                                     Container(
-                                      margin: const EdgeInsets.symmetric(
-                                          vertical: 5),
+                                      margin: const EdgeInsets.symmetric(vertical: 5),
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
                                         border: Border.all(color: Colors.grey),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: ListTile(
-                                        title: Text(review),
+                                        title: Text(reviewItem.reviewContent),
+                                        subtitle: Text(
+                                          'User: ${reviewItem.userName}, Rating: ${reviewItem.rating}',
+                                        ),
                                       ),
                                     ),
                                 ],
                               );
                             }
                           },
-                        ),
+                        )
+
+
+
                       ],
                     ),
                   ),

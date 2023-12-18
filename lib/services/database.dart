@@ -58,12 +58,44 @@ class DatabaseService {
     });
   }
 
-  Future updateReviewData(String foodID, String review) async {
+  Future updateReviewData(String foodID, String review, double rating) async {
     //UPDATE REVIEW DATA ON THE SAME ORDER
-    return await reviewCollection.doc(foodID).update({
+    await reviewCollection.doc(foodID).update({
       'RfoodReview': FieldValue.arrayUnion([review]),
     });
+
+    String userName = await getUserName(uid) ?? 'Unknown User';
+
+    return await reviewCollection
+        .doc(foodID)
+        .collection('RfoodRatings')
+        .add({
+      'userID': uid,
+      'name': userName,
+      'rating': rating,
+      'reviewContent': review,
+    })
+        .then((_) => print('Review added successfully!'))
+        .catchError((error) => print('Error adding review: $error'));
   }
+
+  Future<String?> getUserName(String uid) async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> userDoc =
+      (await Jood.doc(uid).get()) as DocumentSnapshot<Map<String, dynamic>>;
+
+      if (userDoc.exists) {
+        return userDoc.data()?['name'];
+      } else {
+        return null; // User not found
+      }
+    } catch (e) {
+      print('Error getting username: $e');
+      return null;
+    }
+  }
+
+
 
   Future setReviewData(String foodID) async {
     //SET REVIEW DATA WHEN ADD MORE FOOD
@@ -290,5 +322,42 @@ class DatabaseService {
     });
   }
 
+  Stream<List<ReviewItem>> getReviews(String foodID) {
+    return reviewCollection
+        .doc(foodID)
+        .collection('RfoodRatings')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        var data = doc.data() as Map<String, dynamic>;
+
+        // Create a ReviewItem object with relevant data
+        return ReviewItem(
+          userID: data['userID'] ?? '',
+          userName: data['name'] ?? 'Unknown User',
+          rating: data['rating'] ?? 0.0,
+          reviewContent: data['reviewContent'] ?? '',
+        );
+      }).toList();
+    });
+  }
+
+
+
   setPaymentData(String s, String t) {}
 }
+
+class ReviewItem {
+  final String userID;
+  final String userName;
+  final double rating;
+  final String reviewContent; // Add this property
+
+  ReviewItem({
+    required this.userID,
+    required this.userName,
+    required this.rating,
+    required this.reviewContent, // Add this constructor parameter
+  });
+}
+
