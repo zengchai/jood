@@ -21,7 +21,8 @@ class _SignInState extends State<SignIn> {
   bool loading = false;
   bool error = false;
   final _formKey = GlobalKey<FormState>();
-
+  var iconColor = Color(0xFF3C312B).withOpacity(0.10);
+  var iconColor2 = Color(0xFF3C312B).withOpacity(0.10);
   String email = '';
   String password = '';
 
@@ -38,7 +39,7 @@ class _SignInState extends State<SignIn> {
     return loading ? Loading() : Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.brown[400],
+        backgroundColor: Color(0xFF3C312B).withOpacity(0.80),
         elevation: 0.0,
         title: Text("Sign In"),
         actions: <Widget>[],
@@ -58,40 +59,57 @@ class _SignInState extends State<SignIn> {
           color: Colors.black,
         ),
         SizedBox(height: 50.0),
-        TextFormField(
+              Focus(
+                onFocusChange: (hasFocus) {
+                  // Use the hasFocus value to determine whether the field is focused
+                  setState(() {
+                    iconColor = hasFocus
+                        ? Color(0xFF3C312B).withOpacity(0.75) // Focused color
+                        : Color(0xFF3C312B).withOpacity(0.10); // Unfocused color
+                  });
+                },
+                child: TextFormField(
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,
           hintText: 'Email', // Add your placeholder text
+              prefixIcon: Icon(Icons.email,
+                color: iconColor,), // Email icon
+
               enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(4.0), // Set the border radius here
                   borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
               ),
               focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.0), // Set the border radius here
                   borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
               )
         ),
           validator: (val) => val!.isEmpty ? 'Enter an email': null,
-
           onChanged: (value){
-  setState(() {
-    email = value;
-  });
+            setState(() {
+              email = value;
+            });
           },
-        ),
-        SizedBox(height: 30.0),
-        TextFormField(
+                )),
+              Focus(
+                onFocusChange: (hasFocus) {
+                  // Use the hasFocus value to determine whether the field is focused
+                  setState(() {
+                    iconColor2 = hasFocus
+                        ? Color(0xFF3C312B).withOpacity(0.75) // Focused color
+                        : Color(0xFF3C312B).withOpacity(0.10); // Unfocused color
+                  });
+                },
+                child: TextFormField(
             decoration: InputDecoration(
               fillColor: Colors.white,
               filled: true,
               hintText: 'Password', // Add your placeholder text
+                prefixIcon: Icon(Icons.lock,
+                  color: iconColor2,),
                 enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(4.0), // Set the border radius here
                     borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
                 ),
                 focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0), // Set the border radius here
                     borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
                 )
             ),
@@ -103,8 +121,23 @@ class _SignInState extends State<SignIn> {
     password = val;
   });
           }
+        )),
+      SizedBox(height:10.0),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            TextButton(
+              onPressed: () async{
+                await Navigator.pushNamed(context, '/resetpassword');
+              },
+              child: Text(
+                'Forgot Password',
+                style: TextStyle(color: Color(0xFF3C312B).withOpacity(0.90)),
+              ),
+            ),
+          ],
         ),
-        SizedBox(height:50.0),
+        SizedBox(height:30.0),
         ElevatedButton(
             onPressed: () async{
               if(_formKey.currentState!.validate()){
@@ -135,22 +168,6 @@ class _SignInState extends State<SignIn> {
             ),
         ),
       SizedBox(height:30.0),
-      ElevatedButton(
-        onPressed: () async{
-          await Navigator.pushNamed(context, '/resetpassword');
-        },
-        style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B).withOpacity(0.75),),
-          foregroundColor: MaterialStateProperty.all<Color>(Color(0xFFFFFFCC)),
-          minimumSize: MaterialStateProperty.all<Size>(Size(200, 50)),
-        ),
-        child: Text(
-          'Forgot Password',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-
-
     ],
     )
     )),])
