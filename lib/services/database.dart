@@ -15,7 +15,7 @@ class DatabaseService {
   final CollectionReference Jood =
       FirebaseFirestore.instance.collection('User');
   final CollectionReference orderCollection =
-      FirebaseFirestore.instance.collection('orders');
+      FirebaseFirestore.instance.collection('Order');
   final CollectionReference reviewCollection =
       FirebaseFirestore.instance.collection('reviews');
   final CollectionReference cartCollection =
@@ -92,7 +92,6 @@ class DatabaseService {
   }
 
 
-
   Future setReviewData(String foodID) async {
     //SET REVIEW DATA WHEN ADD MORE FOOD
     return await reviewCollection.doc(foodID).set({
@@ -100,13 +99,6 @@ class DatabaseService {
     });
   }
 
-  Stream<List<String>> foodReviewsStream(String foodID) {
-    return reviewCollection.doc(foodID).snapshots().map((snapshot) {
-      var data = snapshot.data() as Map<String, dynamic>;
-      List<String> foodReviews = List<String>.from(data['RfoodReview'] ?? []);
-      return foodReviews;
-    });
-  }
 
   // Function to add a food item to the cart
   Future<void> addToCart(String foodName, String foodImage, double foodPrice) async {

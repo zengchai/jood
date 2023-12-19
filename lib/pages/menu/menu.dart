@@ -4,6 +4,7 @@ import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:jood/pages/menu/overlay.dart';
 import 'package:intl/intl.dart';
 import 'package:jood/pages/menu/provider/menu_provider/menu_provider.dart';
@@ -85,8 +86,42 @@ class _CategoryMenuState extends State<MenuPage> {
                               return Text('Error: ${snapshot.error}');
                             } else {
                               List<ReviewItem> reviews = snapshot.data ?? [];
+
+                              // Calculate the average rating
+                              double averageRating = reviews.isEmpty
+                                  ? 0.0
+                                  : reviews.map((review) => review.rating).reduce((a, b) => a + b) /
+                                  reviews.length;
+
                               return Column(
                                 children: [
+                                  // Display the average rating with stars
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Average Rating: ',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      RatingBarIndicator(
+                                        rating: averageRating,
+                                        itemBuilder: (context, index) => Icon(
+                                          Icons.star,
+                                          color: Colors.amber,
+                                        ),
+                                        itemCount: 5,
+                                        itemSize: 26.0,
+                                        unratedColor: Colors.grey,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+
+                                  // Display individual reviews
                                   for (ReviewItem reviewItem in reviews)
                                     Container(
                                       margin: const EdgeInsets.symmetric(vertical: 5),
@@ -96,9 +131,50 @@ class _CategoryMenuState extends State<MenuPage> {
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: ListTile(
-                                        title: Text(reviewItem.reviewContent),
-                                        subtitle: Text(
-                                          'User: ${reviewItem.userName}, Rating: ${reviewItem.rating}',
+                                        title: Row(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            // Display the username
+                                            Text(
+                                              reviewItem.userName,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10), // Adjust the spacing
+
+                                            // Display the rating to the right of the username
+                                            Row(
+                                              children: [
+                                                Text('  '),
+                                                RatingBarIndicator(
+                                                  rating: reviewItem.rating,
+                                                  itemBuilder: (context, index) => Icon(
+                                                    Icons.star,
+                                                    color: Colors.amber,
+                                                  ),
+                                                  itemCount: 5,
+                                                  itemSize: 20.0,
+                                                  unratedColor: Colors.grey,
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        subtitle: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const SizedBox(height: 5),
+
+                                            // Display the review content below the rating
+                                            Text(
+                                              reviewItem.reviewContent,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
@@ -107,9 +183,6 @@ class _CategoryMenuState extends State<MenuPage> {
                             }
                           },
                         )
-
-
-
                       ],
                     ),
                   ),

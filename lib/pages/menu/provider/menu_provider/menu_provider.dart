@@ -203,6 +203,15 @@ class MenuProvider extends ChangeNotifier {
       // preams['id'] = id;
       // log('==@ Preams: $preams');
 
+      QuerySnapshot reviewsSnapshot = await FirebaseFirestore.instance
+          .collection('reviews')
+          .where('foodID', isEqualTo: id)
+          .get();
+
+      for (QueryDocumentSnapshot reviewDoc in reviewsSnapshot.docs) {
+        await reviewDoc.reference.delete();
+      }
+
       await menuCollectionRef.doc(id).delete();
 
       response.statusCode == 200;
