@@ -438,7 +438,7 @@ class DatabaseService {
     try {
       // Fetch the existing order data
       DocumentSnapshot<Object?> orderSnapshot =
-          await paidOrderCollection.doc("9KSthNsxuHc0Z8Xrr28bPOQ1wCg1").get();
+          await paidOrderCollection.doc(uid).get();
       var orderData = orderSnapshot.data() as Map<String, dynamic>;
 
       // Check if the array exists and has at least 6 elements
@@ -448,9 +448,7 @@ class DatabaseService {
       orderData[orderId][5] = status;
 
       // // Update the order in the database
-      await paidOrderCollection
-          .doc("9KSthNsxuHc0Z8Xrr28bPOQ1wCg1")
-          .update(orderData);
+      await paidOrderCollection.doc(uid).update(orderData);
 
       // if (orderData.containsKey('Order') &&
       //     orderData['Order'] is List &&

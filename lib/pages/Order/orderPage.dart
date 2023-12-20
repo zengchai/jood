@@ -208,16 +208,32 @@ class _OrderPageState extends State<OrderPage> {
                                   snapshot.data!.isEmpty) {
                                 return Text("No data available");
                               } else {
-                                List<OrderItem> orderData = snapshot.data ?? [];
+                                List<OrderItem> orderItems =
+                                    snapshot.data ?? [];
+                                String orderID = orderItems.isNotEmpty
+                                    ? orderItems[0].orderID
+                                    : ''; // Assuming orderID is available in the first item
+                                String status = orderItems.isNotEmpty
+                                    ? orderItems[0].status
+                                    : '';
+
                                 return ListView.builder(
-                                  itemCount: orderData.length,
+                                  itemCount: orderItems.length,
                                   itemBuilder: (
                                     context,
                                     index,
                                   ) {
                                     // Display and manipulate cart items in the UI
-                                    return _buildOrderItemCard(orderData[index],
-                                        false, currentUser!.uid);
+                                    // return _buildOrderItemCard(
+                                    //     orderData[index],
+                                    //     false,
+                                    //     currentUser!.uid);
+                                    return _buildOrderItemCard(
+                                        orderItems,
+                                        orderID,
+                                        status,
+                                        false,
+                                        currentUser!.uid);
                                   },
                                 );
                               }
@@ -294,12 +310,22 @@ class _OrderPageState extends State<OrderPage> {
                                   itemBuilder: (context, index) {
                                     List<OrderItem> orderItems =
                                         allOrders[index];
+                                    String orderID = orderItems.isNotEmpty
+                                        ? orderItems[0].orderID
+                                        : ''; // Assuming orderID is available in the first item
+                                    String status = orderItems.isNotEmpty
+                                        ? orderItems[0].status
+                                        : '';
 
                                     // Display and manipulate cart items in the UI
                                     return Column(
                                       children: orderItems.map((orderItem) {
                                         return _buildOrderItemCard(
-                                            orderItem, true, currentUser!.uid);
+                                            orderItems,
+                                            orderID,
+                                            status,
+                                            true,
+                                            currentUser!.uid);
                                       }).toList(),
                                     );
                                   },
@@ -313,8 +339,8 @@ class _OrderPageState extends State<OrderPage> {
               ));
   }
 
-  Widget _buildOrderItemCard(
-      OrderItem orderItem, bool isAdmin, String currentUserid) {
+  Widget _buildOrderItemCard(List<OrderItem> orderItems, String orderID,
+      String status, bool isAdmin, String currentUserid) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
       width: 400,
@@ -323,54 +349,68 @@ class _OrderPageState extends State<OrderPage> {
           borderRadius: BorderRadius.circular(10)),
       child: ListTile(
         contentPadding: EdgeInsets.all(8),
-        leading: Image.network(
-          orderItem.foodImage,
-          width: 60,
-          height: 60,
-          fit: BoxFit.cover,
-        ),
-        title: Text(orderItem.foodName),
-        subtitle: Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Quantity: ${orderItem.quantity}'),
-                Text('Price: \$${orderItem.price.toStringAsFixed(2)}'),
-                if (isAdmin)
-                  DropdownButton<String>(
-                    value: '${orderItem.status}',
-                    onChanged: (newStatus) async {
-                      if (newStatus == 'Complete') {
-                        // Update the order status in the database
-                        await DatabaseService(uid: currentUserid)
-                            .updateOrderStatus(orderItem.orderID, newStatus!);
-                      }
+            //Text('Username: $username'),
+            Text('Order ID: $orderID'),
+            for (var orderItem in orderItems) ...[
+              Row(
+                children: [
+                  Expanded(
+                    child: Image.network(
+                      orderItem.foodImage,
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(orderItem.foodName),
+                        Text('Quantity: ${orderItem.quantity}'),
+                        Text('Price: \$${orderItem.price.toStringAsFixed(2)}'),
+                        if (!isAdmin)
+                          ElevatedButton(
+                            onPressed: () {
+                              _popupReview(orderItem);
+                            },
+                            child: Text('Give Review'),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10), // Adjust spacing between items
+            ],
+            if (isAdmin)
+              DropdownButton<String>(
+                value: '$status',
+                onChanged: (newStatus) async {
+                  if (newStatus == 'Complete') {
+                    // Update the order status in the database
+                    await DatabaseService(uid: currentUserid)
+                        .updateOrderStatus(orderID, newStatus!);
+                  }
 
-                      // Update the status in the local UI state
-                      setState(() {
-                        orderItem.status = newStatus!;
-                      });
-                    },
-                    items: <String>['Preparing', 'Complete']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                if (!isAdmin) Text('Status: ${orderItem.status}'),
-                if (!isAdmin)
-                  ElevatedButton(
-                    onPressed: () {
-                      _popupReview(orderItem);
-                    },
-                    child: Text('Give Review'),
-                  ),
-              ],
-            ),
+                  // Update the status in the local UI state
+                  setState(() {
+                    status = newStatus!;
+                  });
+                },
+                items: <String>['Preparing', 'Complete']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            if (!isAdmin) Text('Status: $status'),
           ],
         ),
       ),
