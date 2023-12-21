@@ -56,7 +56,7 @@ class _OrderPageState extends State<OrderPage> {
                         ),
                         SizedBox(height: 20),
 
-                        ReviewForm(foodName: orderItem.foodName),
+                        ReviewForm(foodID: orderItem.foodID),
                       ],
                     ),
                   ),
