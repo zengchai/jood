@@ -1,5 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:jood/pages/shoppingcart/CartItem.dart';
 import 'package:jood/services/auth.dart';
+import 'package:collection/collection.dart';
+import 'package:jood/services/database.dart';
+import 'package:provider/provider.dart';
+
+import '../../models/users.dart';
 
 class CustomStepIndicator extends StatelessWidget {
   final int currentStep;
@@ -56,20 +63,6 @@ class CustomStepIndicator extends StatelessWidget {
   }
 }
 
-class FoodItem {
-  final String name;
-  final String image;
-  int quantity;
-  final double price;
-
-  FoodItem({
-    required this.name,
-    required this.image,
-    required this.quantity,
-    required this.price,
-  });
-}
-
 class Payment extends StatefulWidget {
   @override
   _PaymentState createState() => _PaymentState();
@@ -80,59 +73,67 @@ class _PaymentState extends State<Payment> {
   final AuthService _auth = AuthService();
   int _selectedIndex = 2;
 
-  //replace with real data
-  List<FoodItem> foodItems = [
-    FoodItem(name: 'FriedMee', image: 'assets/friedmee.jpeg', quantity: 2, price: 7.0),
-    FoodItem(name: 'FriedRice', image: 'assets/friedrice.jpeg', quantity: 1, price: 6.0),
-  ];
-
-  double calculateTotalPrice() {
-    return foodItems.fold(0, (sum, item) => sum + item.price * item.quantity);
-  }
-
+// Updated: Maintain a list of selected food items in the cart
+  List<CartItem> cartItems = [];
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = Provider.of<AppUsers?>(context);
     return Scaffold(
       backgroundColor: Colors.brown[50],
-      appBar: AppBar(
-        backgroundColor: Color(0xFF7b5916).withOpacity(0.75),
-        elevation: 0.0,
-        actions: <Widget>[],
-      ),
+      appBar: AppBar(),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Food Items',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: foodItems.length,
-                itemBuilder: (context, index) {
-                  return _buildFoodItemCard(foodItems[index]);
+        padding: const EdgeInsets.all(15.0),
+        child: ListView(children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomStepIndicator(
+                  currentStep: currentStep), // Add the step indicator
+              Text(
+                'CART',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 16),
+              // Expanded(
+              //   child: ListView.builder(
+              //     itemCount: cartItems.length,
+              //     itemBuilder: (context, index) {
+              //       return _buildFoodItemCard(cartItems[index]);
+              //     },
+              //   ),
+              // ),
+              StreamBuilder<List<CartItem>>(
+                stream: DatabaseService(uid: currentUser!.uid).getCartItems(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator(); // Loading indicator
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    List<CartItem> cartItems = snapshot.data ?? [];
+                    // Display and manipulate cart items in the UI
+                    return Column(
+                      children: cartItems.map((item) {
+                        return _buildFoodItemCard(item);
+                      }).toList(),
+                    );
+                  }
                 },
               ),
-            ),
-            SizedBox(height: 16),
-            _buildTotalPrice(),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                // Navigate to another page for payment
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => PaymentConfirmationPage()),
-                );
-              },
-              child: Text('Pay'),
-            ),
-          ],
-        ),
+              SizedBox(height: 16),
+              _buildTotalPrice(),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () async {
+                  // Navigate to another page for payment
+                  await Navigator.pushNamed(context, '/method');
+                },
+                child: Text('Pay'),
+              ),
+            ],
+          ),
+        ]),
       ),
 
       //bottomNavigationBar=============================
@@ -147,12 +148,11 @@ class _PaymentState extends State<Payment> {
       ),
     );
   }
-
-  Widget _buildFoodItemCard(FoodItem foodItem) {
+  Widget _buildFoodItemCard(CartItem foodItem) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8),
       child: ListTile(
-        leading: Image.asset(
+        leading: Image.network(
           foodItem.image,
           width: 60,
           height: 60,
@@ -162,7 +162,7 @@ class _PaymentState extends State<Payment> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Price: \$${foodItem.price}'),
+            Text('Price: RM${foodItem.price.toStringAsFixed(2)}'),
             Row(
               children: [
                 IconButton(
@@ -185,50 +185,92 @@ class _PaymentState extends State<Payment> {
       ),
     );
   }
-
-  Widget _buildTotalPrice() {
-    double totalPrice = calculateTotalPrice();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Total Price:',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        Text(
-          '\$$totalPrice',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
-        ),
-      ],
-    );
-  }
-
-  void _incrementQuantity(FoodItem foodItem) {
+  void _incrementQuantity(CartItem cartItem) {
+    final currentUser = Provider.of<AppUsers?>(context, listen: false);
     setState(() {
-      foodItem.quantity++;
+      cartItem.quantity++;
     });
+    // Update quantity in Firestore
+    DatabaseService(uid: currentUser!.uid).addCartItem(cartItem);
   }
 
-  void _decrementQuantity(FoodItem foodItem) {
+  void _decrementQuantity(CartItem cartItem) {
+    final currentUser = Provider.of<AppUsers?>(context, listen: false);
     setState(() {
-      if (foodItem.quantity > 0) {
-        foodItem.quantity--;
+      if (cartItem.quantity > 1) {
+        cartItem.quantity--;
+        // Update quantity in Firestore
+        DatabaseService(uid: currentUser!.uid).minusCartItem(cartItem);
+      } else {
+        // If quantity is 1, remove the item from the cart
+        _removeCartItem(cartItem, currentUser);
       }
     });
   }
-}
+  void _removeCartItem(CartItem cartItem, AppUsers? currentUser) {
+    setState(() {
+      // Remove the item from the cart locally
+      cartItems.remove(cartItem);
+    });
+    // Remove the item from Firestore
+    DatabaseService(uid: currentUser!.uid).removeCartItem(cartItem);
+  }
 
-class PaymentConfirmationPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Payment Confirmation'),
-      ),
-      body: Center(
-        child: Text('Payment successful!'),
-      ),
+  Widget _buildTotalPrice() {
+    final currentUser = Provider.of<AppUsers?>(context, listen: false);
+    return StreamBuilder<List<CartItem>>(
+      stream: DatabaseService(uid: currentUser!.uid).getCartItems(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          List<CartItem> cartItems = snapshot.data ?? [];
+          double totalPrice =
+          cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Total Price:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'RM${totalPrice.toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
+              ),
+            ],
+          );
+        }
+      },
     );
+  }
+
+
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    switch (index) {
+      case 0:
+        Navigator.pushReplacementNamed(context, '/home');
+        break;
+      case 1:
+        Navigator.pushReplacementNamed(context, '/menu');
+        break;
+      case 2:
+        Navigator.pushReplacementNamed(context, '/payment');
+        break;
+      case 3:
+        Navigator.pushReplacementNamed(context, '/profile');
+        break;
+    }
   }
 }
