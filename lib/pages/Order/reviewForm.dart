@@ -7,16 +7,17 @@ import '../menu/provider/menu_provider/menu_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 
-class reviewForm extends StatefulWidget {
+class ReviewForm extends StatefulWidget {
+  final String foodName;
 
-  const reviewForm({Key? key}) : super(key: key);
+  const ReviewForm({Key? key, required this.foodName}) : super(key: key);
 
   @override
-  State<reviewForm> createState() => _reviewFormState();
+  State<ReviewForm> createState() => _reviewFormState();
 }
 
 
-class _reviewFormState extends State<reviewForm> {
+class _reviewFormState extends State<ReviewForm> {
 
   final _formKey = GlobalKey<FormState>();
   String review = '';
@@ -27,8 +28,8 @@ class _reviewFormState extends State<reviewForm> {
 
     final currentUser = Provider.of<AppUsers?>(context);
 
-    String? foodID = Provider.of<MenuProvider>(context).foodID ?? "";
-    //need to change, foodID need to tally with the food that i clicked
+    //String? foodID = Provider.of<MenuProvider>(context).foodID ?? "";
+    String foodName = widget.foodName;
 
     return Form(
       key: _formKey,
@@ -68,7 +69,7 @@ class _reviewFormState extends State<reviewForm> {
           SizedBox(height: 10),
           ElevatedButton(
             onPressed: () async{
-              await DatabaseService(uid: currentUser!.uid).updateReviewData(foodID, review, rating);
+              await DatabaseService(uid: currentUser!.uid).updateReviewData(foodName, review, rating);
               Navigator.of(context).pop();
             },
             child: Text('Submit'),

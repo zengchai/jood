@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:jood/models/users.dart';
 import 'package:jood/pages/Order/orderItem.dart';
-import 'package:jood/pages/order/reviewForm.dart';
+import 'package:jood/pages/Order/reviewForm.dart';
 import 'package:jood/pages/payment/payment.dart';
 import 'package:jood/services/auth.dart';
 import 'package:jood/services/database.dart';
@@ -56,10 +56,7 @@ class _OrderPageState extends State<OrderPage> {
                         ),
                         SizedBox(height: 20),
 
-                        //DO THE STARS THING
-
-                        reviewForm(),
-
+                        ReviewForm(foodName: orderItem.foodName),
                       ],
                     ),
                   ),

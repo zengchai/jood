@@ -148,7 +148,7 @@ class MenuProvider extends ChangeNotifier {
     }
   }
 
-  /* 
+  /*
   Future menuUpdate({
     String? id,
     XFile? img,
@@ -203,14 +203,8 @@ class MenuProvider extends ChangeNotifier {
       // preams['id'] = id;
       // log('==@ Preams: $preams');
 
-      QuerySnapshot reviewsSnapshot = await FirebaseFirestore.instance
-          .collection('reviews')
-          .where('foodID', isEqualTo: id)
-          .get();
+      await FirebaseFirestore.instance.collection('reviews').doc(foodID).delete();
 
-      for (QueryDocumentSnapshot reviewDoc in reviewsSnapshot.docs) {
-        await reviewDoc.reference.delete();
-      }
 
       await menuCollectionRef.doc(id).delete();
 

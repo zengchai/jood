@@ -54,16 +54,16 @@ class DatabaseService {
   }
 
 
-  Future updateReviewData(String foodID, String review, double rating) async {
+  Future updateReviewData(String foodName, String review, double rating) async {
     //UPDATE REVIEW DATA ON THE SAME ORDER
-    await reviewCollection.doc(foodID).update({
+    await reviewCollection.doc(foodName).update({
       'RfoodReview': FieldValue.arrayUnion([review]),
     });
 
     String userName = await getUserName(uid) ?? 'Unknown User';
 
     return await reviewCollection
-        .doc(foodID)
+        .doc(foodName)
         .collection('RfoodRatings')
         .add({
       'userID': uid,
@@ -92,9 +92,9 @@ class DatabaseService {
   }
 
 
-  Future setReviewData(String foodID) async {
+  Future setReviewData(String foodName) async {
     //SET REVIEW DATA WHEN ADD MORE FOOD
-    return await reviewCollection.doc(foodID).set({
+    return await reviewCollection.doc(foodName).set({
       'RfoodReview': [],
     });
   }

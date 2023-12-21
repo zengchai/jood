@@ -542,7 +542,8 @@ class _CategoryMenuState extends State<MenuPage> {
                                                                   id: menuProvider
                                                                       .menuList[
                                                                           index]
-                                                                      .id);
+                                                                      .id,
+                                                                  );
                                                         });
                                                   }),
                                             ),
