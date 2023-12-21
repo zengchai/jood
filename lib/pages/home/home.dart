@@ -55,7 +55,7 @@ class _HomeState extends State<Home> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Address'),
+            title: Text('Delivery Address'),
             contentPadding: EdgeInsets.all(0),
             content: Container(
               width: MediaQuery.of(context).size.width,
@@ -63,7 +63,7 @@ class _HomeState extends State<Home> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                    padding: EdgeInsets.symmetric(vertical: 25, horizontal: 25),
                     child: addressForm(),
                   )
                 ],
@@ -84,109 +84,118 @@ class _HomeState extends State<Home> {
     }
 
     return StreamProvider<UserProfile>.value(
-    value: DatabaseService(uid: currentUser!.uid).useraccount,
+      value: DatabaseService(uid: currentUser!.uid).useraccount,
       initialData: UserProfile.defaultInstance(),
+      catchError: (context, error) {
+        // Handle the error, e.g., show an error message or log the error
+        print('Error in StreamProvider: $error');
+        return UserProfile.defaultInstance(); // Provide a default value
+      },
       child: Consumer<UserProfile>(
         builder: (context, userProfile, _) {
-      // Update addressController when userProfile changes
-      addressController.text = userProfile.address ?? '';
+          // Update addressController when userProfile changes
+          addressController.text = userProfile.address ?? '';
 
-      return showCustomer ?
+          return showCustomer ?
 
-      // If he/she is a customer
-      Scaffold(
-        backgroundColor: Colors.brown[50],
-        appBar: AppBar(
-          leadingWidth: 120,
-          leading: Container(
-            padding: EdgeInsets.symmetric(vertical: 19, horizontal: 19),
-            child: Image.asset(
-              'assets/icon.png',
-              width: 50, // adjust the width as needed
-              height: 50, // adjust the height as needed
-            ),
-          ),
-          backgroundColor: Colors.white,
-          elevation: 0.0,
-          actions: <Widget>[
-            TextButton(
-                onPressed: () => _showPanel(),
-                child: Container(
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.location_on,
-                        color: Color(0xFF3C312B).withOpacity(0.75),
-                      ),
-                      SizedBox(width: 14,),
-                      Text(
-                        addressController.text.length > 14
-                          ? '${addressController.text.substring(0, 14)}...' // Display first 20 characters
-                          : addressController.text,
-                        style: TextStyle(
-                          color: Color(0xFF3C312B).withOpacity(0.75),
-                        ),),
-                    ],
-                  ),
-                )),
-            TextButton.icon(
-                onPressed: () async {
-                  await Navigator.pushNamed(context, '/cart');
-                },
-                icon: Icon(Icons.add_shopping_cart,
-                  color: Color(0xFF3C312B).withOpacity(0.75),
+          // If he/she is a customer
+          Scaffold(
+            backgroundColor: Colors.brown[50],
+            appBar: AppBar(
+              leadingWidth: 120,
+              leading: Container(
+                padding: EdgeInsets.symmetric(vertical: 19, horizontal: 19),
+                child: Image.asset(
+                  'assets/icon.png',
+                  width: 50, // adjust the width as needed
+                  height: 50, // adjust the height as needed
                 ),
-                label: Text(''))
-          ],
-        ),
-        body: IndexedStack(
-          index: _selectedIndex,
-          children: [
-            // Page 1 content
-            MenuPage(foodReviews: foodReviews),
-            // Page 2 content
-            OrderPage(),
-            ProfilePage(),
-          ],
-        ),
-        bottomNavigationBar: CustomBottomNavigationBar(
-          selectedIndex: _selectedIndex,
-          onItemTapped: _onItemTapped,
-        ),
-      ):
+              ),
+              backgroundColor: Colors.white,
+              elevation: 0.0,
+              actions: <Widget>[
+                TextButton(
+                    onPressed: () => _showPanel(),
+                    child: Container(
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.location_on,
+                            color: Color(0xFF3C312B).withOpacity(0.75),
+                          ),
+                          SizedBox(width: 14,),
+                          Text(
+                            addressController.text.length > 14
+                                ? '${addressController.text.substring(0, 14)}...' // Display first 20 characters
+                                : addressController.text,
+                            style: TextStyle(
+                              color: Color(0xFF3C312B).withOpacity(0.75),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )),
+                TextButton.icon(
+                    onPressed: () async {
+                      await Navigator.pushNamed(context, '/cart');
+                    },
+                    icon: Icon(Icons.add_shopping_cart,
+                      color: Color(0xFF3C312B).withOpacity(0.75),
+                    ),
+                    label: Text(''))
+              ],
+            ),
+            body: IndexedStack(
+              index: _selectedIndex,
+              children: [
+                // Page 1 content
+                MenuPage(foodReviews: foodReviews),
+                // Page 2 content
+                OrderPage(),
+                ProfilePage(),
+              ],
+            ),
+            bottomNavigationBar: CustomBottomNavigationBar(
+              selectedIndex: _selectedIndex,
+              onItemTapped: _onItemTapped,
+            ),
+          ):
 
-      // If he/she is a seller
-      Scaffold(
-      backgroundColor: Colors.brown[50],
-      appBar: AppBar(
-        leadingWidth: 120,
-        leading: Container(
-          padding: EdgeInsets.symmetric(vertical: 19, horizontal: 19),
-          child: Image.asset(
-            'assets/icon.png',
-            width: 50, // adjust the width as needed
-            height: 50, // adjust the height as needed
-          ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0.0,
-        actions: <Widget>[
-        ],
+          // If he/she is a seller
+          Scaffold(
+            backgroundColor: Colors.brown[50],
+            appBar: AppBar(
+              leadingWidth: 120,
+              leading: Container(
+                padding: EdgeInsets.symmetric(vertical: 19, horizontal: 19),
+                child: Image.asset(
+                  'assets/icon.png',
+                  width: 50, // adjust the width as needed
+                  height: 50, // adjust the height as needed
+                ),
+              ),
+              backgroundColor: Colors.white,
+              elevation: 0.0,
+              actions: <Widget>[
+              ],
+            ),
+            body: IndexedStack(
+              index: _selectedIndex,
+              children: [
+                // Page 1 content
+                MenuPage(foodReviews: foodReviews),
+                // Page 2 content
+                OrderPage(),
+                ProfilePage(),
+              ],
+            ),
+            bottomNavigationBar: CustomBottomNavigationBar(
+              selectedIndex: _selectedIndex,
+              onItemTapped: _onItemTapped,
+            ),
+          );
+        },
       ),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: [
-          // Page 1 content
-          MenuPage(foodReviews: foodReviews),
-          // Page 2 content
-          OrderPage(),
-          ProfilePage(),
-        ],
-      ),
-      bottomNavigationBar: CustomBottomNavigationBar(
-        selectedIndex: _selectedIndex,
-        onItemTapped: _onItemTapped,
-      ),
-    );}));
+    );
   }
 }

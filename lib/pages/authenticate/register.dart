@@ -16,6 +16,9 @@ class _RegisterState extends State<Register> {
 
   final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
+  var iconColor1 = Color(0xFF7b5916).withOpacity(0.25);
+  var iconColor2 = Color(0xFF7b5916).withOpacity(0.25);
+  var iconColor3 = Color(0xFF7b5916).withOpacity(0.25);
 
   bool loading = false;
   String email = '';
@@ -48,18 +51,27 @@ class _RegisterState extends State<Register> {
                         color: Colors.black,
                       ),
                       SizedBox(height: 50.0),
-                      TextFormField(
+                  Focus(
+                    onFocusChange: (hasFocus) {
+                      // Use the hasFocus value to determine whether the field is focused
+                      setState(() {
+                        iconColor1 = hasFocus
+                            ? Color(0xFF7b5916).withOpacity(0.75) // Focused color
+                            : Color(0xFF7b5916).withOpacity(0.25); // Unfocused color
+                      });
+                    },
+                    child: TextFormField(
                         decoration: InputDecoration(
                             hintText: 'Name', // Add your placeholder text
                             fillColor: Colors.white,
+                            prefixIcon: Icon(Icons.people,
+                              color: iconColor1,),
                             filled: true,
                             enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(4.0), // Set the border radius here
-                                borderSide: BorderSide(color: Color(0xFFF6B22D).withOpacity(0.25), width: 2.0)
+                                borderSide: BorderSide(color: Color(0xFF7b5916).withOpacity(0.25), width: 2.0)
                             ),
                             focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.0), // Set the border radius here
-                                borderSide: BorderSide(color: Color(0xFFF6B22D).withOpacity(0.75), width: 2.0)
+                                borderSide: BorderSide(color: Color(0xFF7b5916).withOpacity(0.75), width: 2.0)
                             )
                         ),
                         validator: (val) => val!.isEmpty ? 'Enter an name': null,
@@ -68,20 +80,29 @@ class _RegisterState extends State<Register> {
                             name = value;
                           });
                         },
-                      ),
-                      SizedBox(height: 30.0),
-                      TextFormField(
+                    )),
+                  Focus(
+                    onFocusChange: (hasFocus) {
+                      // Use the hasFocus value to determine whether the field is focused
+                      setState(() {
+                        iconColor2 = hasFocus
+                            ? Color(0xFF7b5916).withOpacity(0.75) // Focused color
+                            : Color(0xFF7b5916).withOpacity(0.25); // Unfocused color
+                      });
+                    },
+                    child: TextFormField(
                         decoration: InputDecoration(
                           hintText: 'Email', // Add your placeholder text
                           fillColor: Colors.white,
+                            prefixIcon: Icon(Icons.email,
+                              color: iconColor2,),
                           filled: true,
+
                             enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(4.0), // Set the border radius here
-                                borderSide: BorderSide(color: Color(0xFFF6B22D).withOpacity(0.25), width: 2.0)
+                                borderSide: BorderSide(color: Color(0xFF7b5916).withOpacity(0.25), width: 2.0)
                             ),
                             focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.0), // Set the border radius here
-                                borderSide: BorderSide(color: Color(0xFFF6B22D).withOpacity(0.75), width: 2.0)
+                                borderSide: BorderSide(color: Color(0xFF7b5916).withOpacity(0.75), width: 2.0)
                             )
                         ),
                         validator: (val) => val!.isEmpty ? 'Enter an email': null,
@@ -90,20 +111,28 @@ class _RegisterState extends State<Register> {
                             email = value;
                           });
                         },
-                      ),
-                      SizedBox(height: 30.0),
-                      TextFormField(
+                      )),
+                  Focus(
+                    onFocusChange: (hasFocus) {
+                      // Use the hasFocus value to determine whether the field is focused
+                      setState(() {
+                        iconColor3 = hasFocus
+                            ? Color(0xFF7b5916).withOpacity(0.75) // Focused color
+                            : Color(0xFF7b5916).withOpacity(0.25); // Unfocused color
+                      });
+                    },
+                    child: TextFormField(
                           decoration: InputDecoration(
                               hintText: 'Password',
                               fillColor: Colors.white,
                               filled: true,// Add your placeholder text
+                              prefixIcon: Icon(Icons.lock,
+                                color: iconColor3,),
                               enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(4.0), // Set the border radius here
-                                  borderSide: BorderSide(color: Color(0xFFF6B22D).withOpacity(0.25), width: 2.0)
+                                  borderSide: BorderSide(color: Color(0xFF7b5916).withOpacity(0.25), width: 2.0)
                               ),
                               focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12.0), // Set the border radius here
-                                  borderSide: BorderSide(color: Color(0xFFF6B22D).withOpacity(0.75), width: 2.0)
+                                  borderSide: BorderSide(color: Color(0xFF7b5916).withOpacity(0.75), width: 2.0)
                               )
                           ),
                           validator: (val) => val!.length<6 ? 'Enter a password 6+ chars long': null,
@@ -113,7 +142,7 @@ class _RegisterState extends State<Register> {
                               password = val;
                             });
                           }
-                      ),
+                      )),
                       SizedBox(height:50.0),
                       ElevatedButton(
                         onPressed: () async{
