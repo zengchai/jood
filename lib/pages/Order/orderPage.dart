@@ -173,16 +173,42 @@ class _OrderPageState extends State<OrderPage> {
                                   snapshot.data!.isEmpty) {
                                 return Text("No data available");
                               } else {
-                                List<OrderItem> orderData = snapshot.data ?? [];
+                                List<OrderItem> allOrderItems =
+                                    snapshot.data ?? [];
+
+                                // Group order items by order ID
+                                Map<String, List<OrderItem>> groupedOrders = {};
+
+                                for (var orderItem in allOrderItems) {
+                                  if (!groupedOrders
+                                      .containsKey(orderItem.orderID)) {
+                                    groupedOrders[orderItem.orderID] = [];
+                                  }
+                                  groupedOrders[orderItem.orderID]!
+                                      .add(orderItem);
+                                }
+
                                 return ListView.builder(
-                                  itemCount: orderData.length,
+                                  itemCount: groupedOrders.length,
                                   itemBuilder: (context, index) {
-                                    // Display and manipulate cart items in the UI
-                                    return Column(
-                                      children: orderData.map((orderItem) {
-                                        return _buildOrderItemCard(
-                                            orderItem, false);
-                                      }).toList(),
+                                    String orderID =
+                                        groupedOrders.keys.elementAt(index);
+                                    List<OrderItem> orderItems =
+                                        groupedOrders[orderID] ?? [];
+                                    String status = orderItems.isNotEmpty
+                                        ? orderItems[0].status
+                                        : '';
+                                    String username = orderItems.isNotEmpty
+                                        ? orderItems[0].username
+                                        : '';
+
+                                    return _buildOrderItemCard(
+                                      orderItems,
+                                      orderID,
+                                      status,
+                                      false,
+                                      currentUser!.uid,
+                                      username,
                                     );
                                   },
                                 );
@@ -255,18 +281,43 @@ class _OrderPageState extends State<OrderPage> {
                               } else {
                                 List<List<OrderItem>> allOrders =
                                     snapshot.data ?? [];
-                                return ListView.builder(
-                                  itemCount: allOrders.length,
-                                  itemBuilder: (context, index) {
-                                    List<OrderItem> orderItems =
-                                        allOrders[index];
 
-                                    // Display and manipulate cart items in the UI
-                                    return Column(
-                                      children: orderItems.map((orderItem) {
-                                        return _buildOrderItemCard(
-                                            orderItem, true);
-                                      }).toList(),
+                                // Group order items by order ID
+                                Map<String, List<OrderItem>> groupedOrders = {};
+
+                                for (var customerOrders in allOrders) {
+                                  for (var orderItem in customerOrders) {
+                                    String orderID = orderItem.orderID;
+
+                                    if (!groupedOrders.containsKey(orderID)) {
+                                      groupedOrders[orderID] = [];
+                                    }
+
+                                    groupedOrders[orderID]!.add(orderItem);
+                                  }
+                                }
+
+                                return ListView.builder(
+                                  itemCount: groupedOrders.length,
+                                  itemBuilder: (context, index) {
+                                    String orderID =
+                                        groupedOrders.keys.elementAt(index);
+                                    List<OrderItem> orderItems =
+                                        groupedOrders[orderID] ?? [];
+                                    String status = orderItems.isNotEmpty
+                                        ? orderItems[0].status
+                                        : '';
+                                    String username = orderItems.isNotEmpty
+                                        ? orderItems[0].username
+                                        : '';
+
+                                    return _buildOrderItemCard(
+                                      orderItems,
+                                      orderID,
+                                      status,
+                                      true, // Assuming this is an admin view
+                                      currentUser!.uid,
+                                      username,
                                     );
                                   },
                                 );
@@ -279,7 +330,8 @@ class _OrderPageState extends State<OrderPage> {
               ));
   }
 
-  Widget _buildOrderItemCard(OrderItem orderItem, bool isAdmin) {
+  Widget _buildOrderItemCard(List<OrderItem> orderItems, String orderID,
+      String status, bool isAdmin, String currentUserid, String username) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
       width: 400,
@@ -288,30 +340,95 @@ class _OrderPageState extends State<OrderPage> {
           borderRadius: BorderRadius.circular(10)),
       child: ListTile(
         contentPadding: EdgeInsets.all(8),
-        leading: Image.network(
-          orderItem.foodImage,
-          width: 60,
-          height: 60,
-          fit: BoxFit.cover,
-        ),
-        title: Text(orderItem.foodName),
-        subtitle: Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Quantity: ${orderItem.quantity}'),
-                Text('Price: \$${orderItem.price.toStringAsFixed(2)}'),
-                if (!isAdmin)
-                  ElevatedButton(
-                    onPressed: () {
-                      _popupReview(orderItem);
-                    },
-                    child: Text('Give Review'),
-                  ),
-              ],
+            //Text('Username: $username'),
+            Text(
+              'OrderID: $orderID',
+              style: TextStyle(
+                //color: Colors.blue, // Text color
+                fontSize: 19.0, // Font size
+                fontWeight: FontWeight.bold, // Font weight
+                //fontStyle: FontStyle.italic, // Font style (e.g., italic)
+                letterSpacing: 1.1, // Space between characters
+                //decoration: TextDecoration.underline, // Underline the text
+                //decorationColor: Colors.red, // Underline color
+                //decorationStyle: TextDecorationStyle.dashed, // Underline style
+              ),
             ),
+            if (isAdmin)
+              Text(
+                'Username: $username',
+                style: TextStyle(
+                  //color: Colors.blue, // Text color
+                  fontSize: 19.0, // Font size
+                  fontWeight: FontWeight.bold, // Font weight
+                  //fontStyle: FontStyle.italic, // Font style (e.g., italic)
+                  letterSpacing: 1.1, // Space between characters
+                  //decoration: TextDecoration.underline, // Underline the text
+                  //decorationColor: Colors.red, // Underline color
+                  //decorationStyle: TextDecorationStyle.dashed, // Underline style
+                ),
+              ),
+            for (var orderItem in orderItems) ...[
+              Row(
+                children: [
+                  Expanded(
+                    child: Image.network(
+                      orderItem.foodImage,
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(orderItem.foodName),
+                        Text('Quantity: ${orderItem.quantity}'),
+                        Text('Price: \$${orderItem.price.toStringAsFixed(2)}'),
+                        if (!isAdmin)
+                          ElevatedButton(
+                            onPressed: () {
+                              _popupReview(orderItem);
+                            },
+                            child: Text('Give Review'),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10), // Adjust spacing between items
+            ],
+            if (isAdmin)
+              DropdownButton<String>(
+                value: status ??
+                    'Preparing', // Provide a default value if status is null
+                onChanged: (newStatus) async {
+                  if (newStatus == 'Complete') {
+                    // Update the order status in the database
+                    await DatabaseService(uid: currentUserid)
+                        .updateOrderStatus(orderID, newStatus!);
+                  }
+
+                  // Update the status in the local UI state
+                  setState(() {
+                    status = newStatus!;
+                  });
+                },
+                items: <String>['Preparing', 'Complete']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            if (!isAdmin) Text('Status: $status'),
           ],
         ),
       ),
