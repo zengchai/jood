@@ -76,8 +76,8 @@ class DatabaseService {
   }
 
   // Function to add a food item to the cart
-  Future<void> addToCart(
-      String foodName, String foodImage, double foodPrice) async {
+  Future<void> addToCart(String foodID, String foodName, String foodImage,
+      double foodPrice) async {
     // Convert foodPrice to double if it's a String
     final double parsedPrice = foodPrice is String
         ? double.tryParse(foodPrice as String) ?? 0.0
@@ -101,18 +101,18 @@ class DatabaseService {
         final int newQuantity = existingQuantity + 1;
 
         await cartCollection.doc(uid).set({
-          itemId: [foodName, foodImage, parsedPrice, newQuantity],
+          itemId: [foodName, foodImage, parsedPrice, newQuantity, foodID],
         }, SetOptions(merge: true));
       } else {
         // If the item doesn't exist, add it to the cart
         await cartCollection.doc(uid).set({
-          itemId: [foodName, foodImage, parsedPrice, 1],
+          itemId: [foodName, foodImage, parsedPrice, 1, foodID],
         }, SetOptions(merge: true));
       }
     } else {
       // If the cart doesn't exist, create a new one with the item
       await cartCollection.doc(uid).set({
-        itemId: [foodName, foodImage, parsedPrice, 1],
+        itemId: [foodName, foodImage, parsedPrice, 1, foodID],
       }, SetOptions(merge: true));
     }
   }
@@ -143,6 +143,7 @@ class DatabaseService {
             image: 'error_image.jpg',
             quantity: 0,
             price: 0.0,
+            foodID: 'Invalid foodID',
           );
         }
 
@@ -151,6 +152,7 @@ class DatabaseService {
           image: item[1] as String,
           quantity: (item[3] as num).toInt(),
           price: (item[2] as num).toDouble(),
+          foodID: item[4] as String,
         );
       }).toList();
 
@@ -184,6 +186,7 @@ class DatabaseService {
           'price': cartItems[i].price,
           'quantity': cartItems[i].quantity,
           'itemID': itemId,
+          'foodID': cartItems[i].foodID,
         };
       }
 
@@ -269,6 +272,7 @@ class DatabaseService {
 
         await cartCollection.doc(uid).set({
           cartItem.name: [
+            cartItem.foodID,
             cartItem.name,
             cartItem.image,
             cartItem.price,
@@ -296,6 +300,7 @@ class DatabaseService {
 
         await cartCollection.doc(uid).set({
           cartItem.name: [
+            cartItem.foodID,
             cartItem.name,
             cartItem.image,
             cartItem.price,
@@ -351,10 +356,12 @@ class DatabaseService {
             orderID: orderData['orderId'] as String,
             foodName: itemData['name'] as String,
             foodImage: itemData['image'] as String,
+            foodID: itemData['foodID'] as String,
             quantity: itemData['quantity'] as int,
             price: itemData['price'] as double,
             orderDate: formattedDate,
             status: orderData['status'] as String,
+            username: orderData['name'] as String,
           );
         });
       }).toList();
@@ -403,10 +410,12 @@ class DatabaseService {
                   orderID: orderData['orderId'] as String,
                   foodName: itemData['name'] as String,
                   foodImage: itemData['image'] as String,
+                  foodID: itemData['foodID'] as String,
                   quantity: itemData['quantity'] as int,
                   price: itemData['price'] as double,
                   orderDate: formattedDate,
                   status: orderData['status'] as String,
+                  username: orderData['name'] as String,
                 );
               });
             }).toList();
@@ -429,43 +438,27 @@ class DatabaseService {
 
 //method to update the order status
   Future<void> updateOrderStatus(String orderId, String status) async {
-    //ltr need update Order$orderId once ZE update
-
-    // return await orderCollection.doc("H4zCS1bQB8DxpvqzOexp").set({
-    //   {'Order$orderId.status': status},
-    //   SetOptions(merge: true),
-    // });
     try {
-      // Fetch the existing order data
-      DocumentSnapshot<Object?> orderSnapshot =
-          await paidOrderCollection.doc(uid).get();
-      var orderData = orderSnapshot.data() as Map<String, dynamic>;
+      // Fetch all documents in the collection
+      QuerySnapshot<Object?> orderSnapshot = await paidOrderCollection.get();
 
-      // Check if the array exists and has at least 6 elements
-      //'Order$orderId.status' = Ordertime$stamp/Order$ID
-      // Update the status at index 5 in the array
-      //orderData['Order$orderId'][5] = status;
-      orderData[orderId][5] = status;
+      // Iterate through each document
+      for (QueryDocumentSnapshot<Object?> document in orderSnapshot.docs) {
+        var orderData = document.data() as Map<String, dynamic>;
 
-      // // Update the order in the database
-      await paidOrderCollection.doc(uid).update(orderData);
+        // Check if the order with the given orderId exists in this document
+        if (orderData.containsKey(orderId)) {
+          // Update the status for the specific order
+          orderData[orderId]['status'] = status;
 
-      // if (orderData.containsKey('Order') &&
-      //     orderData['Order'] is List &&
-      //     orderData['Order'].length >= 6) {
-      //   // Toggle the status between "Preparing" and "Complete"
-      //   String currentStatus = orderData['Order$orderId'][5];
-      //   String newStatus =
-      //       (currentStatus == 'Preparing') ? 'Complete' : 'Preparing';
+          // Update only the specific order within the document
+          await paidOrderCollection.doc(document.id).set(orderData);
+          return; // Exit the function after updating the order
+        }
+      }
 
-      //   // Update the status at index 5 in the array
-      //   orderData['Order$orderId'][5] = newStatus;
-
-      //   // Update the order in the database
-      //   await orderCollection.doc("H4zCS1bQB8DxpvqzOexp").update(orderData);
-      // } else {
-      //   print("Invalid order structure or missing status field.");
-      // }
+      // If the loop completes without finding the order, log a message
+      print("Order with ID $orderId not found.");
     } catch (e) {
       print("Error updating order status: $e");
       // Handle errors here

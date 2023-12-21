@@ -285,6 +285,11 @@ class _CategoryMenuState extends State<MenuPage> {
                                                           menuProvider
                                                                   .menuList[
                                                                       index]
+                                                                  .id ??
+                                                              "",
+                                                          menuProvider
+                                                                  .menuList[
+                                                                      index]
                                                                   .title ??
                                                               "",
                                                           menuProvider
