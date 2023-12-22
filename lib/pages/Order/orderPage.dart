@@ -55,7 +55,6 @@ class _OrderPageState extends State<OrderPage> {
                           subtitle: Text(orderItem.price.toStringAsFixed(2)),
                         ),
                         SizedBox(height: 20),
-
                         ReviewForm(foodID: orderItem.foodID),
                       ],
                     ),
@@ -68,7 +67,6 @@ class _OrderPageState extends State<OrderPage> {
       },
     );
   }
-
 
 // Date picker for filter
   void _showDatePicker() async {
@@ -201,6 +199,8 @@ class _OrderPageState extends State<OrderPage> {
                                     String username = orderItems.isNotEmpty
                                         ? orderItems[0].username
                                         : '';
+                                    double totalPrice =
+                                        orderItems[0].totalPrice;
 
                                     return _buildOrderItemCard(
                                       orderItems,
@@ -209,6 +209,7 @@ class _OrderPageState extends State<OrderPage> {
                                       false,
                                       currentUser!.uid,
                                       username,
+                                      totalPrice,
                                     );
                                   },
                                 );
@@ -310,6 +311,8 @@ class _OrderPageState extends State<OrderPage> {
                                     String username = orderItems.isNotEmpty
                                         ? orderItems[0].username
                                         : '';
+                                    double totalPrice =
+                                        orderItems[0].totalPrice;
 
                                     return _buildOrderItemCard(
                                       orderItems,
@@ -318,6 +321,7 @@ class _OrderPageState extends State<OrderPage> {
                                       true, // Assuming this is an admin view
                                       currentUser!.uid,
                                       username,
+                                      totalPrice,
                                     );
                                   },
                                 );
@@ -330,107 +334,167 @@ class _OrderPageState extends State<OrderPage> {
               ));
   }
 
-  Widget _buildOrderItemCard(List<OrderItem> orderItems, String orderID,
-      String status, bool isAdmin, String currentUserid, String username) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-      width: 400,
-      decoration: BoxDecoration(
-          color: Color.fromRGBO(248, 232, 209, 1),
-          borderRadius: BorderRadius.circular(10)),
-      child: ListTile(
-        contentPadding: EdgeInsets.all(8),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            //Text('Username: $username'),
-            Text(
-              'OrderID: $orderID',
-              style: TextStyle(
-                //color: Colors.blue, // Text color
-                fontSize: 19.0, // Font size
-                fontWeight: FontWeight.bold, // Font weight
-                //fontStyle: FontStyle.italic, // Font style (e.g., italic)
-                letterSpacing: 1.1, // Space between characters
-                //decoration: TextDecoration.underline, // Underline the text
-                //decorationColor: Colors.red, // Underline color
-                //decorationStyle: TextDecorationStyle.dashed, // Underline style
+  Widget _buildOrderItemCard(
+    List<OrderItem> orderItems,
+    String orderID,
+    String status,
+    bool isAdmin,
+    String currentUserid,
+    String username,
+    double totalPrice,
+  ) {
+    return Card(
+      margin: const EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      elevation: 5,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Color.fromARGB(194, 255, 183, 0), // Orange color theme
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
               ),
             ),
-            if (isAdmin)
-              Text(
-                'Username: $username',
-                style: TextStyle(
-                  //color: Colors.blue, // Text color
-                  fontSize: 19.0, // Font size
-                  fontWeight: FontWeight.bold, // Font weight
-                  //fontStyle: FontStyle.italic, // Font style (e.g., italic)
-                  letterSpacing: 1.1, // Space between characters
-                  //decoration: TextDecoration.underline, // Underline the text
-                  //decorationColor: Colors.red, // Underline color
-                  //decorationStyle: TextDecorationStyle.dashed, // Underline style
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Order ID:',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  orderID,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (isAdmin)
+                  Text(
+                    'Username: $username',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          SizedBox(height: 10),
+          // Order Items
+          for (var orderItem in orderItems) ...[
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Card(
+                elevation: 0, // Set to 0 to remove inner card shadow
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          orderItem.foodImage,
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              orderItem.foodName,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text('Quantity: ${orderItem.quantity}'),
+                            Text(
+                                'Price: \RM${orderItem.price.toStringAsFixed(2)}'),
+                            if (!isAdmin)
+                              ElevatedButton(
+                                onPressed: () {
+                                  _popupReview(orderItem);
+                                },
+                                child: Text('Give Review'),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            for (var orderItem in orderItems) ...[
-              Row(
-                children: [
-                  Expanded(
-                    child: Image.network(
-                      orderItem.foodImage,
-                      width: 60,
-                      height: 60,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(orderItem.foodName),
-                        Text('Quantity: ${orderItem.quantity}'),
-                        Text('Price: \$${orderItem.price.toStringAsFixed(2)}'),
-                        if (!isAdmin)
-                          ElevatedButton(
-                            onPressed: () {
-                              _popupReview(orderItem);
-                            },
-                            child: Text('Give Review'),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10), // Adjust spacing between items
-            ],
-            if (isAdmin)
-              DropdownButton<String>(
-                value: status ??
-                    'Preparing', // Provide a default value if status is null
-                onChanged: (newStatus) async {
-                  if (newStatus == 'Complete') {
-                    // Update the order status in the database
-                    await DatabaseService(uid: currentUserid)
-                        .updateOrderStatus(orderID, newStatus!);
-                  }
-
-                  // Update the status in the local UI state
-                  setState(() {
-                    status = newStatus!;
-                  });
-                },
-                items: <String>['Preparing', 'Complete']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-            if (!isAdmin) Text('Status: $status'),
+            ),
+            SizedBox(height: 10),
           ],
-        ),
+          // Total Price, Status Dropdown, and Status Text
+          Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.orange, // Orange color theme
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Total Price: \RM${totalPrice.toStringAsFixed(2)}',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (isAdmin)
+                  DropdownButton<String>(
+                    value: status ?? 'Preparing',
+                    onChanged: (newStatus) async {
+                      if (newStatus == 'Complete') {
+                        await DatabaseService(uid: currentUserid)
+                            .updateOrderStatus(orderID, newStatus!);
+                      }
+                      setState(() {
+                        status = newStatus!;
+                      });
+                    },
+                    items: <String>['Preparing', 'Complete']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                if (!isAdmin) Text('Status: $status'),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
