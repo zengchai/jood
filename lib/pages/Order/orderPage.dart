@@ -169,7 +169,20 @@ class _OrderPageState extends State<OrderPage> {
                                 return Text("Error: ${snapshot.error}");
                               } else if (!snapshot.hasData ||
                                   snapshot.data!.isEmpty) {
-                                return Text("No data available");
+                                return Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "No order available",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 17,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
                               } else {
                                 List<OrderItem> allOrderItems =
                                     snapshot.data ?? [];
@@ -278,7 +291,20 @@ class _OrderPageState extends State<OrderPage> {
                                 return Text("Error: ${snapshot.error}");
                               } else if (!snapshot.hasData ||
                                   snapshot.data!.isEmpty) {
-                                return Text("No data available");
+                                return Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "No order available",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 17,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
                               } else {
                                 List<List<OrderItem>> allOrders =
                                     snapshot.data ?? [];
@@ -355,7 +381,7 @@ class _OrderPageState extends State<OrderPage> {
           Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Color.fromARGB(194, 255, 183, 0), // Orange color theme
+              color: Color.fromRGBO(255, 196, 114, 1),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -401,6 +427,7 @@ class _OrderPageState extends State<OrderPage> {
               ),
               child: Card(
                 elevation: 0, // Set to 0 to remove inner card shadow
+                color: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -453,7 +480,7 @@ class _OrderPageState extends State<OrderPage> {
           Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.orange, // Orange color theme
+              color: Color.fromRGBO(255, 196, 114, 1),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(20),
                 bottomRight: Radius.circular(20),
@@ -466,7 +493,7 @@ class _OrderPageState extends State<OrderPage> {
                   'Total Price: \RM${totalPrice.toStringAsFixed(2)}',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 17,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -478,6 +505,7 @@ class _OrderPageState extends State<OrderPage> {
                         await DatabaseService(uid: currentUserid)
                             .updateOrderStatus(orderID, newStatus!);
                       }
+
                       setState(() {
                         status = newStatus!;
                       });
@@ -490,7 +518,15 @@ class _OrderPageState extends State<OrderPage> {
                       );
                     }).toList(),
                   ),
-                if (!isAdmin) Text('Status: $status'),
+                if (!isAdmin)
+                  Text(
+                    'Status: $status',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
               ],
             ),
           ),
