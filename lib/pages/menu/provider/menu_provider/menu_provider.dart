@@ -148,7 +148,7 @@ class MenuProvider extends ChangeNotifier {
     }
   }
 
-  /* 
+  /*
   Future menuUpdate({
     String? id,
     XFile? img,
@@ -202,6 +202,9 @@ class MenuProvider extends ChangeNotifier {
       // Map<String, dynamic> preams = {};
       // preams['id'] = id;
       // log('==@ Preams: $preams');
+
+      await FirebaseFirestore.instance.collection('reviews').doc(foodID).delete();
+
 
       await menuCollectionRef.doc(id).delete();
 

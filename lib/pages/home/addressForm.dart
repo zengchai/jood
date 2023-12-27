@@ -38,7 +38,7 @@ class _addressFormState extends State<addressForm> {
       key: _formKey,
       child: Column(
         children: <Widget>[
-          SizedBox(height: 35,),
+          SizedBox(height: 10,),
           TextFormField(
             controller: addressController,
             decoration: InputDecoration(
@@ -56,7 +56,7 @@ class _addressFormState extends State<addressForm> {
             ),
             validator: (val) => val!.isEmpty ? 'Enter an address': null,
           ),
-          SizedBox(height: 50,),
+          SizedBox(height: 25,),
           ElevatedButton(
             onPressed: () async{
               await DatabaseService(uid: currentUser!.uid).updateAddressData(addressController.text);
@@ -65,7 +65,7 @@ class _addressFormState extends State<addressForm> {
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B).withOpacity(0.75),),
               foregroundColor: MaterialStateProperty.all<Color>(Color(0xFFFFFFCC)),
-              minimumSize: MaterialStateProperty.all<Size>(Size(200, 50)),
+              minimumSize: MaterialStateProperty.all<Size>(Size(150, 40)),
             ),
             child: Text(
               'Update',

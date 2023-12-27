@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:jood/models/users.dart';
 import 'package:jood/pages/Order/orderItem.dart';
-import 'package:jood/pages/order/reviewForm.dart';
+import 'package:jood/pages/Order/reviewForm.dart';
 import 'package:jood/pages/payment/payment.dart';
 import 'package:jood/services/auth.dart';
 import 'package:jood/services/database.dart';
@@ -29,75 +29,38 @@ class _OrderPageState extends State<OrderPage> {
   int _currentPageIndex = 0;
 
   void _popupReview(OrderItem orderItem) {
-    double rating = 0;
-
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: Text('Review'),
           contentPadding: EdgeInsets.all(0),
-          content: Container(
-            width: MediaQuery.of(context).size.width,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: Image.network(
-                          orderItem.foodImage,
-                          width: 120,
-                          height: 120,
+          content: SingleChildScrollView(
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          leading: Image.network(
+                            orderItem.foodImage,
+                            width: 120,
+                            height: 120,
+                          ),
+                          title: Text(orderItem.foodName),
+                          subtitle: Text(orderItem.price.toStringAsFixed(2)),
                         ),
-                        title: Text(orderItem.foodName),
-                        subtitle: Text(orderItem.price.toStringAsFixed(2)),
-                      ),
-                      SizedBox(height: 20),
-
-                      RatingBar.builder(
-                        initialRating: rating,
-                        minRating: 1,
-                        direction: Axis.horizontal,
-                        allowHalfRating: false,
-                        itemCount: 5,
-                        itemSize: 30.0,
-                        itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                        itemBuilder: (context, _) => Icon(
-                          Icons.star,
-                          color: Colors.amber,
-                        ),
-                        onRatingUpdate: (newRating) {
-                          setState(() {
-                            rating = newRating;
-                          });
-                        },
-                      ),
-
-                      SizedBox(height: 20),
-
-                      //DO THE STARS THING
-
-                      reviewForm(),
-
-                      ElevatedButton(
-                        onPressed: () {
-                          // Use the 'rating' variable to submit the rating
-                          print('Selected Rating: $rating');
-
-                          // TODO: Implement logic to submit the rating to the database
-                          // databaseService.submitRating(orderItem.foodID, rating);
-
-                          Navigator.of(context).pop(); // Close the dialog
-                        },
-                        child: Text('Submit Review'),
-                      ),
-                    ],
+                        SizedBox(height: 20),
+                        ReviewForm(foodID: orderItem.foodID),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -206,18 +169,60 @@ class _OrderPageState extends State<OrderPage> {
                                 return Text("Error: ${snapshot.error}");
                               } else if (!snapshot.hasData ||
                                   snapshot.data!.isEmpty) {
-                                return Text("No data available");
+                                return Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "No order available",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 17,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
                               } else {
-                                List<OrderItem> orderData = snapshot.data ?? [];
+                                List<OrderItem> allOrderItems =
+                                    snapshot.data ?? [];
+
+                                // Group order items by order ID
+                                Map<String, List<OrderItem>> groupedOrders = {};
+
+                                for (var orderItem in allOrderItems) {
+                                  if (!groupedOrders
+                                      .containsKey(orderItem.orderID)) {
+                                    groupedOrders[orderItem.orderID] = [];
+                                  }
+                                  groupedOrders[orderItem.orderID]!
+                                      .add(orderItem);
+                                }
+
                                 return ListView.builder(
-                                  itemCount: orderData.length,
+                                  itemCount: groupedOrders.length,
                                   itemBuilder: (context, index) {
-                                    // Display and manipulate cart items in the UI
-                                    return Column(
-                                      children: orderData.map((orderItem) {
-                                        return _buildOrderItemCard(
-                                            orderItem, false);
-                                      }).toList(),
+                                    String orderID =
+                                        groupedOrders.keys.elementAt(index);
+                                    List<OrderItem> orderItems =
+                                        groupedOrders[orderID] ?? [];
+                                    String status = orderItems.isNotEmpty
+                                        ? orderItems[0].status
+                                        : '';
+                                    String username = orderItems.isNotEmpty
+                                        ? orderItems[0].username
+                                        : '';
+                                    double totalPrice =
+                                        orderItems[0].totalPrice;
+
+                                    return _buildOrderItemCard(
+                                      orderItems,
+                                      orderID,
+                                      status,
+                                      false,
+                                      currentUser!.uid,
+                                      username,
+                                      totalPrice,
                                     );
                                   },
                                 );
@@ -286,22 +291,63 @@ class _OrderPageState extends State<OrderPage> {
                                 return Text("Error: ${snapshot.error}");
                               } else if (!snapshot.hasData ||
                                   snapshot.data!.isEmpty) {
-                                return Text("No data available");
+                                return Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "No order available",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 17,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
                               } else {
                                 List<List<OrderItem>> allOrders =
                                     snapshot.data ?? [];
-                                return ListView.builder(
-                                  itemCount: allOrders.length,
-                                  itemBuilder: (context, index) {
-                                    List<OrderItem> orderItems =
-                                        allOrders[index];
 
-                                    // Display and manipulate cart items in the UI
-                                    return Column(
-                                      children: orderItems.map((orderItem) {
-                                        return _buildOrderItemCard(
-                                            orderItem, true);
-                                      }).toList(),
+                                // Group order items by order ID
+                                Map<String, List<OrderItem>> groupedOrders = {};
+
+                                for (var customerOrders in allOrders) {
+                                  for (var orderItem in customerOrders) {
+                                    String orderID = orderItem.orderID;
+
+                                    if (!groupedOrders.containsKey(orderID)) {
+                                      groupedOrders[orderID] = [];
+                                    }
+
+                                    groupedOrders[orderID]!.add(orderItem);
+                                  }
+                                }
+
+                                return ListView.builder(
+                                  itemCount: groupedOrders.length,
+                                  itemBuilder: (context, index) {
+                                    String orderID =
+                                        groupedOrders.keys.elementAt(index);
+                                    List<OrderItem> orderItems =
+                                        groupedOrders[orderID] ?? [];
+                                    String status = orderItems.isNotEmpty
+                                        ? orderItems[0].status
+                                        : '';
+                                    String username = orderItems.isNotEmpty
+                                        ? orderItems[0].username
+                                        : '';
+                                    double totalPrice =
+                                        orderItems[0].totalPrice;
+
+                                    return _buildOrderItemCard(
+                                      orderItems,
+                                      orderID,
+                                      status,
+                                      true, // Assuming this is an admin view
+                                      currentUser!.uid,
+                                      username,
+                                      totalPrice,
                                     );
                                   },
                                 );
@@ -314,41 +360,177 @@ class _OrderPageState extends State<OrderPage> {
               ));
   }
 
-  Widget _buildOrderItemCard(OrderItem orderItem, bool isAdmin) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-      width: 400,
-      decoration: BoxDecoration(
-          color: Color.fromRGBO(248, 232, 209, 1),
-          borderRadius: BorderRadius.circular(10)),
-      child: ListTile(
-        contentPadding: EdgeInsets.all(8),
-        leading: Image.network(
-          orderItem.foodImage,
-          width: 60,
-          height: 60,
-          fit: BoxFit.cover,
-        ),
-        title: Text(orderItem.foodName),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
+  Widget _buildOrderItemCard(
+    List<OrderItem> orderItems,
+    String orderID,
+    String status,
+    bool isAdmin,
+    String currentUserid,
+    String username,
+    double totalPrice,
+  ) {
+    return Card(
+      margin: const EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      elevation: 5,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Color.fromRGBO(255, 196, 114, 1),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Quantity: ${orderItem.quantity}'),
-                Text('Price: \$${orderItem.price.toStringAsFixed(2)}'),
-                if (!isAdmin)
-                  ElevatedButton(
-                    onPressed: () {
-                      _popupReview(orderItem);
-                    },
-                    child: Text('Give Review'),
+                Text(
+                  'Order ID:',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  orderID,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (isAdmin)
+                  Text(
+                    'Username: $username',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
               ],
             ),
+          ),
+          SizedBox(height: 10),
+          // Order Items
+          for (var orderItem in orderItems) ...[
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Card(
+                elevation: 0, // Set to 0 to remove inner card shadow
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          orderItem.foodImage,
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              orderItem.foodName,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text('Quantity: ${orderItem.quantity}'),
+                            Text(
+                                'Price: \RM${orderItem.price.toStringAsFixed(2)}'),
+                            if (!isAdmin)
+                              ElevatedButton(
+                                onPressed: () {
+                                  _popupReview(orderItem);
+                                },
+                                child: Text('Give Review'),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
           ],
-        ),
+          // Total Price, Status Dropdown, and Status Text
+          Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Color.fromRGBO(255, 196, 114, 1),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Total Price: \RM${totalPrice.toStringAsFixed(2)}',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (isAdmin)
+                  DropdownButton<String>(
+                    value: status ?? 'Preparing',
+                    onChanged: (newStatus) async {
+                      if (newStatus == 'Complete') {
+                        await DatabaseService(uid: currentUserid)
+                            .updateOrderStatus(orderID, newStatus!);
+                      }
+
+                      setState(() {
+                        status = newStatus!;
+                      });
+                    },
+                    items: <String>['Preparing', 'Complete']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                if (!isAdmin)
+                  Text(
+                    'Status: $status',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

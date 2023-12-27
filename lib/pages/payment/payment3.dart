@@ -3,12 +3,10 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../models/users.dart';
 import '../../services/database.dart';
-import 'package:screenshot/screenshot.dart';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:gallery_saver/gallery_saver.dart';
 
 class CustomStepIndicator extends StatelessWidget {
   final int currentStep;
@@ -72,15 +70,13 @@ class Receipt extends StatefulWidget {
 
 class _ReceiptState extends State<Receipt> {
   int currentStep = 3;
-  final _screenshotController = ScreenshotController();
 
   @override
   Widget build(BuildContext context) {
     final String orderId = ModalRoute.of(context)!.settings.arguments as String;
 
-    return Screenshot(
-      controller: _screenshotController,
-      child: Scaffold(
+
+      return Scaffold(
         appBar: AppBar(
           backgroundColor: Color(0xFF00000),
           automaticallyImplyLeading: false,
@@ -112,58 +108,12 @@ class _ReceiptState extends State<Receipt> {
                 Divider(height: 30, thickness: 2),
                 _buildPaymentDetails(orderId),
                 SizedBox(height: 30),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    _downloadReceipt();
-                  },
-                  icon: Icon(Icons.download),
-                  label: Text('Download Receipt'),
-                ),
+
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-  Future<void> _downloadReceipt() async {
-    try {
-      Uint8List? imageBytes = await _screenshotController.capture();
-
-      if (imageBytes != null) {
-        // Use path_provider to get the application's documents directory
-        final directory = await getApplicationDocumentsDirectory();
-
-        // Save the file with a different name (e.g., receipt.png)
-        final file = File('${directory.path}/receipt.png');
-        await file.writeAsBytes(imageBytes);
-
-        // Use gallery_saver to save the file to the gallery
-        bool? success = await GallerySaver.saveImage(file.path, albumName: 'YourAlbumName');
-
-        if (success == true) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Receipt downloaded successfully'),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to save receipt to gallery'),
-            ),
-          );
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to capture screenshot'),
-          ),
-        );
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
+      );
   }
 
   Widget _buildConfirmationSection() {
