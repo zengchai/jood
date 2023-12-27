@@ -5,7 +5,7 @@ import 'package:jood/models/userprofile.dart';
 import 'package:jood/pages/Order/orderPage.dart';
 import 'package:jood/pages/shoppingcart/CartItem.dart';
 import 'package:jood/services/auth.dart';
-
+import 'package:intl/date_symbol_data_local.dart';
 import '../pages/Order/orderItem.dart';
 
 class DatabaseService {
@@ -15,7 +15,7 @@ class DatabaseService {
   final CollectionReference Jood =
       FirebaseFirestore.instance.collection('User');
   final CollectionReference orderCollection =
-      FirebaseFirestore.instance.collection('orders');
+      FirebaseFirestore.instance.collection('Order');
   final CollectionReference reviewCollection =
       FirebaseFirestore.instance.collection('reviews');
   final CollectionReference cartCollection =
@@ -116,11 +116,32 @@ class DatabaseService {
     }
   }
 
+  Future<void> clearCart() async {
+    try {
+      // Get the current cart data
+      DocumentSnapshot<Map<String, dynamic>> cartSnapshot =
+      await cartCollection.doc(uid).get() as DocumentSnapshot<Map<String, dynamic>>;
+
+      if (cartSnapshot.exists) {
+        // If the cart exists, remove all items
+        await cartCollection.doc(uid).update({
+          for (var key in cartSnapshot.data()!.keys)
+            if (key != 'uid') key: FieldValue.delete(),
+        });
+
+      } else {
+        print('Cart does not exist for user $uid');
+      }
+    } catch (e) {
+      print('Error clearing cart: $e');
+      throw e;
+    }
+  }
   // Function to retrieve cart items
   Stream<List<CartItem>> getCartItems() {
     return cartCollection.doc(uid).snapshots().map((snapshot) {
       if (!snapshot.exists) {
-        return []; // Return an empty list if the document doesn't exist
+        return [];
       }
 
       var data = snapshot.data() as Map<String, dynamic>;
@@ -135,7 +156,6 @@ class DatabaseService {
       // Map the item keys to a list of CartItem objects
       List<CartItem> cartItems = itemKeys.map((key) {
         dynamic item = data[key];
-        print('Item: $item');
         if (item == null || item is! List<dynamic> || item.length < 4) {
           return CartItem(
             name: 'Invalid Item Format',
@@ -158,56 +178,52 @@ class DatabaseService {
   }
 
   Future<String> createOrder(String paymentmethod) async {
-    try {
-      // Retrieve cart items
-      String name = await getOrderInfo(uid) ?? '';
-      List<CartItem> cartItems = await getCartItems().first;
-      String status = "Preparing";
+    String name = await getOrderInfo(uid) ?? '';
+    List<CartItem> cartItems = await getCartItems().first;
+    String status = "Preparing";
 
-      // Calculate total price
-      double totalPrice = cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
+    // Calculate total price
+    double totalPrice = cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
 
-      // Create order ID
-      final String orderId = 'Order${DateFormat('yyyyMMddHHmm').format(DateTime.now())}';
-      // Create a map to store items
-      Map<String, dynamic> itemsMap = {};
+    // Initialize date format for the Malaysian locale
+    await initializeDateFormatting('en_MY', null);
+    final DateTime localDateTime = DateTime.now().toLocal();
+    final String formattedDateTime = DateFormat('yyyyMMddHHmm', 'en_MY')
+        .format(localDateTime);
 
-      // Populate the map with item details
-      for (int i = 0; i < cartItems.length; i++) {
-        String itemId = 'item_$i'; // Unique identifier for each item
-        itemsMap[itemId] = {
-          'name': cartItems[i].name,
-          'image': cartItems[i].image,
-          'price': cartItems[i].price,
-          'quantity': cartItems[i].quantity,
-        };
-      }
+    // Create order ID using the formatted local time
+    final String orderId = 'Order$formattedDateTime';
 
-      // Create the order
-      await paidOrderCollection.doc(uid).set({
-        orderId: {
-          'orderId': orderId,
-          'timestamp': FieldValue.serverTimestamp(), // Set timestamp for date and time
-          'items': itemsMap, // Store items using the map
-          'name': name,
-          'paymentMethod': paymentmethod, // Replace with the actual payment method
-          'status': status,
-          'totalPrice': totalPrice,
-        },
-      }, SetOptions(merge: true));
+    Map<String, dynamic> itemsMap = {};
 
-      print('Order created successfully');
-
-      // Return the orderId
-      return orderId;
-    } catch (e) {
-      print("Error creating order: $e");
-      return ''; // Return an empty string in case of an error
+    for (int i = 0; i < cartItems.length; i++) {
+      String itemId = 'item_$i'; // Unique identifier for each item
+      itemsMap[itemId] = {
+        'name': cartItems[i].name,
+        'image': cartItems[i].image,
+        'price': cartItems[i].price,
+        'quantity': cartItems[i].quantity,
+      };
     }
+
+    // Create the order
+    await paidOrderCollection.doc(uid).set({
+      orderId: {
+        'orderId': orderId,
+        'timestamp': FieldValue.serverTimestamp(),
+        'items': itemsMap,
+        'name': name,
+        'paymentMethod': paymentmethod,
+        'status': status,
+        'totalPrice': totalPrice,
+      },
+    }, SetOptions(merge: true));
+
+    // Return the orderId
+    return orderId;
   }
   Future<Map<String, dynamic>> getOrderDetails(String orderId) async {
     try {
-      // Use .get() to fetch the document snapshot
       DocumentSnapshot orderSnapshot =
       await paidOrderCollection.doc(uid).get();
 
@@ -234,16 +250,13 @@ class DatabaseService {
     return {};
   }
 
-  /*String _getPaymentmethodFromSnapshot(DocumentSnapshot snapshot) {
-    var userPaymentMethod = snapshot.data() as Map<String, dynamic>;
-    return userPaymentMethod['PaymentMethod'] ?? '';
+  Future<bool> isCartNotEmpty() async {
+    // Retrieve cart items
+    List<CartItem> cartItems = await getCartItems().first;
+
+    // Check if the cart is not empty
+    return cartItems.isNotEmpty;
   }
-  Future<String?> getPaymentMethod(String uid) async {
-    DocumentSnapshot<Object?> snapshot = await paidOrderCollection.doc(uid).get();
-    String paymentMethod = _getPaymentmethodFromSnapshot(snapshot);
-    return paymentMethod;
-  }
-  */
 
   Future<void> addCartItem(CartItem cartItem) async {
     final DocumentSnapshot<Map<String, dynamic>> cartSnapshot =
@@ -319,7 +332,6 @@ class DatabaseService {
 
       List<OrderItem> orderItems = orderkeys.map((key) {
         dynamic item = data[key];
-        print('Item: $item');
         if (item == null || item is! List<dynamic> || item.length < 4) {
           return OrderItem(
               foodName: 'Invalid Item Format',
@@ -446,7 +458,6 @@ class DatabaseService {
       return _userProfileFromSnapshot(snapshot);
     } catch (e) {
       // Handle errors here
-      print("Error fetching user profile: $e");
       return null; // You might want to return a default or empty profile in case of an error
     }
   }

@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
 import '../../models/users.dart';
 import '../../services/database.dart';
+import 'package:screenshot/screenshot.dart';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:gallery_saver/gallery_saver.dart';
 
 class CustomStepIndicator extends StatelessWidget {
   final int currentStep;
@@ -36,13 +41,13 @@ class CustomStepIndicator extends StatelessWidget {
       height: circleSize,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: isCurrentStep ? Colors.blue : Colors.grey,
+        color: isCurrentStep ? Colors.white : Colors.grey,
       ),
       child: Center(
         child: Text(
           '$stepNumber',
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.black,
             fontWeight: FontWeight.bold,
             fontSize: 16.0,
           ),
@@ -67,35 +72,98 @@ class Receipt extends StatefulWidget {
 
 class _ReceiptState extends State<Receipt> {
   int currentStep = 3;
+  final _screenshotController = ScreenshotController();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      backgroundColor: Colors.brown[50],
-      body: Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CustomStepIndicator(currentStep: currentStep),
-            SizedBox(height: 10),
-            _buildConfirmationSection(),
-            Divider(height: 30, thickness: 2),
-            _buildPaymentDetails(),
-            SizedBox(height: 30),
-            ElevatedButton.icon(
+    final String orderId = ModalRoute.of(context)!.settings.arguments as String;
+
+    return Screenshot(
+      controller: _screenshotController,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Color(0xFF00000),
+          automaticallyImplyLeading: false,
+          title: Text('Receipt'),
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.home,
+                size: 30.0,
+                color: Colors.white,
+              ),
               onPressed: () {
-                // Handle download PDF action
-                //_downloadReceipt();
+                Navigator.pushReplacementNamed(context, '/home');
               },
-              icon: Icon(Icons.download),
-              label: Text('Download Receipt'),
             ),
           ],
         ),
+        backgroundColor: Colors.brown[50],
+        body: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: RepaintBoundary(
+            key: GlobalKey(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomStepIndicator(currentStep: currentStep),
+                SizedBox(height: 10),
+                _buildConfirmationSection(),
+                Divider(height: 30, thickness: 2),
+                _buildPaymentDetails(orderId),
+                SizedBox(height: 30),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    _downloadReceipt();
+                  },
+                  icon: Icon(Icons.download),
+                  label: Text('Download Receipt'),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
+  }
+  Future<void> _downloadReceipt() async {
+    try {
+      Uint8List? imageBytes = await _screenshotController.capture();
+
+      if (imageBytes != null) {
+        // Use path_provider to get the application's documents directory
+        final directory = await getApplicationDocumentsDirectory();
+
+        // Save the file with a different name (e.g., receipt.png)
+        final file = File('${directory.path}/receipt.png');
+        await file.writeAsBytes(imageBytes);
+
+        // Use gallery_saver to save the file to the gallery
+        bool? success = await GallerySaver.saveImage(file.path, albumName: 'YourAlbumName');
+
+        if (success == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Receipt downloaded successfully'),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to save receipt to gallery'),
+            ),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to capture screenshot'),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
   Widget _buildConfirmationSection() {
@@ -107,7 +175,7 @@ class _ReceiptState extends State<Receipt> {
             color: Colors.green,
             size: 60.0,
           ),
-          SizedBox(height: 10),
+          SizedBox(height: 15 ), // Add more space below the icon
           Text(
             'Payment Confirmed',
             style: TextStyle(
@@ -115,11 +183,13 @@ class _ReceiptState extends State<Receipt> {
               fontWeight: FontWeight.bold,
             ),
           ),
+          SizedBox(height: 15), // Add more space below the icon
         ],
       ),
     );
   }
-  Widget _buildPaymentDetails() {
+
+  Widget _buildPaymentDetails(String orderId) {
     final currentUser = Provider.of<AppUsers?>(context);
     String orderNo = '';
     String dateTime = '';
@@ -128,8 +198,7 @@ class _ReceiptState extends State<Receipt> {
 
     return SingleChildScrollView(
       child: FutureBuilder<Map<String, dynamic>>(
-        future: createOrderAndFetchDetails(currentUser, paymentMethod),
-        builder: (context, snapshot) {
+        future: DatabaseService(uid: currentUser!.uid).getOrderDetails(orderId), builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return CircularProgressIndicator();
           } else if (snapshot.hasError) {
@@ -137,16 +206,14 @@ class _ReceiptState extends State<Receipt> {
           } else {
             Map<String, dynamic> orderDetails = snapshot.data ?? {};
 
-            // Assign orderDetails to your local variables
+            // Assign orderDetails to local variables
             orderNo = orderDetails['orderId'] ?? '';
             DateTime orderTimestamp = orderDetails['timestamp']?.toDate() ?? DateTime.now();
             paymentMethod = orderDetails['paymentMethod'] ?? '';
             name = orderDetails['name'] ?? '';
 
-            // Format date and time
             dateTime = DateFormat('dd/MM/yyyy hh:mma').format(orderTimestamp);
 
-            // Return the widget with the updated values
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -171,26 +238,6 @@ class _ReceiptState extends State<Receipt> {
         },
       ),
     );
-  }
-  Future<Map<String, dynamic>> createOrderAndFetchDetails(AppUsers? currentUser, String paymentMethod) async {
-    try {
-      // Create order and get orderId
-      String orderId =
-      await DatabaseService(uid: currentUser!.uid).createOrder(paymentMethod); //need correction
-      print('Order created successfully. OrderId: $orderId');
-
-      // Fetch order details
-      Map<String, dynamic> orderDetails =
-      await DatabaseService(uid: currentUser.uid).getOrderDetails(orderId);
-
-      print('Order details: $orderDetails');
-
-      // Return order details map
-      return orderDetails;
-    } catch (e) {
-      print("Error creating order or fetching details: $e");
-      return {}; // Return an empty map in case of an error
-    }
   }
 
   Widget _buildDetailItem(String label, String value) {
@@ -218,34 +265,6 @@ class _ReceiptState extends State<Receipt> {
         ],
       ),
     );
-  }}
-/*
-  void _downloadReceipt() {
-    // Create a PDF document
-    final pdf = pw.Document();
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) {
-          return pw.Center(
-            child: pw.Text('Receipt Content Goes Here'),
-          );
-        },
-      ),
-    );
-
-    // Save the PDF to a file
-    savePDF(pdf);
   }
 
-  Future<void> savePDF(pw.Document pdf) async {
-    final bytes = await pdf.save();
-    final blob = html.Blob([bytes]);
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.AnchorElement(href: url)
-      ..target = 'blank'
-      ..download = 'receipt.pdf'
-      ..click();
-    html.Url.revokeObjectUrl(url);
-  }
 }
- */

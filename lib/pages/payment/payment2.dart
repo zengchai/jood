@@ -34,13 +34,13 @@ class CustomStepIndicator extends StatelessWidget {
       height: circleSize,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: isCurrentStep ? Colors.blue : Colors.grey,
+        color: isCurrentStep ? Colors.white : Colors.grey,
       ),
       child: Center(
         child: Text(
           '$stepNumber',
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.black,
             fontWeight: FontWeight.bold,
             fontSize: 16.0,
           ),
@@ -71,17 +71,22 @@ class _MethodPageState extends State<MethodPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.brown[50],
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: Color(0xFF00000),
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(50.0),
+        padding: const EdgeInsets.all(15.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CustomStepIndicator(currentStep: currentStep),
             SizedBox(height: 30),
-            Text(
-              'Choose Payment Option',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text(
+                'Choose Payment Option',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
             ),
             SizedBox(height: 20),
             PaymentOptionCard(
@@ -109,7 +114,10 @@ class PaymentOptionCard extends StatelessWidget {
     return Card(
       margin: EdgeInsets.all(8.0),
       child: ListTile(
-        title: Text(optionName),
+        title: Text(
+          optionName,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         contentPadding: EdgeInsets.all(8.0),
         leading: Container(
           width: 80.0,
@@ -122,19 +130,26 @@ class PaymentOptionCard extends StatelessWidget {
           ),
         ),
         trailing: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            primary: Color(0xFF0000), // Same background color as the "Pay" button
+            onPrimary: Colors.black, // Same text color as the "Pay" button
+          ),
           onPressed: () async {
             String selectedPaymentMethod = optionName;
-            print('Selected Payment Method: $selectedPaymentMethod');
-            await DatabaseService(uid: Provider.of<AppUsers?>(context, listen: false)!.uid)
-                .createOrder(selectedPaymentMethod);
-            await Navigator.pushNamed(context, '/receipt');
+
+            try {
+              String orderId = await DatabaseService(uid: Provider.of<AppUsers?>(context, listen: false)!.uid)
+                  .createOrder(selectedPaymentMethod);
+
+              await DatabaseService(uid: Provider.of<AppUsers?>(context, listen: false)!.uid).clearCart();
+
+              Navigator.pushNamed(context, '/receipt', arguments: orderId);
+            } catch (e) {
+              // Handle error
+            }
           },
           child: Text('Select'),
         ),
-        onTap: () {
-          // Optionally handle the selection when tapping the entire card
-          // This can be removed if you only want the button to trigger selection
-        },
       ),
     );
   }

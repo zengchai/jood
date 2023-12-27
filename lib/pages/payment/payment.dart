@@ -39,13 +39,13 @@ class CustomStepIndicator extends StatelessWidget {
       height: circleSize,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: isCurrentStep ? Colors.blue : Colors.grey,
+        color: isCurrentStep ? Colors.white : Colors.grey,
       ),
       child: Center(
         child: Text(
           '$stepNumber',
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.black,
             fontWeight: FontWeight.bold,
             fontSize: 16.0,
           ),
@@ -67,78 +67,103 @@ class Payment extends StatefulWidget {
   @override
   _PaymentState createState() => _PaymentState();
 }
-
 class _PaymentState extends State<Payment> {
   int currentStep = 1;
   final AuthService _auth = AuthService();
   int _selectedIndex = 2;
 
-// Updated: Maintain a list of selected food items in the cart
+  // Updated: Maintain a list of selected food items in the cart
   List<CartItem> cartItems = [];
 
   @override
   Widget build(BuildContext context) {
     final currentUser = Provider.of<AppUsers?>(context);
+
     return Scaffold(
       backgroundColor: Colors.brown[50],
-      appBar: AppBar(),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Color(0xFF00000),
+        title: Row(
+          children: [
+            IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            Text('CART', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
-        child: ListView(children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomStepIndicator(
-                  currentStep: currentStep), // Add the step indicator
-              Text(
-                'CART',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CustomStepIndicator(
+              currentStep: currentStep,
+            ),
+            SizedBox(height: 16),
+            Expanded(
+              child: Scrollbar(
+                child: SingleChildScrollView(
+                  child: StreamBuilder<List<CartItem>>(
+                    stream: DatabaseService(uid: currentUser!.uid).getCartItems(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        List<CartItem> cartItems = snapshot.data ?? [];
+                        return Column(
+                          children: cartItems.map((item) {
+                            return _buildFoodItemCard(item);
+                          }).toList(),
+                        );
+                      }
+                    },
+                  ),
+                ),
               ),
-              SizedBox(height: 16),
-              // Expanded(
-              //   child: ListView.builder(
-              //     itemCount: cartItems.length,
-              //     itemBuilder: (context, index) {
-              //       return _buildFoodItemCard(cartItems[index]);
-              //     },
-              //   ),
-              // ),
-              StreamBuilder<List<CartItem>>(
-                stream: DatabaseService(uid: currentUser!.uid).getCartItems(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator(); // Loading indicator
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    List<CartItem> cartItems = snapshot.data ?? [];
-                    // Display and manipulate cart items in the UI
-                    return Column(
-                      children: cartItems.map((item) {
-                        return _buildFoodItemCard(item);
-                      }).toList(),
-                    );
-                  }
-                },
-              ),
-              SizedBox(height: 16),
-              _buildTotalPrice(),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () async {
-                  // Navigate to another page for payment
-                  await Navigator.pushNamed(context, '/method');
-                },
-                child: Text('Pay'),
-              ),
-            ],
-          ),
-        ]),
-      ),
+            ),
+            SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildTotalPrice(), // Display Total Price here
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: Color(0xFF0000),
+                    onPrimary: Colors.black,
+                  ),
+                  onPressed: () async {
+                    // Check if the cart is not empty
+                    bool isCartNotEmpty = await DatabaseService(uid: Provider.of<AppUsers?>(context, listen: false)!.uid)
+                        .isCartNotEmpty();
 
-      //bottomNavigationBar=============================
+                    if (isCartNotEmpty) {
+                      Navigator.pushNamed(context, '/method');
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('There is nothing in your cart.'),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                    }
+                  },
+                  child: Text('Pay'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      // bottomNavigationBar=============================
       bottomNavigationBar: Container(
-        height: 70.0, //height of bar
+        height: 30.0, // height of bar
         decoration: BoxDecoration(
           border: Border.all(
             color: const Color.fromARGB(255, 114, 114, 114).withOpacity(0.5),
@@ -148,6 +173,7 @@ class _PaymentState extends State<Payment> {
       ),
     );
   }
+
   Widget _buildFoodItemCard(CartItem foodItem) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8),
@@ -202,7 +228,6 @@ class _PaymentState extends State<Payment> {
         // Update quantity in Firestore
         DatabaseService(uid: currentUser!.uid).minusCartItem(cartItem);
       } else {
-        // If quantity is 1, remove the item from the cart
         _removeCartItem(cartItem, currentUser);
       }
     });
@@ -218,42 +243,32 @@ class _PaymentState extends State<Payment> {
 
   Widget _buildTotalPrice() {
     final currentUser = Provider.of<AppUsers?>(context, listen: false);
-    return StreamBuilder<List<CartItem>>(
-      stream: DatabaseService(uid: currentUser!.uid).getCartItems(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else {
-          List<CartItem> cartItems = snapshot.data ?? [];
-          double totalPrice =
-          cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
+    return Container(
+      margin: EdgeInsets.only(top: 8), // Add some top margin
+      child: StreamBuilder<List<CartItem>>(
+        stream: DatabaseService(uid: currentUser!.uid).getCartItems(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else {
+            List<CartItem> cartItems = snapshot.data ?? [];
+            double totalPrice =
+            cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Total Price:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            return Text(
+              'Total Price: RM${totalPrice.toStringAsFixed(2)}',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
-              Text(
-                'RM${totalPrice.toStringAsFixed(2)}',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-              ),
-            ],
-          );
-        }
-      },
+            );
+          }
+        },
+      ),
     );
   }
-
-
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
