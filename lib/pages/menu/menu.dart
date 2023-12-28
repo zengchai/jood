@@ -337,16 +337,22 @@ class _CategoryMenuState extends State<MenuPage> {
                                           fontWeight: FontWeight.w500,
                                           color: Colors.black),
                                       textAlign: TextAlign.center,
+
                                     ),
                                     const SizedBox(height: 5),
                                     Text(
-                                        menuProvider.menuList[index].price ??
-                                            '',
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.black),
-                                        textAlign: TextAlign.center),
+                                      'RM ' +
+                                          (menuProvider.menuList[index].price != null
+                                              ? double.parse(menuProvider.menuList[index].price!).toStringAsFixed(2)
+                                              : ''),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 10),

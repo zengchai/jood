@@ -1,4 +1,5 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_string_interpolations
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -46,8 +47,8 @@ class _OrderPageState extends State<OrderPage> {
                     child: Column(
                       children: [
                         ListTile(
-                          leading: Image.network(
-                            orderItem.foodImage,
+                          leading: CachedNetworkImage(
+                            imageUrl: orderItem.foodImage,
                             width: 120,
                             height: 120,
                           ),
@@ -442,8 +443,8 @@ class _OrderPageState extends State<OrderPage> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(10),
-                        child: Image.network(
-                          orderItem.foodImage,
+                        child: CachedNetworkImage(
+                          imageUrl: orderItem.foodImage,
                           width: 100,
                           height: 100,
                           fit: BoxFit.cover,

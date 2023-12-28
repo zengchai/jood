@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:jood/pages/shoppingcart/CartItem.dart';
@@ -178,8 +179,8 @@ class _PaymentState extends State<Payment> {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8),
       child: ListTile(
-        leading: Image.network(
-          foodItem.image,
+        leading: CachedNetworkImage(
+          imageUrl: foodItem.image,
           width: 60,
           height: 60,
           fit: BoxFit.cover,
