@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:jood/pages/shoppingcart/CartItem.dart';
@@ -67,6 +68,7 @@ class Payment extends StatefulWidget {
   @override
   _PaymentState createState() => _PaymentState();
 }
+
 class _PaymentState extends State<Payment> {
   int currentStep = 1;
   final AuthService _auth = AuthService();
@@ -92,7 +94,8 @@ class _PaymentState extends State<Payment> {
                 Navigator.pop(context);
               },
             ),
-            Text('CART', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text('CART',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
@@ -109,7 +112,8 @@ class _PaymentState extends State<Payment> {
               child: Scrollbar(
                 child: SingleChildScrollView(
                   child: StreamBuilder<List<CartItem>>(
-                    stream: DatabaseService(uid: currentUser!.uid).getCartItems(),
+                    stream:
+                        DatabaseService(uid: currentUser!.uid).getCartItems(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return CircularProgressIndicator();
@@ -140,7 +144,9 @@ class _PaymentState extends State<Payment> {
                   ),
                   onPressed: () async {
                     // Check if the cart is not empty
-                    bool isCartNotEmpty = await DatabaseService(uid: Provider.of<AppUsers?>(context, listen: false)!.uid)
+                    bool isCartNotEmpty = await DatabaseService(
+                            uid: Provider.of<AppUsers?>(context, listen: false)!
+                                .uid)
                         .isCartNotEmpty();
 
                     if (isCartNotEmpty) {
@@ -178,8 +184,8 @@ class _PaymentState extends State<Payment> {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8),
       child: ListTile(
-        leading: Image.network(
-          foodItem.image,
+        leading: CachedNetworkImage(
+          imageUrl: foodItem.image,
           width: 60,
           height: 60,
           fit: BoxFit.cover,
@@ -211,6 +217,7 @@ class _PaymentState extends State<Payment> {
       ),
     );
   }
+
   void _incrementQuantity(CartItem cartItem) {
     final currentUser = Provider.of<AppUsers?>(context, listen: false);
     setState(() {
@@ -232,6 +239,7 @@ class _PaymentState extends State<Payment> {
       }
     });
   }
+
   void _removeCartItem(CartItem cartItem, AppUsers? currentUser) {
     setState(() {
       // Remove the item from the cart locally
@@ -254,8 +262,8 @@ class _PaymentState extends State<Payment> {
             return Text('Error: ${snapshot.error}');
           } else {
             List<CartItem> cartItems = snapshot.data ?? [];
-            double totalPrice =
-            cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
+            double totalPrice = cartItems.fold(
+                0, (sum, item) => sum + item.price * item.quantity);
 
             return Text(
               'Total Price: RM${totalPrice.toStringAsFixed(2)}',
@@ -269,6 +277,7 @@ class _PaymentState extends State<Payment> {
       ),
     );
   }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
