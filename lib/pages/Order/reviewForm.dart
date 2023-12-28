@@ -9,8 +9,9 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ReviewForm extends StatefulWidget {
   final String foodID;
+  final String orderID;
 
-  const ReviewForm({Key? key, required this.foodID}) : super(key: key);
+  const ReviewForm({Key? key, required this.foodID, required this.orderID}) : super(key: key);
 
   @override
   State<ReviewForm> createState() => _reviewFormState();
@@ -30,6 +31,7 @@ class _reviewFormState extends State<ReviewForm> {
 
     //String? foodID = Provider.of<MenuProvider>(context).foodID ?? "";
     String foodID = widget.foodID;
+    String orderID = widget.orderID;
 
     return Form(
       key: _formKey,
@@ -69,7 +71,7 @@ class _reviewFormState extends State<ReviewForm> {
           SizedBox(height: 10),
           ElevatedButton(
             onPressed: () async{
-              await DatabaseService(uid: currentUser!.uid).updateReviewData(foodID, review, rating);
+              await DatabaseService(uid: currentUser!.uid).updateReviewData(foodID,orderID, review, rating);
               Navigator.of(context).pop();
             },
             child: Text('Submit'),

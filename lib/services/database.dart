@@ -51,7 +51,7 @@ class DatabaseService {
     });
   }
 
-  Future updateReviewData(String foodID, String review, double rating) async {
+  Future updateReviewData(String foodID,String orderID, String review, double rating) async {
     //UPDATE REVIEW DATA ON THE SAME ORDER
     await reviewCollection.doc(foodID).update({
       'RfoodReview': FieldValue.arrayUnion([review]),
@@ -62,7 +62,8 @@ class DatabaseService {
     return await reviewCollection
         .doc(foodID)
         .collection('RfoodRatings')
-        .add({
+        .doc(orderID)
+        .set({
           'userID': uid,
           'name': userName,
           'rating': rating,
@@ -72,6 +73,16 @@ class DatabaseService {
         .catchError((error) => print('Error adding review: $error'));
   }
 
+  Future<bool> doesOrderIDExist(String foodID, String orderID) async {
+    DocumentSnapshot documentSnapshot = await reviewCollection
+        .doc(foodID)
+        .collection('RfoodRatings')
+        .doc(orderID)
+        .get();
+
+    return documentSnapshot.exists;
+  }
+  
   Future<String?> getUserName(String uid) async {
     try {
       DocumentSnapshot<Map<String, dynamic>> userDoc =
