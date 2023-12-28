@@ -80,7 +80,8 @@ class _CategoryMenuState extends State<MenuPage> {
                         StreamBuilder<List<ReviewItem>>(
                           stream: databaseService.getReviews(foodID!),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
                               return const CircularProgressIndicator();
                             } else if (snapshot.hasError) {
                               return Text('Error: ${snapshot.error}');
@@ -90,8 +91,10 @@ class _CategoryMenuState extends State<MenuPage> {
                               // Calculate the average rating
                               double averageRating = reviews.isEmpty
                                   ? 0.0
-                                  : reviews.map((review) => review.rating).reduce((a, b) => a + b) /
-                                  reviews.length;
+                                  : reviews
+                                          .map((review) => review.rating)
+                                          .reduce((a, b) => a + b) /
+                                      reviews.length;
 
                               return Column(
                                 children: [
@@ -124,7 +127,8 @@ class _CategoryMenuState extends State<MenuPage> {
                                   // Display individual reviews
                                   for (ReviewItem reviewItem in reviews)
                                     Container(
-                                      margin: const EdgeInsets.symmetric(vertical: 5),
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 5),
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
                                         border: Border.all(color: Colors.grey),
@@ -132,7 +136,8 @@ class _CategoryMenuState extends State<MenuPage> {
                                       ),
                                       child: ListTile(
                                         title: Row(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
                                           children: [
                                             // Display the username
                                             Text(
@@ -142,7 +147,9 @@ class _CategoryMenuState extends State<MenuPage> {
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                            const SizedBox(width: 10), // Adjust the spacing
+                                            const SizedBox(
+                                                width:
+                                                    10), // Adjust the spacing
 
                                             // Display the rating to the right of the username
                                             Row(
@@ -150,7 +157,8 @@ class _CategoryMenuState extends State<MenuPage> {
                                                 Text('  '),
                                                 RatingBarIndicator(
                                                   rating: reviewItem.rating,
-                                                  itemBuilder: (context, index) => Icon(
+                                                  itemBuilder:
+                                                      (context, index) => Icon(
                                                     Icons.star,
                                                     color: Colors.amber,
                                                   ),
@@ -163,7 +171,8 @@ class _CategoryMenuState extends State<MenuPage> {
                                           ],
                                         ),
                                         subtitle: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             const SizedBox(height: 5),
 
@@ -340,8 +349,7 @@ class _CategoryMenuState extends State<MenuPage> {
                                     ),
                                     const SizedBox(height: 5),
                                     Text(
-                                        menuProvider.menuList[index].price ??
-                                            '',
+                                        "RM${menuProvider.menuList[index].price ?? ''})",
                                         style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w400,
@@ -503,8 +511,7 @@ class _CategoryMenuState extends State<MenuPage> {
                                       ),
                                       const SizedBox(height: 5),
                                       Text(
-                                          menuProvider.menuList[index].price ??
-                                              '',
+                                          "RM:${menuProvider.menuList[index].price ?? ''}",
                                           style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w400,
@@ -544,11 +551,10 @@ class _CategoryMenuState extends State<MenuPage> {
                                                                   context,
                                                                   listen: false)
                                                               .menuDelete(
-                                                                  id: menuProvider
-                                                                      .menuList[
-                                                                          index]
-                                                                      .id,
-                                                                  );
+                                                            id: menuProvider
+                                                                .menuList[index]
+                                                                .id,
+                                                          );
                                                         });
                                                   }),
                                             ),
