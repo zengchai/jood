@@ -180,7 +180,7 @@ class _PaymentState extends State<Payment> {
       margin: EdgeInsets.symmetric(vertical: 8),
       child: ListTile(
         leading: CachedNetworkImage(
-          imageUrl:foodItem.image,
+          imageUrl: foodItem.image,
           width: 60,
           height: 60,
           fit: BoxFit.cover,
