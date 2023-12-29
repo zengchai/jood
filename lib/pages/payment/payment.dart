@@ -77,8 +77,14 @@ class _PaymentState extends State<Payment> {
   List<CartItem> cartItems = [];
 
   @override
+
   Widget build(BuildContext context) {
     final currentUser = Provider.of<AppUsers?>(context);
+    if (currentUser == null) {
+      WidgetsBinding.instance?.addPostFrameCallback((_) {
+        Navigator.pushNamed(context, '/authenticate');
+      });
+    }
 
     return Scaffold(
       backgroundColor: Colors.brown[50],
