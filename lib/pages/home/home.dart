@@ -40,11 +40,15 @@ class _HomeState extends State<Home> {
 
   Future<void> _initializeAddressController() async {
     final currentUser = Provider.of<AppUsers?>(context, listen: false);
-    final userProfile = await DatabaseService(uid: currentUser!.uid).getUserProfile(currentUser.uid);
-    if (addressController != null) {
-      setState(() {
-        addressController.text = userProfile?.address ?? '';
-      });
+
+    if (currentUser != null) {
+      final userProfile = await DatabaseService(uid: currentUser?.uid ?? '').getUserProfile(currentUser?.uid ?? '');
+
+      if (addressController != null) {
+        setState(() {
+          addressController.text = userProfile?.address ?? '';
+        });
+      }
     }
   }
 
@@ -77,7 +81,16 @@ class _HomeState extends State<Home> {
     bool showCustomer = true;
     final currentUser = Provider.of<AppUsers?>(context);
 
-    if(currentUser!.uid =='TnDmXCiJINXWdNBhfZvuAFCuaSL2'){
+    if (currentUser == null) {
+      // Handle the case where the user is null
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (currentUser.uid == 'TnDmXCiJINXWdNBhfZvuAFCuaSL2') {
       showCustomer = false;
     } else {
       showCustomer = true;
