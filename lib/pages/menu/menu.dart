@@ -19,6 +19,8 @@ import 'custom_button.dart';
 import 'edit_aleart_widget.dart';
 import 'package:jood/services/database.dart';
 
+import 'utils/warning_alert.dart';
+
 class MenuPage extends StatefulWidget {
   //const MenuPage({super.key});
 
@@ -73,7 +75,9 @@ class _CategoryMenuState extends State<MenuPage> {
                           subtitle: Text(
                             'RM ' +
                                 (menuProvider.menuList[index].price != null
-                                    ? double.parse(menuProvider.menuList[index].price!).toStringAsFixed(2)
+                                    ? double.parse(
+                                            menuProvider.menuList[index].price!)
+                                        .toStringAsFixed(2)
                                     : ''),
                           ),
                         ),
@@ -83,7 +87,8 @@ class _CategoryMenuState extends State<MenuPage> {
                         StreamBuilder<List<ReviewItem>>(
                           stream: databaseService.getReviews(foodID!),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
                               return const CircularProgressIndicator();
                             } else if (snapshot.hasError) {
                               return Text('Error: ${snapshot.error}');
@@ -93,8 +98,10 @@ class _CategoryMenuState extends State<MenuPage> {
                               // Calculate the average rating
                               double averageRating = reviews.isEmpty
                                   ? 0.0
-                                  : reviews.map((review) => review.rating).reduce((a, b) => a + b) /
-                                  reviews.length;
+                                  : reviews
+                                          .map((review) => review.rating)
+                                          .reduce((a, b) => a + b) /
+                                      reviews.length;
 
                               return Column(
                                 children: [
@@ -127,7 +134,8 @@ class _CategoryMenuState extends State<MenuPage> {
                                   // Display individual reviews
                                   for (ReviewItem reviewItem in reviews)
                                     Container(
-                                      margin: const EdgeInsets.symmetric(vertical: 5),
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 5),
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
                                         border: Border.all(color: Colors.grey),
@@ -135,7 +143,8 @@ class _CategoryMenuState extends State<MenuPage> {
                                       ),
                                       child: ListTile(
                                         title: Row(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
                                           children: [
                                             // Display the username
                                             Text(
@@ -145,7 +154,9 @@ class _CategoryMenuState extends State<MenuPage> {
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                            const SizedBox(width: 10), // Adjust the spacing
+                                            const SizedBox(
+                                                width:
+                                                    10), // Adjust the spacing
 
                                             // Display the rating to the right of the username
                                             Row(
@@ -153,7 +164,8 @@ class _CategoryMenuState extends State<MenuPage> {
                                                 Text('  '),
                                                 RatingBarIndicator(
                                                   rating: reviewItem.rating,
-                                                  itemBuilder: (context, index) => Icon(
+                                                  itemBuilder:
+                                                      (context, index) => Icon(
                                                     Icons.star,
                                                     color: Colors.amber,
                                                   ),
@@ -166,7 +178,8 @@ class _CategoryMenuState extends State<MenuPage> {
                                           ],
                                         ),
                                         subtitle: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             const SizedBox(height: 5),
 
@@ -340,13 +353,15 @@ class _CategoryMenuState extends State<MenuPage> {
                                           fontWeight: FontWeight.w500,
                                           color: Colors.black),
                                       textAlign: TextAlign.center,
-
                                     ),
                                     const SizedBox(height: 5),
                                     Text(
                                       'RM ' +
-                                          (menuProvider.menuList[index].price != null
-                                              ? double.parse(menuProvider.menuList[index].price!).toStringAsFixed(2)
+                                          (menuProvider.menuList[index].price !=
+                                                  null
+                                              ? double.parse(menuProvider
+                                                      .menuList[index].price!)
+                                                  .toStringAsFixed(2)
                                               : ''),
                                       style: const TextStyle(
                                         fontSize: 16,
@@ -355,7 +370,6 @@ class _CategoryMenuState extends State<MenuPage> {
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
-
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 10),
@@ -389,6 +403,18 @@ class _CategoryMenuState extends State<MenuPage> {
                                                                       .price ??
                                                                   '') ??
                                                               0.0);
+
+                                                  // Show a SnackBar as a pop-up message
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                          "Item added to cart"),
+                                                      duration: Duration(
+                                                          seconds:
+                                                              1), // Adjust the duration as needed
+                                                    ),
+                                                  );
                                                 }),
                                           ),
                                         ],
@@ -513,8 +539,12 @@ class _CategoryMenuState extends State<MenuPage> {
                                       const SizedBox(height: 5),
                                       Text(
                                         'RM ' +
-                                            (menuProvider.menuList[index].price != null
-                                                ? double.parse(menuProvider.menuList[index].price!).toStringAsFixed(2)
+                                            (menuProvider.menuList[index]
+                                                        .price !=
+                                                    null
+                                                ? double.parse(menuProvider
+                                                        .menuList[index].price!)
+                                                    .toStringAsFixed(2)
                                                 : ''),
                                         style: const TextStyle(
                                           fontSize: 16,
@@ -547,22 +577,39 @@ class _CategoryMenuState extends State<MenuPage> {
                                               child: CustomButton(
                                                   text: "Delete",
                                                   onPressed: () async {
-                                                    context.showOverlayLoader(
-                                                        loadingWidget:
-                                                            const OverlayLoadingIndicator(),
-                                                        asyncFunction:
-                                                            () async {
-                                                          await Provider.of<
-                                                                      MenuProvider>(
-                                                                  context,
-                                                                  listen: false)
-                                                              .menuDelete(
-                                                                  id: menuProvider
-                                                                      .menuList[
-                                                                          index]
-                                                                      .id,
-                                                                  );
-                                                        });
+                                                    showDialog(
+                                                      context:
+                                                          context, // Make sure to have access to the current context
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return DeleteWarningAlert(
+                                                          title: 'Delete!',
+                                                          subtitle:
+                                                              'Do you want to delete this item?',
+                                                          onPressed: () async {
+                                                            context
+                                                                .showOverlayLoader(
+                                                              loadingWidget:
+                                                                  const OverlayLoadingIndicator(),
+                                                              asyncFunction:
+                                                                  () async {
+                                                                await Provider.of<
+                                                                            MenuProvider>(
+                                                                        context,
+                                                                        listen:
+                                                                            false)
+                                                                    .menuDelete(
+                                                                        id: menuProvider
+                                                                            .menuList[index]
+                                                                            .id);
+                                                              },
+                                                            );
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                        );
+                                                      },
+                                                    );
                                                   }),
                                             ),
                                           ],
