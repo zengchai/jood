@@ -47,8 +47,9 @@ dependencies:
   fluttertoast: ^8.2.4
   image_picker: ^1.0.5
   dio: ^5.4.0
-  circular_badge_avatar: ^0.1.2
   cached_network_image: ^3.3.0
+  circular_badge_avatar: ^0.1.2
+
 
 dev_dependencies:
   flutter_test:

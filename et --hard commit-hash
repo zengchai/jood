@@ -1,0 +1,303 @@
+[33mcommit 6f533e0dc80b22f321187fbdc40acbc095fb586f[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m
+Merge: 043d304 1863fd3
+Author: Zechih <02zechih@gmail.com>
+Date:   Sat Dec 16 02:21:43 2023 +0800
+
+    ze
+
+[33mcommit 043d304173c7280aae28e11b009b87c94cd4f7c9[m
+Author: Zechih <02zechih@gmail.com>
+Date:   Wed Dec 13 16:56:51 2023 +0800
+
+    nothing
+
+[33mcommit 1863fd31772ef3132c1f3a51153f54c1c5a835af[m
+Merge: fd9d6e9 7efcf5e
+Author: “Loy” <“tanzenchai0923@gmail.com”>
+Date:   Wed Dec 13 16:56:03 2023 +0800
+
+    updating cart
+
+[33mcommit 7efcf5e0b4ca5f116d2bec09eafdf1d5c4de9a67[m[33m ([m[1;32mze[m[33m)[m
+Merge: 88221ad eb74647
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sun Dec 10 15:29:34 2023 +0800
+
+    yam push
+
+[33mcommit 88221ada5b5abcc348af19eeb50f61baab576ebb[m
+Merge: b100365 d1008a6
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sun Dec 10 15:26:01 2023 +0800
+
+    c
+
+[33mcommit b100365857fd9f054ee7f9f637c48e5e7b035bab[m
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sun Dec 10 15:21:09 2023 +0800
+
+    merge main
+
+[33mcommit eb74647d1f6493ddbf5f2fab474884218cde1ddd[m
+Merge: f635bcc 05a8a0c
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sun Dec 10 15:13:28 2023 +0800
+
+    Merge branch 'main' of https://github.com/zengchai/jood
+
+[33mcommit f635bcc8f5ef61f0ac07f0e5ff7a1d3c1bd85e03[m
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sun Dec 10 15:12:49 2023 +0800
+
+    yam push add to csrt
+
+[33mcommit fd9d6e969051a6d10feeb12d1bdc4bc7c4fc44ce[m
+Author: “Loy” <“tanzenchai0923@gmail.com”>
+Date:   Sun Dec 10 15:10:03 2023 +0800
+
+    Updating forget password
+
+[33mcommit 05a8a0c31eaefebf8bb91062ee6862b2c2acdba8[m
+Merge: cd00633 c0d1e7f
+Author: Zechih <02zechih@gmail.com>
+Date:   Sun Dec 10 15:06:24 2023 +0800
+
+    merge
+
+[33mcommit c0d1e7f9a586d30f0f0b1e89bc5b673a5f91b5c1[m
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sun Dec 10 14:46:19 2023 +0800
+
+    yam push add to cart
+
+[33mcommit cd00633d20ca5eba2eb5dd943cec418908efd90e[m
+Author: Zechih <02zechih@gmail.com>
+Date:   Sun Dec 10 14:28:04 2023 +0800
+
+    nothing
+
+[33mcommit 2bdc28f6cbb9a25c54b30ecc1793b1a7d7d83178[m
+Merge: 4078c84 90d1503
+Author: Zechih <02zechih@gmail.com>
+Date:   Sun Dec 10 14:23:31 2023 +0800
+
+    Merge branch 'main' of https://github.com/zengchai/jood
+
+[33mcommit 4078c8462177588e6e064e3203929bb794a5c945[m
+Author: Zechih <02zechih@gmail.com>
+Date:   Sun Dec 10 14:23:24 2023 +0800
+
+    nothing
+
+[33mcommit 90d150353e2005de0731b47b9c968afcf1ed83f8[m
+Author: farid123d <117964049+farid123d@users.noreply.github.com>
+Date:   Thu Dec 7 11:14:46 2023 +0800
+
+    letest-edit-menu
+
+[33mcommit 591a01396e501918c7f9112ab5dc0324bf73bc25[m
+Author: farid123d <117964049+farid123d@users.noreply.github.com>
+Date:   Wed Dec 6 00:03:08 2023 +0800
+
+    complete-delete-food
+
+[33mcommit d1008a6c4d4ab438fcb80621bdb3d2b28ec9aa85[m
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sun Dec 3 11:49:06 2023 +0800
+
+    yam pull
+
+[33mcommit 7c3e017d2fe3b62953ac5355d9fbb65e339b9645[m
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sun Dec 3 11:03:48 2023 +0800
+
+    yam pull
+
+[33mcommit d9abda058ad094839a74118b54bfe34c729db943[m
+Merge: d08e37b 220c72f
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sun Dec 3 10:48:58 2023 +0800
+
+    Merge branch 'main' of https://github.com/zengchai/jood
+
+[33mcommit d08e37bed14b69a5bb8fa292f3bf8b304c077a26[m
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sun Dec 3 10:48:48 2023 +0800
+
+    yam pull
+
+[33mcommit 220c72f75e0ff561639c478666f6336aab8b012c[m
+Merge: 2522750 a520fe1
+Author: Zechih <02zechih@gmail.com>
+Date:   Sun Dec 3 08:48:56 2023 +0800
+
+    no changes
+
+[33mcommit 25227504bc1f1c5dbac0314c409bf90e77bfe2e0[m
+Author: Zechih <02zechih@gmail.com>
+Date:   Fri Dec 1 01:49:10 2023 +0800
+
+    nothing
+
+[33mcommit a520fe1e52f9271905ad7e58cd5044f7d9381af8[m
+Merge: f0b6ab0 4af6d92
+Author: “Loy” <“tanzenchai0923@gmail.com”>
+Date:   Sun Nov 26 14:06:42 2023 +0800
+
+    merging and updating
+
+[33mcommit f0b6ab0cf75b90a22fd6a72e0dbaf7afb7294922[m
+Merge: c7dcf66 bba45e5
+Author: “Loy” <“tanzenchai0923@gmail.com”>
+Date:   Sun Nov 26 14:04:21 2023 +0800
+
+    Merging and updating
+
+[33mcommit 4af6d920134b360cdaeae72a2e4bfc954d753a5c[m
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sun Nov 26 10:56:19 2023 +0800
+
+    merge lazyyam code auth
+
+[33mcommit 2f45057697359808e147488e7fba4e5fce14f471[m
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sun Nov 26 10:55:12 2023 +0800
+
+    merge lazyyam code
+
+[33mcommit f8560cf00f2f8ea10cd6233d1b97d154a245afc0[m
+Merge: cbba8bf c56ae0e
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sun Nov 26 10:52:44 2023 +0800
+
+    merge yam code
+
+[33mcommit cbba8bf2ef7d98d2b02481c26fe2937e987931bc[m
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sun Nov 26 10:51:16 2023 +0800
+
+    yam pull bnew main
+
+[33mcommit c56ae0ea5c28f7a2a0e60fb56995b608d962198a[m
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sun Nov 26 10:47:07 2023 +0800
+
+    yam new database order
+
+[33mcommit c7dcf662f1d8ae9d2d47641979a3741ae087713b[m
+Merge: e4836d8 df9fefe
+Author: “Loy” <“tanzenchai0923@gmail.com”>
+Date:   Sun Nov 26 00:04:00 2023 +0800
+
+    merging
+
+[33mcommit e4836d86411a3df42c384c651fe8228ac6e924e5[m
+Merge: 8c6b4a4 3884d1e
+Author: “Loy” <“tanzenchai0923@gmail.com”>
+Date:   Sat Nov 25 21:43:35 2023 +0800
+
+    merging
+
+[33mcommit 9c091e166e166e6c6387f81be4e6c302bb08ad50[m
+Merge: 51f96b5 df9fefe
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sat Nov 25 21:24:55 2023 +0800
+
+    merge main code
+
+[33mcommit 51f96b5859a180e4eb4732ff00460e7a7d70bd57[m
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sat Nov 25 21:19:54 2023 +0800
+
+    yam update order database
+
+[33mcommit df9fefefae51645ad29b94f9af57030d503bfac5[m
+Merge: 38a156f b0ddb0b
+Author: darren124 <darrenleong124@gmail.com>
+Date:   Sat Nov 25 21:10:50 2023 +0800
+
+    Merge branch 'darren'
+
+[33mcommit 38a156fef7533d18b844d798b3427e48660b61d8[m
+Merge: f332b01 e1ae37f
+Author: darren124 <darrenleong124@gmail.com>
+Date:   Sat Nov 25 21:08:32 2023 +0800
+
+    darren pull
+
+[33mcommit b0ddb0b1dba6b38d699af52f27ca75949a6a88ed[m
+Author: darren124 <darrenleong124@gmail.com>
+Date:   Sat Nov 25 20:57:19 2023 +0800
+
+    darren push
+
+[33mcommit bba45e56296a0c7668dbeed74a4087c3416cbb51[m
+Author: farid123d <117964049+farid123d@users.noreply.github.com>
+Date:   Sat Nov 25 16:29:21 2023 +0800
+
+    food-adding-complete
+
+[33mcommit d71efd2a490674751a8836cb201083654cef7d26[m
+Merge: 20b63c4 e1ae37f
+Author: darren124 <darrenleong124@gmail.com>
+Date:   Sat Nov 25 14:46:07 2023 +0800
+
+    darren pull
+
+[33mcommit 20b63c46108fa26bb8704db288d3b1dbc8f5cc09[m
+Author: darren124 <darrenleong124@gmail.com>
+Date:   Sat Nov 25 14:09:51 2023 +0800
+
+    darren new pull
+
+[33mcommit e1ae37f1e01b5e4d6b786d407b22aeb19a8e2609[m
+Author: Zechih <02zechih@gmail.com>
+Date:   Sat Nov 25 02:03:27 2023 +0800
+
+    ze 3 page
+
+[33mcommit c0c67673738304e9f3c6b9b3de38ef6771395148[m
+Merge: 6fa259c 6e5c7f7
+Author: Zechih <02zechih@gmail.com>
+Date:   Sat Nov 25 02:01:18 2023 +0800
+
+    Merge branch 'main' of https://github.com/zengchai/jood
+
+[33mcommit 6fa259c724792086b1fa9e9d7051fc5255b87ddf[m
+Author: Zechih <02zechih@gmail.com>
+Date:   Sat Nov 25 02:00:36 2023 +0800
+
+    3 payment page
+
+[33mcommit 8c6b4a4fce51ef482a7a8d5d362326ef004f046c[m
+Author: “Loy” <“tanzenchai0923@gmail.com”>
+Date:   Sat Nov 25 01:41:11 2023 +0800
+
+    merging
+
+[33mcommit 137effb9dd9ce4cc634c75985fe3d39a48005e04[m
+Merge: 25fa68d 6e5c7f7
+Author: “Loy” <“tanzenchai0923@gmail.com”>
+Date:   Sat Nov 25 01:40:38 2023 +0800
+
+    merging
+
+[33mcommit 25fa68d2131bc3c685c471e189456e023e2bb77f[m
+Author: “Loy” <“tanzenchai0923@gmail.com”>
+Date:   Sat Nov 25 01:26:56 2023 +0800
+
+    Pulling
+
+[33mcommit 6e5c7f7af5e67e72d3fadda9a898a3bbf815ec80[m
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Sat Nov 25 00:30:37 2023 +0800
+
+    yam update order page
+
+[33mcommit ec2b395f2b80ba5dc96bec576784721ffa0bcceb[m
+Author: lazyyam <yyzhan020623@gmail.com>
+Date:   Fri Nov 24 23:58:11 2023 +0800
+
+    yam update order
+
+[33mcommit 5a406f606f6bfb43ec
