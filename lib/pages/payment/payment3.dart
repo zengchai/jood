@@ -89,7 +89,9 @@ class _ReceiptState extends State<Receipt> {
                 color: Colors.white,
               ),
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/home');
+                Navigator.pop(context);
+                Navigator.pop(context);
+                Navigator.pop(context);
               },
             ),
           ],
