@@ -71,7 +71,10 @@ class _CategoryMenuState extends State<MenuPage> {
                           ),
                           title: Text(menuProvider.menuList[index].title ?? ""),
                           subtitle: Text(
-                            menuProvider.menuList[index].price ?? '',
+                            'RM ' +
+                                (menuProvider.menuList[index].price != null
+                                    ? double.parse(menuProvider.menuList[index].price!).toStringAsFixed(2)
+                                    : ''),
                           ),
                         ),
                         const SizedBox(height: 20),

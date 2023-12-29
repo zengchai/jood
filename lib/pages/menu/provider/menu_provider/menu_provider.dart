@@ -199,14 +199,35 @@ class MenuProvider extends ChangeNotifier {
   }) async {
     Response response = Response();
     try {
-      // Map<String, dynamic> preams = {};
-      // preams['id'] = id;
-      // log('==@ Preams: $preams');
+      // Check if id is not null before proceeding
+      if (id != null) {
+        // Retrieve the foodID associated with the menu item
+        DocumentSnapshot<Map<String, dynamic>> menuSnapshot =
+        await menuCollectionRef.doc(id).get() as DocumentSnapshot<Map<String, dynamic>>;
 
-      await FirebaseFirestore.instance.collection('reviews').doc(foodID).delete();
+        String? foodID = menuSnapshot.data()?['id'];
 
+        // Check if foodID is not null before proceeding
+        if (foodID != null) {
+          // Delete the entire document in 'reviews' collection associated with the foodID
+          await FirebaseFirestore.instance.collection('reviews').doc(foodID).delete();
 
-      await menuCollectionRef.doc(id).delete();
+          // Delete the documents in 'RfoodRatings' subcollection
+          await FirebaseFirestore.instance
+              .collection('reviews')
+              .doc(foodID)
+              .collection('RfoodRatings')
+              .get()
+              .then((snapshot) {
+            for (DocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
+              doc.reference.delete();
+            }
+          });
+
+          // Delete the menu item
+          await menuCollectionRef.doc(id).delete();
+        }
+      }
 
       response.statusCode == 200;
       showSuccessToast('Delete Successfully!');
@@ -218,6 +239,7 @@ class MenuProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
 
   // fetch menu
   List<MenuModel> menuList = [];
