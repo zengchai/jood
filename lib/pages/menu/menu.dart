@@ -211,6 +211,10 @@ class _CategoryMenuState extends State<MenuPage> {
     Provider.of<MenuProvider>(context, listen: false).fetchMenu();
   }
 
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> 953a297d6c5ba455355d7d14d410de04c01455ea
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.sizeOf(context);
@@ -374,6 +378,7 @@ class _CategoryMenuState extends State<MenuPage> {
                                           ),
                                         ],
                                       ),
+<<<<<<< HEAD
                                     )
                                   ],
                                 ),
@@ -381,6 +386,39 @@ class _CategoryMenuState extends State<MenuPage> {
                             }),
                       )
                     ],
+=======
+                                    );
+                                    
+                                  } else {
+                                    return GestureDetector(
+                                      onTap: () {
+                                      //
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return const AddAlertWidget();
+                                          });
+                                      },
+                                      child: Container(
+                                          height: 210,
+                                          width: size.width,
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8),
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  width: 1,
+                                                  color: ColorRes.cateBorder),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              color: ColorRes.cateBack),
+                                          child: const Icon(
+                                              Icons.add_circle_outline,
+                                              size: 60,
+                                              color: ColorRes.cateBorder)),
+                                    );
+                                  }
+                        }),
+>>>>>>> 953a297d6c5ba455355d7d14d410de04c01455ea
                   )
                 :
 

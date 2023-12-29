@@ -13,14 +13,19 @@ import '../../utils/constants/colors_resources.dart';
 import '../response_wrapper/response_wrapper.dart';
 
 final FirebaseFirestore firestore = FirebaseFirestore.instance;
+// Table name in DB
 final CollectionReference menuCollectionRef = firestore.collection('menu');
 final Reference menuStorageRef = FirebaseStorage.instance.ref('menu/');
 
 class MenuProvider extends ChangeNotifier {
 
+<<<<<<< HEAD
   String? _foodID;
   String? get foodID => _foodID;
 
+=======
+  // added product in DB
+>>>>>>> 953a297d6c5ba455355d7d14d410de04c01455ea
   Future menuCreate({
     String? id,
     XFile? img,
@@ -31,6 +36,7 @@ class MenuProvider extends ChangeNotifier {
     Response response = Response();
 
     try {
+<<<<<<< HEAD
       var imgFile = File(img!.path);
       var stgRef = menuStorageRef.child('$img.jpg');
 
@@ -64,6 +70,10 @@ class MenuProvider extends ChangeNotifier {
       log('==@ Preams: $preams');
 
       response.statusCode == 200;
+=======
+      await menuCollectionRef.add(preams);
+      response.statusCode = 200;
+>>>>>>> 953a297d6c5ba455355d7d14d410de04c01455ea
       showSuccessToast('Add Successfully!');
 
       DatabaseService databaseService = DatabaseService(uid: 'currentUserId');
