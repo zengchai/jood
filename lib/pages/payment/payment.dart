@@ -33,7 +33,7 @@ class CustomStepIndicator extends StatelessWidget {
 
   Widget _buildStep(int stepNumber, {bool isFirst = false}) {
     bool isCurrentStep = currentStep == stepNumber;
-    double circleSize = isCurrentStep ? 30.0 : 20.0;
+    double circleSize = isCurrentStep ? 40.0 : 30.0;
 
     return Container(
       width: circleSize,
@@ -57,7 +57,7 @@ class CustomStepIndicator extends StatelessWidget {
 
   Widget _buildBridge() {
     return Container(
-      width: 30,
+      width: 40,
       height: 2,
       color: Colors.grey,
     );
@@ -69,6 +69,7 @@ class Payment extends StatefulWidget {
   _PaymentState createState() => _PaymentState();
 }
 class _PaymentState extends State<Payment> {
+  double _totalPrice = 0.0;
   int currentStep = 1;
   final AuthService _auth = AuthService();
   int _selectedIndex = 2;
@@ -141,6 +142,7 @@ class _PaymentState extends State<Payment> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildTotalPrice(), // Display Total Price here
+                // Move the ElevatedButton to this location
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     primary: Color(0xFF0000),
@@ -152,7 +154,7 @@ class _PaymentState extends State<Payment> {
                         .isCartNotEmpty();
 
                     if (isCartNotEmpty) {
-                      Navigator.pushNamed(context, '/method');
+                      Navigator.pushNamed(context, '/method', arguments: _totalPrice);
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -171,7 +173,7 @@ class _PaymentState extends State<Payment> {
       ),
       // bottomNavigationBar=============================
       bottomNavigationBar: Container(
-        height: 30.0, // height of bar
+        height: 10.0, // height of bar
         decoration: BoxDecoration(
           border: Border.all(
             color: const Color.fromARGB(255, 114, 114, 114).withOpacity(0.5),
@@ -248,35 +250,41 @@ class _PaymentState extends State<Payment> {
     // Remove the item from Firestore
     DatabaseService(uid: currentUser!.uid).removeCartItem(cartItem);
   }
-
   Widget _buildTotalPrice() {
     final currentUser = Provider.of<AppUsers?>(context, listen: false);
-    return Container(
-      margin: EdgeInsets.only(top: 8), // Add some top margin
-      child: StreamBuilder<List<CartItem>>(
-        stream: DatabaseService(uid: currentUser!.uid).getCartItems(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else {
-            List<CartItem> cartItems = snapshot.data ?? [];
-            double totalPrice =
-            cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
+    return StreamBuilder<List<CartItem>>(
+      stream: DatabaseService(uid: currentUser!.uid).getCartItems(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          List<CartItem> cartItems = snapshot.data ?? [];
+          _totalPrice = cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
 
-            return Text(
-              'Total Price: RM${totalPrice.toStringAsFixed(2)}',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+          return Column(
+            children: [
+              Divider(
+                height: 1, // Adjust the line height
+                color: Colors.grey, // Set the line color
               ),
-            );
-          }
-        },
-      ),
+              SizedBox(height: 8), // Add some spacing between line and text
+              Text(
+                'Total Price: RM${_totalPrice.toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          );
+        }
+      },
     );
   }
+
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
