@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:jood/models/userprofile.dart';
 import 'package:jood/pages/Order/orderPage.dart';
@@ -82,12 +83,8 @@ class _HomeState extends State<Home> {
     final currentUser = Provider.of<AppUsers?>(context);
 
     if (currentUser == null) {
-      // Handle the case where the user is null
-      return Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+      child: CircularProgressIndicator();
+      return Container(); // or return some placeholder widget
     }
 
     if (currentUser.uid == 'TnDmXCiJINXWdNBhfZvuAFCuaSL2') {
