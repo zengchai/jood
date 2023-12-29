@@ -14,7 +14,7 @@ import 'package:jood/pages/payment/payment3.dart';
 import 'package:jood/pages/wrapper.dart';
 import 'package:jood/services/auth.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
+//import 'package:firebase_app_check/firebase_app_check.dart';
 
 
 import 'pages/menu/provider/menu_provider/menu_provider.dart';
