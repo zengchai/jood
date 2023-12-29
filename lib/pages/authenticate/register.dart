@@ -175,9 +175,6 @@ class _RegisterState extends State<Register> {
                           ),
                         ),
                       ),
-                      Text(
-                        error,
-                      )
                     ],
                   )
               )),
