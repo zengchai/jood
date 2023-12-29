@@ -56,7 +56,7 @@ class _OrderPageState extends State<OrderPage> {
                           subtitle: Text(orderItem.price.toStringAsFixed(2)),
                         ),
                         SizedBox(height: 20),
-                        ReviewForm(foodID: orderItem.foodID),
+                        ReviewForm(foodID: orderItem.foodID, orderID: orderItem.orderID,),
                       ],
                     ),
                   ),
@@ -103,12 +103,14 @@ class _OrderPageState extends State<OrderPage> {
   Widget build(BuildContext context) {
     bool showCustomer = true;
     final currentUser = Provider.of<AppUsers?>(context);
+    DatabaseService databaseService = DatabaseService(uid: currentUser!.uid);
 
     if (currentUser!.uid == 'TnDmXCiJINXWdNBhfZvuAFCuaSL2') {
       showCustomer = false;
     } else {
       showCustomer = true;
     }
+
 
     return Scaffold(
         backgroundColor: Colors.white,
@@ -224,6 +226,7 @@ class _OrderPageState extends State<OrderPage> {
                                       currentUser!.uid,
                                       username,
                                       totalPrice,
+                                      databaseService
                                     );
                                   },
                                 );
@@ -349,6 +352,7 @@ class _OrderPageState extends State<OrderPage> {
                                       currentUser!.uid,
                                       username,
                                       totalPrice,
+                                      databaseService
                                     );
                                   },
                                 );
@@ -369,6 +373,7 @@ class _OrderPageState extends State<OrderPage> {
     String currentUserid,
     String username,
     double totalPrice,
+      DatabaseService databaseService,
   ) {
     return Card(
       margin: const EdgeInsets.all(16),
@@ -462,8 +467,11 @@ class _OrderPageState extends State<OrderPage> {
                                 'Price: \RM${orderItem.price.toStringAsFixed(2)}'),
                             if (!isAdmin)
                               ElevatedButton(
-                                onPressed: () {
-                                  _popupReview(orderItem);
+                                onPressed: () async {
+                                  bool orderExists = await databaseService.doesOrderIDExist(orderItem.foodID,orderID);
+                                  if (!orderExists) {
+                                    _popupReview(orderItem);
+                                  }
                                 },
                                 child: Text('Give Review'),
                               ),
