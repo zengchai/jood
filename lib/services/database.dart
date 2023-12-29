@@ -401,6 +401,7 @@ class DatabaseService {
             status: orderData['status'] as String,
             username: orderData['name'] as String,
             totalPrice: orderData['totalPrice'] as double,
+            timeStamp: dateTime,
           );
         });
       }).toList();
@@ -456,6 +457,7 @@ class DatabaseService {
                   status: orderData['status'] as String,
                   username: orderData['name'] as String,
                   totalPrice: orderData['totalPrice'] as double,
+                  timeStamp: dateTime,
                 );
               });
             }).toList();

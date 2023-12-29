@@ -11,6 +11,7 @@ class OrderItem {
   String status;
   final String username;
   final double totalPrice;
+  DateTime timeStamp;
 
   OrderItem({
     required this.orderID,
@@ -23,5 +24,6 @@ class OrderItem {
     required this.status,
     required this.username,
     required this.totalPrice,
+    required this.timeStamp,
   });
 }
