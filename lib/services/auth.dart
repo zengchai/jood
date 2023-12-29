@@ -74,7 +74,12 @@ class AuthService {
   Future<void> resetPassword(String email, BuildContext context) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      print('Password reset email sent successfully');
+      showDialog(
+        context: context, // Make sure to have access to the current context
+        builder: (BuildContext context) {
+          return WarningAlert(title: 'Success', subtitle: 'Password reset email sent successfully');
+        },
+      );
     } catch (e) {
       if (e is FirebaseAuthException) {
         showDialog(

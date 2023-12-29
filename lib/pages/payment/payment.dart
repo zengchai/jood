@@ -84,6 +84,7 @@ class _PaymentState extends State<Payment> {
       WidgetsBinding.instance?.addPostFrameCallback((_) {
         Navigator.pushNamed(context, '/authenticate');
       });
+      return Container(); // or return some placeholder widget
     }
 
     return Scaffold(
