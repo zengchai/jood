@@ -56,7 +56,10 @@ class _OrderPageState extends State<OrderPage> {
                           subtitle: Text(orderItem.price.toStringAsFixed(2)),
                         ),
                         SizedBox(height: 20),
-                        ReviewForm(foodID: orderItem.foodID, orderID: orderItem.orderID,),
+                        ReviewForm(
+                          foodID: orderItem.foodID,
+                          orderID: orderItem.orderID,
+                        ),
                       ],
                     ),
                   ),
@@ -111,7 +114,6 @@ class _OrderPageState extends State<OrderPage> {
       showCustomer = true;
     }
 
-
     return Scaffold(
         backgroundColor: Colors.white,
         body: showCustomer
@@ -163,7 +165,12 @@ class _OrderPageState extends State<OrderPage> {
                         StreamBuilder<List<OrderItem>>(
                             // stream: DatabaseService(uid: currentUser!.uid)
                             stream: DatabaseService(uid: currentUser!.uid)
-                                .getCustomerOrder(formattedDate),
+                                .getCustomerOrder(formattedDate)
+                                .map((orders) => orders
+                                    .where((order) => order.timeStamp != null)
+                                    .toList()
+                                  ..sort((a, b) =>
+                                      b.timeStamp!.compareTo(a.timeStamp!))),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
@@ -219,15 +226,14 @@ class _OrderPageState extends State<OrderPage> {
                                         orderItems[0].totalPrice;
 
                                     return _buildOrderItemCard(
-                                      orderItems,
-                                      orderID,
-                                      status,
-                                      false,
-                                      currentUser!.uid,
-                                      username,
-                                      totalPrice,
-                                      databaseService
-                                    );
+                                        orderItems,
+                                        orderID,
+                                        status,
+                                        false,
+                                        currentUser!.uid,
+                                        username,
+                                        totalPrice,
+                                        databaseService);
                                   },
                                 );
                               }
@@ -286,7 +292,30 @@ class _OrderPageState extends State<OrderPage> {
                         StreamBuilder<List<List<OrderItem>>>(
                             // stream: DatabaseService(uid: currentUser!.uid)
                             stream: DatabaseService(uid: currentUser!.uid)
-                                .getSellerOrder(selectedDate: formattedDate),
+                                .getSellerOrder(selectedDate: formattedDate)
+                                .map((allOrders) {
+                              // Flatten the list and sort by timestamp
+                              List<OrderItem> flattenedOrders = allOrders
+                                  .expand((orders) => orders)
+                                  .where((order) => order.timeStamp != null)
+                                  .toList()
+                                ..sort((a, b) =>
+                                    b.timeStamp!.compareTo(a.timeStamp!));
+
+                              // Group by order ID again
+                              Map<String, List<OrderItem>> groupedOrders = {};
+                              for (var orderItem in flattenedOrders) {
+                                String orderID = orderItem.orderID;
+
+                                if (!groupedOrders.containsKey(orderID)) {
+                                  groupedOrders[orderID] = [];
+                                }
+
+                                groupedOrders[orderID]!.add(orderItem);
+                              }
+
+                              return groupedOrders.values.toList();
+                            }),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
@@ -345,15 +374,14 @@ class _OrderPageState extends State<OrderPage> {
                                         orderItems[0].totalPrice;
 
                                     return _buildOrderItemCard(
-                                      orderItems,
-                                      orderID,
-                                      status,
-                                      true, // Assuming this is an admin view
-                                      currentUser!.uid,
-                                      username,
-                                      totalPrice,
-                                      databaseService
-                                    );
+                                        orderItems,
+                                        orderID,
+                                        status,
+                                        true, // Assuming this is an admin view
+                                        currentUser!.uid,
+                                        username,
+                                        totalPrice,
+                                        databaseService);
                                   },
                                 );
                               }
@@ -373,7 +401,7 @@ class _OrderPageState extends State<OrderPage> {
     String currentUserid,
     String username,
     double totalPrice,
-      DatabaseService databaseService,
+    DatabaseService databaseService,
   ) {
     return Card(
       margin: const EdgeInsets.all(16),
@@ -387,7 +415,7 @@ class _OrderPageState extends State<OrderPage> {
           Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Color.fromRGBO(255, 196, 114, 1),
+              color: Color.fromRGBO(184, 134, 65, 0.608),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -464,11 +492,13 @@ class _OrderPageState extends State<OrderPage> {
                             ),
                             Text('Quantity: ${orderItem.quantity}'),
                             Text(
-                                'Price: \RM${orderItem.price.toStringAsFixed(2)}'),
+                                'Price: \RM ${orderItem.price.toStringAsFixed(2)}'),
                             if (!isAdmin)
                               ElevatedButton(
                                 onPressed: () async {
-                                  bool orderExists = await databaseService.doesOrderIDExist(orderItem.foodID,orderID);
+                                  bool orderExists =
+                                      await databaseService.doesOrderIDExist(
+                                          orderItem.foodID, orderID);
                                   if (!orderExists) {
                                     _popupReview(orderItem);
                                   }
@@ -489,7 +519,7 @@ class _OrderPageState extends State<OrderPage> {
           Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Color.fromRGBO(255, 196, 114, 1),
+              color: Color.fromRGBO(184, 134, 65, 0.608),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(20),
                 bottomRight: Radius.circular(20),
@@ -499,7 +529,7 @@ class _OrderPageState extends State<OrderPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Total Price: \RM${totalPrice.toStringAsFixed(2)}',
+                  'Total Price: \RM ${totalPrice.toStringAsFixed(2)}',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 17,
