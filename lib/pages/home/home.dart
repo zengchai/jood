@@ -83,9 +83,7 @@ class _HomeState extends State<Home> {
     final currentUser = Provider.of<AppUsers?>(context);
 
     if (currentUser == null) {
-      WidgetsBinding.instance?.addPostFrameCallback((_) {
-        Navigator.pushNamed(context, '/authenticate');
-      });
+      child: CircularProgressIndicator();
       return Container(); // or return some placeholder widget
     }
 
