@@ -32,7 +32,7 @@ class CustomStepIndicator extends StatelessWidget {
 
   Widget _buildStep(int stepNumber, {bool isFirst = false}) {
     bool isCurrentStep = currentStep == stepNumber;
-    double circleSize = isCurrentStep ? 30.0 : 20.0;
+    double circleSize = isCurrentStep ? 40.0 : 30.0;
 
     return Container(
       width: circleSize,
@@ -56,7 +56,7 @@ class CustomStepIndicator extends StatelessWidget {
 
   Widget _buildBridge() {
     return Container(
-      width: 30,
+      width: 40,
       height: 2,
       color: Colors.grey,
     );

@@ -27,7 +27,7 @@ class CustomStepIndicator extends StatelessWidget {
 
   Widget _buildStep(int stepNumber, {bool isFirst = false}) {
     bool isCurrentStep = currentStep == stepNumber;
-    double circleSize = isCurrentStep ? 30.0 : 20.0;
+    double circleSize = isCurrentStep ? 40.0 : 30.0;
 
     return Container(
       width: circleSize,
@@ -51,7 +51,7 @@ class CustomStepIndicator extends StatelessWidget {
 
   Widget _buildBridge() {
     return Container(
-      width: 30,
+      width: 40,
       height: 2,
       color: Colors.grey,
     );
@@ -65,6 +65,15 @@ class MethodPage extends StatefulWidget {
 }
 
 class _MethodPageState extends State<MethodPage> {
+  double totalPrice = 0.0;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Retrieve the total price from the arguments
+    totalPrice = ModalRoute.of(context)?.settings.arguments as double? ?? 0.0;
+  }
   int currentStep = 2;
 
   @override
@@ -88,6 +97,15 @@ class _MethodPageState extends State<MethodPage> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
+            SizedBox(height: 10),
+
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text(
+                'Total Price: RM ${totalPrice.toStringAsFixed(2)}',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold,decoration: TextDecoration.underline,),
+              ),
+            ),
             SizedBox(height: 20),
             PaymentOptionCard(
               optionName: 'TouchNGo',
@@ -97,6 +115,8 @@ class _MethodPageState extends State<MethodPage> {
               optionName: 'Cash On Delivery',
               imagePath: 'assets/CoD.png',
             ),
+            SizedBox(height: 20), // Add some space between payment options and total price
+
           ],
         ),
       ),
