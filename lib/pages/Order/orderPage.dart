@@ -495,14 +495,13 @@ class _OrderPageState extends State<OrderPage> {
                                 'Price: \RM ${orderItem.price.toStringAsFixed(2)}'),
                             if (!isAdmin)
                               ElevatedButton(
-                                onPressed: () async {
-                                  bool orderExists =
-                                      await databaseService.doesOrderIDExist(
-                                          orderItem.foodID, orderID);
+                                onPressed: status != 'Preparing' ? () async {
+                                  bool orderExists = await databaseService.doesOrderIDExist(
+                                      orderItem.foodID, orderID);
                                   if (!orderExists) {
                                     _popupReview(orderItem);
                                   }
-                                },
+                                } : null,
                                 child: Text('Give Review'),
                               ),
                           ],

@@ -6,6 +6,8 @@ import 'package:jood/models/users.dart';
 import 'package:jood/pages/Order/orderPage.dart'; //yam
 import 'package:jood/services/database.dart';
 
+import '../constants/warningalert2.dart';
+
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -77,7 +79,7 @@ class AuthService {
       showDialog(
         context: context, // Make sure to have access to the current context
         builder: (BuildContext context) {
-          return WarningAlert(title: 'Success', subtitle: 'Password reset email sent successfully');
+          return WarningAlert2(title: 'Success', subtitle: 'Password reset email sent successfully');
         },
       );
     } catch (e) {
@@ -85,7 +87,7 @@ class AuthService {
         showDialog(
           context: context, // Make sure to have access to the current context
           builder: (BuildContext context) {
-            return WarningAlert(title: 'Error', subtitle: '${e.message}');
+            return WarningAlert2(title: 'Error', subtitle: '${e.message}');
           },
         );
       }
