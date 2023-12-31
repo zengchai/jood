@@ -92,18 +92,18 @@ class _PaymentState extends State<Payment> {
       backgroundColor: Colors.brown[50],
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Color(0xFF00000),
-        title: Row(
-          children: [
-            IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            Text('CART', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          ],
+        backgroundColor: Color(0xFF3C312B).withOpacity(0.8),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
+        iconTheme: IconThemeData(
+          color: Colors.white, // Set the color you want for the back button
+        ),
+        elevation: 0.0,
+        title: Text('CART', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
       ),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
