@@ -90,20 +90,12 @@ class _MethodPageState extends State<MethodPage> {
           children: [
             CustomStepIndicator(currentStep: currentStep),
             SizedBox(height: 30),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(
-                'Choose Payment Option',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
-            SizedBox(height: 10),
 
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Text(
                 'Total Price: RM ${totalPrice.toStringAsFixed(2)}',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold,decoration: TextDecoration.underline,),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,),
               ),
             ),
             SizedBox(height: 20),
