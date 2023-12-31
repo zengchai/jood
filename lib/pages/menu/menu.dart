@@ -302,6 +302,9 @@ class _CategoryMenuState extends State<MenuPage> {
                                     mainAxisSpacing: 10,
                                     mainAxisExtent: 225),
                             itemBuilder: (ctx, index) {
+
+                              CachedNetworkImageProvider(menuProvider.menuList[index].img ?? '').evict();
+
                               return Container(
                                 height: 230,
                                 width: size.width,
@@ -324,6 +327,7 @@ class _CategoryMenuState extends State<MenuPage> {
                                             _popupViewReview(
                                                 menuProvider, index);
                                           },
+
                                           child: CachedNetworkImage(
                                             height: 100,
                                             width: size.width,

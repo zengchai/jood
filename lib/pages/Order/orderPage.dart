@@ -53,7 +53,7 @@ class _OrderPageState extends State<OrderPage> {
                             height: 120,
                           ),
                           title: Text(orderItem.foodName),
-                          subtitle: Text(orderItem.price.toStringAsFixed(2)),
+                          subtitle: Text('RM ' + orderItem.price.toStringAsFixed(2)),
                         ),
                         SizedBox(height: 20),
                         ReviewForm(
@@ -492,7 +492,7 @@ class _OrderPageState extends State<OrderPage> {
                             ),
                             Text('Quantity: ${orderItem.quantity}'),
                             Text(
-                                'Price: \RM ${orderItem.price.toStringAsFixed(2)}'),
+                                'Price: RM ${orderItem.price.toStringAsFixed(2)}'),
                             if (!isAdmin)
                               ElevatedButton(
                                 onPressed: status != 'Preparing' ? () async {

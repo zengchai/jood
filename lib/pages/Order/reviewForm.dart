@@ -56,7 +56,7 @@ class _reviewFormState extends State<ReviewForm> {
             },
           ),
 
-          SizedBox(height: 10),
+          SizedBox(height: 15),
 
           TextFormField(
             decoration: InputDecoration(
