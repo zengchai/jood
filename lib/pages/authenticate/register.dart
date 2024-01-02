@@ -16,10 +16,10 @@ class _RegisterState extends State<Register> {
 
   final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
-  var iconColor1 = Color(0xFF7b5916).withOpacity(0.25);
-  var iconColor2 = Color(0xFF7b5916).withOpacity(0.25);
-  var iconColor3 = Color(0xFF7b5916).withOpacity(0.25);
-
+  var iconColor1 = Color(0xFF7b5916).withOpacity(0.40);
+  var iconColor2 = Color(0xFF7b5916).withOpacity(0.40);
+  var iconColor3 = Color(0xFF7b5916).withOpacity(0.40);
+  bool focus = false;
   bool loading = false;
   String email = '';
   String name = '';
@@ -31,9 +31,17 @@ class _RegisterState extends State<Register> {
     return loading ? Loading() : Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Color(0xFF7b5916).withOpacity(0.75),
+          backgroundColor: Colors.white,
           elevation: 0.0,
-          title: Text("Sign Up"),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          iconTheme: IconThemeData(
+            color: Colors.black, // Set the color you want for the back button
+          ),
           actions: <Widget>[],
         ),
         body: ListView(
@@ -45,24 +53,50 @@ class _RegisterState extends State<Register> {
                   child: Column(
                     children: <Widget>[
                       SizedBox(height: 50.0),
-                      Icon(
-                        Icons.perm_identity_rounded,
-                        size: 60,
-                        color: Colors.black,
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          children: [
+                            Text(
+                              "Sign Up",
+                              style: TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      SizedBox(height: 50.0),
+                      SizedBox(height: 30.0),
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          children: [
+                            Text(
+                              "Discover a world of flavors at your fingertips!",
+                              style: TextStyle(
+                                fontSize: 13
+                                ,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 40.0),
                   Focus(
                     onFocusChange: (hasFocus) {
                       // Use the hasFocus value to determine whether the field is focused
                       setState(() {
                         iconColor1 = hasFocus
                             ? Color(0xFF7b5916).withOpacity(0.75) // Focused color
-                            : Color(0xFF7b5916).withOpacity(0.25); // Unfocused color
+                            : Color(0xFF7b5916).withOpacity(0.40); // Unfocused color
                       });
                     },
                     child: TextFormField(
                         decoration: InputDecoration(
-                            hintText: 'Name', // Add your placeholder text
+                            border: OutlineInputBorder(),
+                            labelText: 'Name',
+                            labelStyle: TextStyle(color: iconColor1),
                             fillColor: Colors.white,
                             prefixIcon: Icon(Icons.people,
                               color: iconColor1,),
@@ -81,18 +115,22 @@ class _RegisterState extends State<Register> {
                           });
                         },
                     )),
+                      SizedBox(height: 15),
                   Focus(
                     onFocusChange: (hasFocus) {
                       // Use the hasFocus value to determine whether the field is focused
                       setState(() {
-                        iconColor2 = hasFocus
+                        focus = hasFocus;
+                        iconColor2 = focus
                             ? Color(0xFF7b5916).withOpacity(0.75) // Focused color
-                            : Color(0xFF7b5916).withOpacity(0.25); // Unfocused color
+                            : Color(0xFF7b5916).withOpacity(0.40); // Unfocused color
                       });
                     },
                     child: TextFormField(
                         decoration: InputDecoration(
-                          hintText: 'Email', // Add your placeholder text
+                          border: OutlineInputBorder(),
+                          labelText: 'Email',
+                          labelStyle: TextStyle(color: iconColor2),
                           fillColor: Colors.white,
                             prefixIcon: Icon(Icons.email,
                               color: iconColor2,),
@@ -112,18 +150,21 @@ class _RegisterState extends State<Register> {
                           });
                         },
                       )),
+                      SizedBox(height: 15),
                   Focus(
                     onFocusChange: (hasFocus) {
                       // Use the hasFocus value to determine whether the field is focused
                       setState(() {
                         iconColor3 = hasFocus
                             ? Color(0xFF7b5916).withOpacity(0.75) // Focused color
-                            : Color(0xFF7b5916).withOpacity(0.25); // Unfocused color
+                            : Color(0xFF7b5916).withOpacity(0.40); // Unfocused color
                       });
                     },
                     child: TextFormField(
                           decoration: InputDecoration(
-                              hintText: 'Password',
+                              border: OutlineInputBorder(),
+                              labelText: 'Password',
+                              labelStyle: TextStyle(color: iconColor3),
                               fillColor: Colors.white,
                               filled: true,// Add your placeholder text
                               prefixIcon: Icon(Icons.lock,
@@ -166,10 +207,10 @@ class _RegisterState extends State<Register> {
                         style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all<Color>(Color(0xFFF6B22D).withOpacity(0.75),),
                           foregroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B)),
-                          minimumSize: MaterialStateProperty.all<Size>(Size(200, 50)),
+                          minimumSize: MaterialStateProperty.all<Size>(Size(260, 50)),
                         ),
                         child: Text(
-                          'Register',
+                          'Sign Up',
                           style: TextStyle(
                             fontSize: 15.0,
                           ),

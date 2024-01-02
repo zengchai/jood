@@ -21,8 +21,8 @@ class _SignInState extends State<SignIn> {
   bool loading = false;
   bool error = false;
   final _formKey = GlobalKey<FormState>();
-  var iconColor = Color(0xFF3C312B).withOpacity(0.10);
-  var iconColor2 = Color(0xFF3C312B).withOpacity(0.10);
+  var iconColor = Color(0xFF3C312B).withOpacity(0.40);
+  var iconColor2 = Color(0xFF3C312B).withOpacity(0.40);
   String email = '';
   String password = '';
 
@@ -39,9 +39,17 @@ class _SignInState extends State<SignIn> {
     return loading ? Loading() : Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Color(0xFF3C312B).withOpacity(0.80),
+        backgroundColor: Colors.white,
         elevation: 0.0,
-        title: Text("Sign In"),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        iconTheme: IconThemeData(
+          color: Colors.black, // Set the color you want for the back button
+        ),
         actions: <Widget>[],
       ),
       body: ListView(
@@ -52,76 +60,104 @@ class _SignInState extends State<SignIn> {
               key: _formKey,
     child: Column(
     children: <Widget>[
+
         SizedBox(height: 50.0),
-        Icon(
-          Icons.perm_identity_rounded,
-          size: 60,
-          color: Colors.black,
+      Container(
+        alignment: Alignment.centerLeft,
+        child: Column(
+          children: [
+            Text(
+              "Sign In",
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
-        SizedBox(height: 50.0),
-              Focus(
-                onFocusChange: (hasFocus) {
-                  // Use the hasFocus value to determine whether the field is focused
-                  setState(() {
-                    iconColor = hasFocus
-                        ? Color(0xFF3C312B).withOpacity(0.75) // Focused color
-                        : Color(0xFF3C312B).withOpacity(0.10); // Unfocused color
-                  });
-                },
-                child: TextFormField(
+        ),
+      SizedBox(height: 30.0),
+      Container(
+        alignment: Alignment.centerLeft,
+        child: Column(
+          children: [
+            Text(
+              "Welcome to Jood!",
+              style: TextStyle(
+                fontSize: 13
+                ,
+              ),
+            ),
+
+          ],
+        ),
+      ),
+        SizedBox(height: 40.0),
+      Focus(
+        onFocusChange: (hasFocus) {
+          setState(() {
+            iconColor = hasFocus
+                ? Color(0xFF3C312B).withOpacity(0.75) // Focused color
+                : Color(0xFF3C312B).withOpacity(0.40); // Unfocused color
+          });
+        },
+        child: TextFormField(
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,
-          hintText: 'Email', // Add your placeholder text
-              prefixIcon: Icon(Icons.email,
-                color: iconColor,), // Email icon
-
-              enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
-              ),
-              focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
-              )
-        ),
-          validator: (val) => val!.isEmpty ? 'Enter an email': null,
-          onChanged: (value){
+            border: OutlineInputBorder(),
+            labelText: 'Email',
+            labelStyle: TextStyle(color: iconColor),
+            prefixIcon: Icon(Icons.email, color: iconColor), // Email icon
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.25), width: 2.0),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0),
+            ),
+          ),
+          validator: (val) => val!.isEmpty ? 'Enter an email' : null,
+          onChanged: (value) {
             setState(() {
               email = value;
             });
           },
-                )),
-              Focus(
-                onFocusChange: (hasFocus) {
-                  // Use the hasFocus value to determine whether the field is focused
-                  setState(() {
-                    iconColor2 = hasFocus
-                        ? Color(0xFF3C312B).withOpacity(0.75) // Focused color
-                        : Color(0xFF3C312B).withOpacity(0.10); // Unfocused color
-                  });
-                },
-                child: TextFormField(
-            decoration: InputDecoration(
-              fillColor: Colors.white,
-              filled: true,
-              hintText: 'Password', // Add your placeholder text
-                prefixIcon: Icon(Icons.lock,
-                  color: iconColor2,),
-                enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.10), width: 2.0)
-                ),
-                focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0)
-                )
+        ),
+      ),
+      SizedBox(height: 15),
+      Focus(
+        onFocusChange: (hasFocus) {
+          setState(() {
+            iconColor2 = hasFocus
+                ? Color(0xFF3C312B).withOpacity(0.75) // Focused color
+                : Color(0xFF3C312B).withOpacity(0.40); // Unfocused color
+          });
+        },
+        child: TextFormField(
+          decoration: InputDecoration(
+            fillColor: Colors.white,
+            filled: true,
+            border: OutlineInputBorder(),
+            labelText: 'Password',
+            labelStyle: TextStyle(color: iconColor2),
+            prefixIcon: Icon(Icons.lock, color: iconColor2),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.25), width: 2.0),
             ),
-            validator: (val) => val!.length<6 ? 'Enter a password 6+ chars long': null,
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFF3C312B).withOpacity(0.75), width: 2.0),
+            ),
+          ),
+          validator: (val) => val!.length < 6 ? 'Enter a password 6+ chars long' : null,
+          obscureText: true,
+          onChanged: (val) {
+            setState(() {
+              password = val;
+            });
+          },
+        ),
+      ),
 
-            obscureText: true,
-          onChanged: (val){
-  setState(() {
-    password = val;
-  });
-          }
-        )),
       SizedBox(height:10.0),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -160,7 +196,7 @@ class _SignInState extends State<SignIn> {
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF3C312B).withOpacity(0.75),),
               foregroundColor: MaterialStateProperty.all<Color>(Color(0xFFFFFFCC)),
-              minimumSize: MaterialStateProperty.all<Size>(Size(200, 50)),
+              minimumSize: MaterialStateProperty.all<Size>(Size(260, 50)),
             ),
             child: Text(
               'Sign In',

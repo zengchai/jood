@@ -145,7 +145,7 @@ class _EditProfileState extends State<EditProfile> {
                 padding: EdgeInsets.symmetric(vertical: 20.0,horizontal: 30.0),
                 child: Column(
                   children: [
-                    SizedBox(height: 15,),
+                    SizedBox(height: 20,),
                     ProfileItem(value: 'Name', controller: nameController, enable: editEnable),
                     SizedBox(height: 30,),
                     ProfileItem(value: 'Email', controller: emailController, enable: false),
@@ -155,7 +155,7 @@ class _EditProfileState extends State<EditProfile> {
                     ProfileItem(value: 'Phone Number', controller: phonenumController, enable: editEnable),
                     SizedBox(height: 30,),
                     ProfileItem(value: 'Address', controller: addressController, enable: editEnable),
-                    SizedBox(height:40.0),
+                    editEnable ? SizedBox(height:40.0): SizedBox(height:20.0),
                     editEnable ? ElevatedButton(
                           onPressed: () async{
                             if(nameController.text.isEmpty||matricController.text.isEmpty||phonenumController.text.isEmpty||addressController.text.isEmpty){
@@ -183,7 +183,8 @@ class _EditProfileState extends State<EditProfile> {
                             'Save',
                             style: TextStyle(color: Colors.white),
                           ),
-                        ): Container()
+                        ): Container(),
+                    editEnable ? SizedBox(height:20.0): SizedBox(height:0.0),
                     // Add more widgets to display other user information
                   ],
                 ),

@@ -129,6 +129,7 @@ class AuthService {
       try {
         await deleteUserData(user.uid); // Delete Firestore data first
         await user.delete(); // Delete the Authentication account
+        Navigator.pop(context);
         showDialog(
           context: context, // Make sure to have access to the current context
           builder: (BuildContext context) {
@@ -140,6 +141,7 @@ class AuthService {
         );
         return await FirebaseAuth.instance.signOut();
       } catch (e) {
+        Navigator.pop(context);
         showDialog(
           context: context, // Make sure to have access to the current context
           builder: (BuildContext context) {

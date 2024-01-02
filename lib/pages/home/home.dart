@@ -81,7 +81,7 @@ class _HomeState extends State<Home> {
 
     bool showCustomer = true;
     final currentUser = Provider.of<AppUsers?>(context);
-
+    final DatabaseService databaseService = DatabaseService(uid: currentUser!.uid);
     if (currentUser == null) {
       child: CircularProgressIndicator();
       return Container(); // or return some placeholder widget
@@ -145,25 +145,57 @@ class _HomeState extends State<Home> {
                         ],
                       ),
                     )),
-                TextButton.icon(
-                    onPressed: () async {
-                      await Navigator.pushNamed(context, '/cart');
-                    },
-                    icon: Icon(Icons.add_shopping_cart,
-                      color: Color(0xFF3C312B).withOpacity(0.75),
-                    ),
-                    label: Text(''))
+                FutureBuilder<bool>(
+                  future: databaseService.isCartNotEmpty(), // Assume you have a function to check if the cart is not empty
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      // If the Future is still running, display a loading indicator
+                      return CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      // If there's an error, handle it accordingly
+                      return Icon(Icons.error);
+                    } else {
+                      // If the cart is not empty, show the filled cart icon, otherwise, show the empty cart icon
+                      return TextButton.icon(
+                        onPressed: () async {
+                          await Navigator.pushNamed(context, '/cart');
+                        },
+                        icon: Icon(
+                          snapshot.data ?? false
+                              ? Icons.shopping_cart
+                              : Icons.shopping_cart_outlined,
+                          color: Color(0xFF3C312B).withOpacity(0.75),
+                        ),
+                        label: Text(''),
+                      );
+                    }
+                  },
+                ),
               ],
             ),
-            body: IndexedStack(
-              index: _selectedIndex,
-              children: [
-                // Page 1 content
-                MenuPage(foodReviews: foodReviews),
-                // Page 2 content
-                OrderPage(),
-                ProfilePage(),
-              ],
+            body: FutureBuilder<bool>(
+              future: databaseService.isCartNotEmpty(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Icon(Icons.error);
+                } else {
+                  return IndexedStack(
+                    index: _selectedIndex,
+                    children: [
+                      // Page 1 content
+                      MenuPage(foodReviews: foodReviews,onCartUpdated: () {
+                        // Trigger a rebuild when the cart is updated
+                        setState(() {});
+                      },),
+                      // Page 2 content
+                      OrderPage(),
+                      ProfilePage(),
+                    ],
+                  );
+                }
+              },
             ),
             bottomNavigationBar: CustomBottomNavigationBar(
               selectedIndex: _selectedIndex,
@@ -193,7 +225,10 @@ class _HomeState extends State<Home> {
               index: _selectedIndex,
               children: [
                 // Page 1 content
-                MenuPage(foodReviews: foodReviews),
+                MenuPage(foodReviews: foodReviews,onCartUpdated: () {
+              // Trigger a rebuild when the cart is updated
+              setState(() {});
+          },),
                 // Page 2 content
                 OrderPage(),
                 ProfilePage(),
