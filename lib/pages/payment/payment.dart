@@ -263,26 +263,30 @@ class _PaymentState extends State<Payment> {
           List<CartItem> cartItems = snapshot.data ?? [];
           _totalPrice = cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
 
-          return Column(
-            children: [
-              Divider(
-                height: 1, // Adjust the line height
-                color: Colors.grey, // Set the line color
-              ),
-              SizedBox(height: 8), // Add some spacing between line and text
-              Text(
-                'Total Price: RM${_totalPrice.toStringAsFixed(2)}',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+          return Container(
+            color: Colors.brown[50], // Set your desired background color here
+            child: Column(
+              children: [
+                Divider(
+                  height: 1, // Adjust the line height
+                  color: Colors.grey, // Set the line color
                 ),
-              ),
-            ],
+                SizedBox(height: 8), // Add some spacing between line and text
+                Text(
+                  'Total Price: RM${_totalPrice.toStringAsFixed(2)}',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
           );
         }
       },
     );
   }
+
 
 
   void _onItemTapped(int index) {
