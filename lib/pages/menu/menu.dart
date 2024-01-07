@@ -25,8 +25,9 @@ class MenuPage extends StatefulWidget {
   //const MenuPage({super.key});
 
   final List<String> foodReviews;
+  final VoidCallback onCartUpdated;
 
-  const MenuPage({Key? key, required this.foodReviews}) : super(key: key);
+  const MenuPage({Key? key, required this.foodReviews, required this.onCartUpdated}) : super(key: key);
 
   @override
   State<MenuPage> createState() => _CategoryMenuState();
@@ -232,7 +233,7 @@ class _CategoryMenuState extends State<MenuPage> {
     final currentUser = Provider.of<AppUsers?>(context);
     DateTime now = DateTime.now();
     String formattedDate = DateFormat('dd/MM/yyyy').format(now);
-
+    VoidCallback onCartUpdated = widget.onCartUpdated;
     if (currentUser!.uid == 'TnDmXCiJINXWdNBhfZvuAFCuaSL2') {
       showCustomer = false;
     } else {
@@ -302,6 +303,9 @@ class _CategoryMenuState extends State<MenuPage> {
                                     mainAxisSpacing: 10,
                                     mainAxisExtent: 225),
                             itemBuilder: (ctx, index) {
+
+                              CachedNetworkImageProvider(menuProvider.menuList[index].img ?? '').evict();
+
                               return Container(
                                 height: 230,
                                 width: size.width,
@@ -324,6 +328,7 @@ class _CategoryMenuState extends State<MenuPage> {
                                             _popupViewReview(
                                                 menuProvider, index);
                                           },
+
                                           child: CachedNetworkImage(
                                             height: 100,
                                             width: size.width,
@@ -403,7 +408,7 @@ class _CategoryMenuState extends State<MenuPage> {
                                                                       .price ??
                                                                   '') ??
                                                               0.0);
-
+                                                  onCartUpdated();
                                                   // Show a SnackBar as a pop-up message
                                                   ScaffoldMessenger.of(context)
                                                       .showSnackBar(

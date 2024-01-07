@@ -28,6 +28,7 @@ class _OrderPageState extends State<OrderPage> {
   late String formattedDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
   late final String review;
   int _currentPageIndex = 0;
+  Map<String, bool> orderExpansionStates = {};
 
   void _popupReview(OrderItem orderItem) {
     showDialog(
@@ -53,7 +54,8 @@ class _OrderPageState extends State<OrderPage> {
                             height: 120,
                           ),
                           title: Text(orderItem.foodName),
-                          subtitle: Text(orderItem.price.toStringAsFixed(2)),
+                          subtitle:
+                              Text('RM ' + orderItem.price.toStringAsFixed(2)),
                         ),
                         SizedBox(height: 20),
                         ReviewForm(
@@ -403,8 +405,10 @@ class _OrderPageState extends State<OrderPage> {
     double totalPrice,
     DatabaseService databaseService,
   ) {
+    bool isCompleteStatus = status == 'Complete';
+
     return Card(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(16, 10, 16, 10),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
@@ -413,158 +417,176 @@ class _OrderPageState extends State<OrderPage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Color.fromRGBO(184, 134, 65, 0.608),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Order ID:',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+            child: ExpansionTile(
+              key: GlobalKey(), // Use GlobalKey for each ExpansionTile
+              onExpansionChanged: (isExpanded) {
+                setState(() {
+                  orderExpansionStates[orderID] = isExpanded;
+                });
+              },
+              initiallyExpanded: orderExpansionStates[orderID] ?? false,
+              title: Container(
+                padding: EdgeInsets.fromLTRB(16, 10, 16, 8),
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(184, 134, 65, 0.608),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                Text(
-                  orderID,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                if (isAdmin)
-                  Text(
-                    'Username: $username',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      orderID,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-              ],
-            ),
-          ),
-          SizedBox(height: 10),
-          // Order Items
-          for (var orderItem in orderItems) ...[
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Card(
-                elevation: 0, // Set to 0 to remove inner card shadow
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: CachedNetworkImage(
-                          imageUrl: orderItem.foodImage,
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
+                    if (isAdmin)
+                      Text(
+                        'Username: $username',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                  ],
+                ),
+              ),
+              children: [
+                // Order Items
+                for (int index = 0; index < orderItems.length; index++) ...[
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Card(
+                      elevation: 0,
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+                        child: Row(
                           children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: CachedNetworkImage(
+                                imageUrl: orderItems[index].foodImage,
+                                height: 90,
+                                width: 110,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    orderItems[index].foodName,
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Price: \RM ${orderItems[index].price.toStringAsFixed(2)}',
+                                  ),
+                                  if (!isAdmin)
+                                    ElevatedButton(
+                                      onPressed: status != 'Preparing'
+                                          ? () async {
+                                              bool orderExists =
+                                                  await databaseService
+                                                      .doesOrderIDExist(
+                                                          orderItems[index]
+                                                              .foodID,
+                                                          orderID);
+                                              if (!orderExists) {
+                                                _popupReview(orderItems[index]);
+                                              }
+                                            }
+                                          : null,
+                                      child: Text('Give Review'),
+                                    ),
+                                ],
+                              ),
+                            ),
                             Text(
-                              orderItem.foodName,
+                              'X ${orderItems[index].quantity}',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 30,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Text('Quantity: ${orderItem.quantity}'),
-                            Text(
-                                'Price: \RM ${orderItem.price.toStringAsFixed(2)}'),
-                            if (!isAdmin)
-                              ElevatedButton(
-                                onPressed: status != 'Preparing' ? () async {
-                                  bool orderExists = await databaseService.doesOrderIDExist(
-                                      orderItem.foodID, orderID);
-                                  if (!orderExists) {
-                                    _popupReview(orderItem);
-                                  }
-                                } : null,
-                                child: Text('Give Review'),
-                              ),
                           ],
                         ),
                       ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                ],
+                // Total Price, Status Dropdown, and Status Text
+                Container(
+                  padding: EdgeInsets.fromLTRB(16, 10, 16, 10),
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(184, 134, 65, 0.608),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Total Price: \RM ${totalPrice.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (isAdmin && !isCompleteStatus)
+                        DropdownButton<String>(
+                          value: status ?? 'Preparing',
+                          onChanged: (newStatus) async {
+                            if (newStatus == 'Complete') {
+                              await DatabaseService(uid: currentUserid)
+                                  .updateOrderStatus(orderID, newStatus!);
+                            }
+
+                            setState(() {
+                              status = newStatus!;
+                            });
+                          },
+                          items: <String>['Preparing', 'Complete']
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                        ),
+                      if (!isAdmin || isCompleteStatus)
+                        Text(
+                          '$status',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                     ],
                   ),
                 ),
-              ),
-            ),
-            SizedBox(height: 10),
-          ],
-          // Total Price, Status Dropdown, and Status Text
-          Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Color.fromRGBO(184, 134, 65, 0.608),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(20),
-                bottomRight: Radius.circular(20),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Total Price: \RM ${totalPrice.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                if (isAdmin)
-                  DropdownButton<String>(
-                    value: status ?? 'Preparing',
-                    onChanged: (newStatus) async {
-                      if (newStatus == 'Complete') {
-                        await DatabaseService(uid: currentUserid)
-                            .updateOrderStatus(orderID, newStatus!);
-                      }
-
-                      setState(() {
-                        status = newStatus!;
-                      });
-                    },
-                    items: <String>['Preparing', 'Complete']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                if (!isAdmin)
-                  Text(
-                    'Status: $status',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
               ],
             ),
           ),

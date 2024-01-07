@@ -106,44 +106,39 @@ class DatabaseService {
     });
   }
   // Function to add a food item to the cart
-  Future<void> addToCart(String foodID, String foodName, String foodImage,
-      double foodPrice) async {
-    // Convert foodPrice to double if it's a String
+  Future<void> addToCart(String foodID, String foodName, String foodImage, double foodPrice) async {
     final double parsedPrice = foodPrice is String
         ? double.tryParse(foodPrice as String) ?? 0.0
         : (foodPrice as num).toDouble();
 
     final String itemId = '$foodName';
 
-    // Check if the item already exists in the cart
     final DocumentSnapshot<Map<String, dynamic>> cartSnapshot =
-        await cartCollection.doc(uid).get()
-            as DocumentSnapshot<Map<String, dynamic>>;
+    await cartCollection.doc(uid).get() as DocumentSnapshot<Map<String, dynamic>>;
 
     if (cartSnapshot.exists) {
-      // If the cart exists, get the current items
       final Map<String, dynamic>? cartData = cartSnapshot.data();
       final List<dynamic>? existingItems = cartData?[itemId];
 
       if (existingItems != null) {
-        // If the item exists, update the quantity
         final int existingQuantity = existingItems[3];
         final int newQuantity = existingQuantity + 1;
 
-        await cartCollection.doc(uid).set({
-          itemId: [foodName, foodImage, parsedPrice, newQuantity, foodID],
-        }, SetOptions(merge: true));
+        // Update the quantity in the existing item array
+        await cartCollection.doc(uid).update({
+          '$itemId': [foodName, foodImage, parsedPrice, newQuantity, foodID],
+        });
       } else {
-        // If the item doesn't exist, add it to the cart
-        await cartCollection.doc(uid).set({
-          itemId: [foodName, foodImage, parsedPrice, 1, foodID],
-        }, SetOptions(merge: true));
+        // Add a new item to the cart
+        await cartCollection.doc(uid).update({
+          '$itemId': [foodName, foodImage, parsedPrice, 1, foodID],
+        });
       }
     } else {
       // If the cart doesn't exist, create a new one with the item
       await cartCollection.doc(uid).set({
-        itemId: [foodName, foodImage, parsedPrice, 1, foodID],
-      }, SetOptions(merge: true));
+        '$itemId': [foodName, foodImage, parsedPrice, 1, foodID],
+      });
     }
   }
 
@@ -624,3 +619,5 @@ class ReviewItem {
     required this.reviewContent, // Add this constructor parameter
   });
 }
+
+

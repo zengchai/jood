@@ -80,6 +80,7 @@ class _PaymentState extends State<Payment> {
   @override
 
   Widget build(BuildContext context) {
+    VoidCallback onCartUpdated;
     final currentUser = Provider.of<AppUsers?>(context);
     if (currentUser == null) {
       WidgetsBinding.instance?.addPostFrameCallback((_) {
